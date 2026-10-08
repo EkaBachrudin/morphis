@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Morphis scenes</title>
+    <link rel="stylesheet" href="/dist/tokens.css" />
+    <style>
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #ffffff;
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      #scenes {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        align-items: flex-start;
+      }
+      .scene {
+        width: 420px;
+      }
+      .scene > ui-input,
+      .scene > ui-card,
+      .scene > ui-select {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="scenes">
+      <div class="scene" id="scene-button-primary">
+        <ui-button variant="primary">Simpan</ui-button>
+      </div>
+      <div class="scene" id="scene-button-secondary">
+        <ui-button variant="secondary">Batal</ui-button>
+      </div>
+      <div class="scene" id="scene-button-disabled">
+        <ui-button variant="primary" disabled>Nonaktif</ui-button>
+      </div>
+      <div class="scene" id="scene-input-default">
+        <ui-input name="email" type="email" label="Email" placeholder="nama@contoh.id"></ui-input>
+      </div>
+      <div class="scene" id="scene-input-invalid">
+        <ui-input name="email" type="email" label="Email" value="bukan-email" invalid></ui-input>
+      </div>
+      <div class="scene" id="scene-card-elevated">
+        <ui-card variant="elevated">
+          <span slot="header">Judul Kartu</span>
+          Konten kartu memakai slot default.
+          <span slot="footer">Footer</span>
+        </ui-card>
+      </div>
+      <div class="scene" id="scene-card-body-only">
+        <ui-card variant="outlined">Hanya body.</ui-card>
+      </div>
+      <div class="scene" id="scene-select">
+        <ui-select
+          label="Framework"
+          placeholder="Pilih…"
+          value="native"
+          options='[{"value":"native","label":"Native HTML"},{"value":"twig","label":"Twig (Drupal)"},{"value":"react","label":"React"},{"value":"vue","label":"Vue"},{"value":"angular","label":"Angular"}]'
+        ></ui-select>
+      </div>
+    </main>
+    <script type="module" src="/dist/morphis.js"></script>
+  </body>
+</html>

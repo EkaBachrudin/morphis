@@ -1,0 +1,26 @@
+{# Contoh template Twig Drupal yang memakai komponen Morphis.
+   Lihat docs/drupal-integration.md untuk langkah lengkap. #}
+{{ attach_library('mytheme/morphis') }}
+
+<article>
+  <h2>{{ title }}</h2>
+
+  <ui-card variant="outlined">
+    <span slot="header">{{ subtitle }}</span>
+    {{ body }}
+  </ui-card>
+
+  <form>
+    <ui-input
+      name="email"
+      type="email"
+      label="{{ 'Email'|t }}"
+      placeholder="nama@contoh.id"
+    ></ui-input>
+
+    <ui-button variant="primary" type="submit">
+      <span slot="icon">💾</span>
+      {{ 'Simpan'|t }}
+    </ui-button>
+  </form>
+</article>

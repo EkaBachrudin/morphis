@@ -1,0 +1,25 @@
+import { Meta, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as Stories from './input.stories';
+import { FrameworkSnippet } from '../../../.storybook/blocks/FrameworkSnippet';
+
+<Meta of={Stories} />
+
+# ui-input
+
+Input teks framework-agnostic. Nilai user tidak terhapus saat atribut lain berubah.
+
+## Contoh
+
+<Canvas of={Stories.Default} />
+<Canvas of={Stories.WithValue} />
+<Canvas of={Stories.Invalid} />
+<Canvas of={Stories.Disabled} />
+
+## Snippet penggunaan
+
+<FrameworkSnippet tag="ui-input" />
+
+## API
+
+<Controls of={Stories.Default} />
+<ArgTypes of={Stories.Default} />

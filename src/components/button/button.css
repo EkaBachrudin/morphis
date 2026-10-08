@@ -1,0 +1,45 @@
+@reference "../../styles/base.css";
+
+:host {
+  --color-primary: var(--ui-color-primary, #2563eb);
+  --color-primary-hover: var(--ui-color-primary-hover, #1d4ed8);
+  --color-on-primary: var(--ui-color-on-primary, #ffffff);
+  --color-surface: var(--ui-color-surface, #ffffff);
+  --color-on-surface: var(--ui-color-on-surface, #111827);
+  --color-border: var(--ui-color-border, #e5e7eb);
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+@layer components {
+  .ui-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .ui-button--primary {
+    @apply bg-primary text-on-primary;
+  }
+
+  .ui-button--primary:hover {
+    @apply bg-primary-hover;
+  }
+
+  .ui-button--secondary {
+    @apply bg-surface text-on-surface border border-border;
+  }
+
+  .ui-button--secondary:hover {
+    @apply bg-on-surface/5;
+  }
+
+  .ui-button__icon {
+    @apply inline-flex h-4 w-4 shrink-0 items-center justify-center;
+  }
+
+  .ui-button__label {
+    @apply truncate;
+  }
+}

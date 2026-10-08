@@ -1,0 +1,24 @@
+import { Meta, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as Stories from './select.stories';
+import { FrameworkSnippet } from '../../../.storybook/blocks/FrameworkSnippet';
+
+<Meta of={Stories} />
+
+# ui-select
+
+Dropdown pilihan dengan panel custom (bukan `<select>` bawaan). Opsi diberikan
+lewat property `options` atau atribut `options` (JSON). Mengikuti pola ARIA
+*select-only combobox* dengan navigasi keyboard penuh.
+
+<Canvas of={Stories.Default} />
+<Canvas of={Stories.Empty} />
+<Canvas of={Stories.Disabled} />
+
+## Snippet penggunaan
+
+<FrameworkSnippet tag="ui-select" />
+
+## API
+
+<Controls of={Stories.Default} />
+<ArgTypes of={Stories.Default} />

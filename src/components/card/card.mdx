@@ -1,0 +1,25 @@
+import { Meta, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as Stories from './card.stories';
+import { FrameworkSnippet } from '../../../.storybook/blocks/FrameworkSnippet';
+
+<Meta of={Stories} />
+
+# ui-card
+
+Kartu framework-agnostic dengan slot `header`, `body` (default), dan `footer`.
+Header/footer otomatis tersembunyi bila kosong.
+
+## Contoh
+
+<Canvas of={Stories.Elevated} />
+<Canvas of={Stories.Outlined} />
+<Canvas of={Stories.BodyOnly} />
+
+## Snippet penggunaan
+
+<FrameworkSnippet tag="ui-card" />
+
+## API
+
+<Controls of={Stories.Elevated} />
+<ArgTypes of={Stories.Elevated} />

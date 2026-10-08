@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--ui-color-primary, #2563eb);
+  --color-primary-hover: var(--ui-color-primary-hover, #1d4ed8);
+  --color-on-primary: var(--ui-color-on-primary, #ffffff);
+  --color-surface: var(--ui-color-surface, #ffffff);
+  --color-on-surface: var(--ui-color-on-surface, #111827);
+  --color-border: var(--ui-color-border, #e5e7eb);
+}

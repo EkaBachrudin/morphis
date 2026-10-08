@@ -1,0 +1,9 @@
+morphis:
+  version: 0.1.0
+  css:
+    base:
+      libraries/morphis/tokens.css: {}
+  js:
+    libraries/morphis/morphis.js:
+      attributes:
+        type: module

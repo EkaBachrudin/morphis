@@ -1,0 +1,56 @@
+import { Source } from '@storybook/addon-docs/blocks';
+
+# Integrasi Drupal
+
+Morphis adalah HTML native + satu file JS kecil + satu file token CSS.
+**Tidak ada framework JS yang perlu dipasang di Drupal.**
+
+## 1. Salin file ke tema
+
+```
+themes/custom/mytheme/libraries/morphis/
+├── morphis.js
+└── tokens.css
+```
+
+## 2. Definisikan library
+
+<Source language="yaml" code={`# mytheme.libraries.yml
+morphis:
+  version: 0.1.0
+  css:
+    base:
+      libraries/morphis/tokens.css: {}
+  js:
+    libraries/morphis/morphis.js:
+      attributes:
+        type: module`} />
+
+## 3. Attach & tempel markup
+
+<Source language="twig" code={`{{ attach_library('mytheme/morphis') }}
+
+<ui-button variant="{{ button_variant|default('primary') }}">
+  <span slot="icon">{{ icon }}</span>
+  {{ label }}
+</ui-button>
+
+<ui-card variant="outlined">
+  <span slot="header">{{ title }}</span>
+  {{ body }}
+  <span slot="footer">{{ footer }}</span>
+</ui-card>`} />
+
+## 4. Theming
+
+<Source language="css" code={`:root {
+  --ui-color-primary: #e11d48;
+}`} />
+
+## Anti-FOUC
+
+<Source language="css" code={`:not(:defined) {
+  visibility: hidden;
+}`} />
+
+Panduan lengkap: `docs/drupal-integration.md`.

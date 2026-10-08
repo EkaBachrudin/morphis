@@ -1,0 +1,31 @@
+import { Source } from '@storybook/addon-docs/blocks';
+
+# Accessibility
+
+Setiap komponen dibangun dengan elemen native di dalam Shadow DOM
+(`<button>`, `<label>` + `<input>`) sehingga semantik dan keyboard behavior
+diwarisi dari browser.
+
+## Yang sudah dijaga
+
+- `ui-button` merender `<button type="button">`; `disabled` dipropagasi.
+- `ui-input` membungkus `<input>` di dalam `<label>` (asosiasi label implisit).
+- Slot kosong pada `ui-card` (header/footer) disembunyikan agar tidak ada
+  landmark kosong.
+- Semua konten dapat difokus keyboard; fokus ring memakai token primary.
+
+## Audit otomatis
+
+Audit a11y dijalankan dengan **axe-core** di dua tempat:
+
+1. Addon **Accessibility** di Storybook (panel bawah tiap story).
+2. Test e2e Playwright:
+
+<Source language="bash" code={`npm run test:e2e`} />
+
+Test akan gagal bila muncul violation axe pada halaman komponen.
+
+## Melaporkan masalah
+
+Tambahkan `aria-*` yang diperlukan lewat atribut pada elemen `<ui-*>`, atau
+gunakan slot untuk memberi label/deskripsi tambahan.

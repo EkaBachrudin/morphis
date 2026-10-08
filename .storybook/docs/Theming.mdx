@@ -1,0 +1,51 @@
+import { Source } from '@storybook/addon-docs/blocks';
+
+# Theming
+
+Semua kustomisasi runtime lewat **CSS custom property** (`--ui-*`) dan
+**Shadow Parts** (`::part()`). Tanpa build ulang.
+
+## Design token
+
+Token global dihasilkan dari `src/tokens/tokens.json` ke `dist/tokens.css`.
+
+| Token | Default |
+| --- | --- |
+| `--ui-color-primary` | `#2563eb` |
+| `--ui-color-primary-hover` | `#1d4ed8` |
+| `--ui-color-on-primary` | `#ffffff` |
+| `--ui-color-surface` | `#ffffff` |
+| `--ui-color-on-surface` | `#111827` |
+| `--ui-color-border` | `#e5e7eb` |
+
+Custom property diwariskan menembus Shadow DOM, jadi override di level mana pun
+akan sampai ke dalam komponen.
+
+<Source language="css" code={`/* global */
+:root {
+  --ui-color-primary: #e11d48;
+}
+
+/* per instance */
+ui-button[data-brand='accent'] {
+  --ui-color-primary: #16a34a;
+}`} />
+
+## Shadow Parts
+
+<Source language="css" code={`ui-button::part(button) {
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+ui-input::part(input) {
+  border-radius: 9999px;
+}`} />
+
+Daftar `part` tiap komponen ada di tabel **CSS Parts** pada halaman komponen.
+
+## Konten slot
+
+<Source language="css" code={`ui-button::slotted(span[slot='icon']) {
+  font-size: 1.25rem;
+}`} />

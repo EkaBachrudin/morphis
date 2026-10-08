@@ -1,0 +1,78 @@
+@reference "../../styles/base.css";
+
+:host {
+  --color-primary: var(--ui-color-primary, #2563eb);
+  --color-surface: var(--ui-color-surface, #ffffff);
+  --color-on-surface: var(--ui-color-on-surface, #111827);
+  --color-border: var(--ui-color-border, #e5e7eb);
+
+  display: inline-block;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+@layer components {
+  .ui-select {
+    @apply relative flex flex-col gap-1;
+  }
+
+  .ui-select__label {
+    @apply text-sm font-medium text-on-surface;
+  }
+
+  .ui-select__trigger {
+    @apply flex w-full items-center justify-between gap-2 rounded-md border border-border bg-surface px-3 py-2 text-left text-sm text-on-surface transition-colors;
+  }
+
+  .ui-select__trigger:hover:not([disabled]) {
+    @apply border-primary;
+  }
+
+  .ui-select__trigger:focus-visible {
+    @apply outline-none ring-2 ring-primary;
+  }
+
+  .ui-select__trigger[disabled] {
+    @apply pointer-events-none cursor-not-allowed opacity-50;
+  }
+
+  .ui-select__value {
+    @apply truncate;
+  }
+
+  .ui-select__value.is-placeholder {
+    @apply text-on-surface/40;
+  }
+
+  .ui-select__chevron {
+    width: 0;
+    height: 0;
+    flex-shrink: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentcolor;
+    transition: transform 0.15s ease;
+  }
+
+  .ui-select__trigger.is-open .ui-select__chevron {
+    transform: rotate(180deg);
+  }
+
+  .ui-select__listbox {
+    @apply absolute left-0 top-full z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-border bg-surface p-0 py-1 list-none shadow-md;
+  }
+
+  .ui-select__option {
+    @apply cursor-pointer list-none px-3 py-2 text-sm text-on-surface;
+  }
+
+  .ui-select__option.is-active {
+    @apply bg-on-surface/5;
+  }
+
+  .ui-select__option.is-selected {
+    @apply font-medium text-primary;
+  }
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Morphis Playground</title>
+    <!-- tokens dimuat sekali, sebelum komponen -->
+    <link rel="stylesheet" href="../dist/tokens.css" />
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        padding: 2rem;
+        max-width: 42rem;
+        margin: 0 auto;
+      }
+      h1 { font-size: 1.25rem; }
+      #app {
+        display: grid;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+      }
+      .row { display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; }
+      /* override token runtime — tanpa build ulang */
+      #app.theme-rose {
+        --ui-color-primary: #e11d48;
+        --ui-color-primary-hover: #be123c;
+        --ui-color-border: #fecdd3;
+      }
+      ui-button::part(button) { text-transform: uppercase; letter-spacing: 0.03em; }
+      /* sembunyikan komponen yang belum terdefinisi (anti-FOUC) */
+      :not(:defined) { visibility: hidden; }
+    </style>
+  </head>
+  <body>
+    <h1>Morphis Playground</h1>
+
+    <div class="row">
+      <button id="toggle" type="button">Ganti tema (rose)</button>
+    </div>
+
+    <div id="app">
+      <div class="row">
+        <ui-button variant="primary"><span slot="icon">💾</span>Simpan</ui-button>
+        <ui-button variant="secondary">Batal</ui-button>
+        <ui-button variant="primary" disabled>Nonaktif</ui-button>
+      </div>
+
+      <ui-input name="email" type="email" label="Email" placeholder="nama@contoh.id"></ui-input>
+
+      <ui-card variant="outlined">
+        <span slot="header">Judul Kartu</span>
+        Konten kartu memakai slot default.
+        <span slot="footer">Footer</span>
+      </ui-card>
+    </div>
+
+    <script type="module" src="../dist/morphis.js"></script>
+    <script>
+      const toggle = document.getElementById('toggle');
+      toggle.addEventListener('click', () => {
+        document.getElementById('app').classList.toggle('theme-rose');
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+@reference "../../styles/base.css";
+
+:host {
+  --color-primary: var(--ui-color-primary, #2563eb);
+  --color-surface: var(--ui-color-surface, #ffffff);
+  --color-on-surface: var(--ui-color-on-surface, #111827);
+  --color-border: var(--ui-color-border, #e5e7eb);
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+@layer components {
+  .ui-field {
+    @apply flex flex-col gap-1;
+  }
+
+  .ui-field__label {
+    @apply text-sm font-medium text-on-surface;
+  }
+
+  .ui-input {
+    @apply w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-on-surface transition-colors;
+    @apply placeholder:text-on-surface/40;
+  }
+
+  .ui-input:focus-visible {
+    @apply outline-none ring-2 ring-primary;
+  }
+
+  .ui-input:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .ui-input[aria-invalid='true'] {
+    @apply border-red-500;
+  }
+}

@@ -1,0 +1,25 @@
+import { Meta, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as Stories from './button.stories';
+import { FrameworkSnippet } from '../../../.storybook/blocks/FrameworkSnippet';
+
+<Meta of={Stories} />
+
+# ui-button
+
+Tombol framework-agnostic. Ganti bahasa contoh lewat toolbar **Framework** di atas,
+lalu salin snippetnya.
+
+## Contoh
+
+<Canvas of={Stories.Primary} />
+<Canvas of={Stories.Secondary} />
+<Canvas of={Stories.Disabled} />
+
+## Snippet penggunaan
+
+<FrameworkSnippet tag="ui-button" />
+
+## API
+
+<Controls of={Stories.Primary} />
+<ArgTypes of={Stories.Primary} />
