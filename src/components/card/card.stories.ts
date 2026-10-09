@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UiCard } from './card';
+import { renderSnippet } from '../../component-meta/snippet-story';
 
 const meta: Meta = {
   title: 'Components/Card',
@@ -44,3 +45,7 @@ export const Elevated: Story = {};
 export const Outlined: Story = { args: { variant: 'outlined' } };
 
 export const BodyOnly: Story = { args: { header: '', footer: '' } };
+
+export const Snippet: Story = {
+  render: (_args, context) => renderSnippet('ui-card', context.globals),
+};

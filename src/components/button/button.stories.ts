@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UiButton } from './button';
+import { renderSnippet } from '../../component-meta/snippet-story';
 
 const meta: Meta = {
   title: 'Components/Button',
@@ -27,3 +28,7 @@ export const Primary: Story = {};
 export const Secondary: Story = { args: { variant: 'secondary' } };
 
 export const Disabled: Story = { args: { disabled: true } };
+
+export const Snippet: Story = {
+  render: (_args, context) => renderSnippet('ui-button', context.globals),
+};

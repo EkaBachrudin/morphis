@@ -42,7 +42,7 @@ Morphis adalah satu paket npm untuk membangun pustaka komponen UI yang:
 | Distribusi | Satu paket npm + CDN (jsDelivr/unpkg) + markup HTML |
 | Integrasi Drupal | **Tidak ada paket khusus**; developer Drupal mencomot dari `dist/` |
 | SSR | Client-side / progressive enhancement |
-| Dokumentasi | Storybook + Custom Elements Manifest + Astro Starlight |
+| Dokumentasi | Storybook + Custom Elements Manifest |
 | Struktur repo | **Satu paket npm** (single-package); tanpa pnpm workspace/turbo/changesets |
 
 ---
@@ -225,6 +225,7 @@ reusable-components/
 │   ├── styles/base.css          # konteks @apply + blok @theme
 │   ├── core/                    # base class MorphisElement + helper
 │   │   └── {element.ts, sheet.ts, emit.ts, define.ts, interpolate.ts, index.ts}
+│   ├── component-meta/          # model docs (dari CEM) + generator snippet + tabel API (Storybook)
 │   └── components/              # SUMBER KEBENARAN (vanilla custom elements)
 │       ├── button/{button.ts, button.css, button.template.html, button.markup.html, button.stories.ts}
 │       ├── input/...
@@ -239,7 +240,7 @@ reusable-components/
 │   ├── markup/*.html
 │   └── types/                   # deklarasi TypeScript
 ├── custom-elements.json         # hasil CEM
-└── docs/
+└── docs/                        # dokumen internal (architecture.md)
 ```
 
 Tidak ada paket hasil kompilasi framework (`react/`, `vue/`, `svelte/`,
@@ -682,15 +683,27 @@ ditangkap seperti event DOM biasa (`on:ui-click` / `onui-click`).
 
 ## 10. Dokumentasi
 
-- **Storybook** (`@storybook/web-components-vite`) di `.storybook/` — story per
-  komponen (`src/components/<name>/<name>.stories.ts`) + controls (props/atribut),
-  addon a11y, viewport, visual regression.
-- **Auto API docs** dari Custom Elements Manifest (`custom-elements.json`) —
-  props, events, slots, dan **parts**.
-- **Docs site** (Astro Starlight) meng-embed Storybook + panduan token +
-  halaman **"How to copy for Drupal"**.
-- Tiap komponen menampilkan: markup HTML, daftar `--ui-*` yang bisa di-override,
-  daftar `part` yang tersedia, dan contoh integrasi per framework.
+Satu permukaan dokumentasi (**Storybook**), satu sumber data
+(`custom-elements.json` + `src/components/*/*.markup.html`):
+
+- **Storybook** (`@storybook/web-components-vite`) di `.storybook/` — dokumentasi
+  lengkap sekaligus *workbench*: story per komponen
+  (`src/components/<name>/<name>.stories.ts`), MDX per komponen
+  (`src/components/<name>/<name>.mdx`) dengan contoh live, controls, dan tabel API
+  lengkap.
+- **Doc block `ui-component-api`** (`src/component-meta/component-api.ts`)
+  merender tabel **Attributes/Events/Slots/CSS Parts/CSS Custom Properties** dari
+  `custom-elements.json` secara dinamis — tanpa langkah generate.
+- **Panduan** (`src/guides/*.mdx`) — Mulai, Theming, Integrasi Drupal, Framework,
+  Accessibility.
+- **Snippet per-framework** lewat story `Snippet` + toolbar **Framework**
+  (Native/Twig/React/Vue/Angular), memakai `src/component-meta/{model,snippets}.ts`.
+- **Auto API docs** dari Custom Elements Manifest (`custom-elements.json`) — satu
+  sumber untuk Storybook dan `ui-component-api`.
+- Addon **a11y** di Storybook untuk audit aksesibilitas.
+
+Modul bersama `src/component-meta/{model,snippets,snippet-story,component-api}.ts`
+mencegah duplikasi logika data/snippet.
 
 ---
 
@@ -753,6 +766,14 @@ ditangkap seperti event DOM biasa (`on:ui-click` / `onui-click`).
 - Wrapper opsional `@morphis/react` (ergonomi event React <19).
 - Uji integrasi nyata React/Angular/Vue/Svelte/Solid.
 - Visual regression + audit aksesibilitas.
+
+**Fase 4 — Dokumentasi Lengkap di Storybook**
+- Storybook menjadi **satu-satunya permukaan dokumentasi**: panduan
+  (`src/guides/*.mdx`) + halaman komponen dengan tabel API lengkap dari CEM.
+- Doc block `ui-component-api` merender Attributes/Events/Slots/CSS Parts/CSS
+  Custom Properties secara dinamis.
+- Pencarian Storybook, deploy statis (`storybook-static/`), dan migrasi panduan
+  dari `docs/`.
 
 ---
 

@@ -1,0 +1,130 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Panduan/Framework" />
+
+# Framework
+
+Prinsipnya: **import sekali** agar custom element terdaftar, lalu pakai tag
+HTML-nya. Karena `<ui-*>` elemen native, **semua versi framework** bekerja tanpa
+build khusus.
+
+```ts
+import '@morphis/components';
+```
+
+## Kontrak umum
+
+| Interaksi | Mekanisme |
+| --- | --- |
+| Data masuk | atribut (string) atau property (objek/boolean) |
+| Data keluar | `CustomEvent` dengan `bubbles: true, composed: true` |
+| Komposisi | `<slot>` (default & bernama) |
+| Gaya | Shadow DOM + `::part()` |
+| Tema | CSS custom property `--ui-*` |
+
+Nama event: `ui-click`, `ui-input`, `ui-change`.
+
+## React
+
+React ≥19 mendukung property dan custom event deklaratif:
+
+```tsx
+import '@morphis/components';
+import { useRef } from 'react';
+
+export function App() {
+  const ref = useRef<HTMLElement>(null);
+  return <ui-button ref={ref} variant="primary">Simpan</ui-button>;
+}
+```
+
+React 16.8–18: pakai wrapper `@morphis/components/react`.
+
+```tsx
+import { Button, Input, Card } from '@morphis/components/react';
+import '@morphis/components/tokens.css';
+
+<Button variant="primary" onUiClick={(e) => console.log(e.detail)}>Simpan</Button>
+```
+
+## Vue 3
+
+```ts
+// vite.config.ts
+vue({
+  template: {
+    compilerOptions: { isCustomElement: (tag) => tag.startsWith('ui-') },
+  },
+});
+```
+
+```vue
+<script setup lang="ts">
+import '@morphis/components';
+function onClick(event: CustomEvent) {
+  console.log(event.detail);
+}
+</script>
+
+<template>
+  <ui-button variant="primary" @ui-click="onClick">Simpan</ui-button>
+  <ui-input label="Email" type="email" />
+</template>
+```
+
+## Svelte
+
+```svelte
+<script lang="ts">
+  import '@morphis/components';
+  function onClick(event: CustomEvent) {
+    console.log(event.detail);
+  }
+</script>
+
+<ui-button variant="primary" on:ui-click={onClick}>Simpan</ui-button>
+```
+
+## Angular
+
+```ts
+// main.ts
+import '@morphis/components';
+import '@morphis/components/tokens.css';
+```
+
+```ts
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
+@NgModule({ schemas: [CUSTOM_ELEMENTS_SCHEMA] })
+export class AppModule {}
+```
+
+```html
+<ui-button variant="primary" (ui-click)="onClick($event)">Simpan</ui-button>
+```
+
+## Solid / Qwik
+
+```tsx
+import '@morphis/components';
+```
+
+```tsx
+// Solid
+<ui-button variant="primary" on:ui-click={onClick}>Simpan</ui-button>
+
+// Qwik
+<ui-button variant="primary" onClick$={onClick}>Simpan</ui-button>
+```
+
+## Data kompleks
+
+Atribut hanya string. Untuk nilai kompleks, set property lewat ref:
+
+```tsx
+const ref = useRef<HTMLElement>(null);
+useEffect(() => {
+  if (ref.current) (ref.current as any).label = 'Email';
+}, []);
+```

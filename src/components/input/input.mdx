@@ -1,6 +1,6 @@
-import { Meta, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks';
 import * as Stories from './input.stories';
-import { FrameworkSnippet } from '../../../.storybook/blocks/FrameworkSnippet';
+import '../../component-meta/component-api';
 
 <Meta of={Stories} />
 
@@ -17,9 +17,10 @@ Input teks framework-agnostic. Nilai user tidak terhapus saat atribut lain berub
 
 ## Snippet penggunaan
 
-<FrameworkSnippet tag="ui-input" />
+<Canvas of={Stories.Snippet} />
 
 ## API
 
 <Controls of={Stories.Default} />
-<ArgTypes of={Stories.Default} />
+
+<ui-component-api tag="ui-input"></ui-component-api>

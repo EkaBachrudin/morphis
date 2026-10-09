@@ -1,6 +1,6 @@
-import { Meta, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks';
 import * as Stories from './card.stories';
-import { FrameworkSnippet } from '../../../.storybook/blocks/FrameworkSnippet';
+import '../../component-meta/component-api';
 
 <Meta of={Stories} />
 
@@ -17,9 +17,10 @@ Header/footer otomatis tersembunyi bila kosong.
 
 ## Snippet penggunaan
 
-<FrameworkSnippet tag="ui-card" />
+<Canvas of={Stories.Snippet} />
 
 ## API
 
 <Controls of={Stories.Elevated} />
-<ArgTypes of={Stories.Elevated} />
+
+<ui-component-api tag="ui-card"></ui-component-api>

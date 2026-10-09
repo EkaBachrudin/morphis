@@ -3,11 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'node:url';
 
 const config: StorybookConfig = {
-  stories: [
-    '../src/**/*.stories.@(ts|js)',
-    '../src/**/*.mdx',
-    '../.storybook/docs/*.mdx',
-  ],
+  stories: ['../src/**/*.stories.@(ts|js)', '../src/**/*.mdx'],
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
   framework: {
     name: '@storybook/web-components-vite',

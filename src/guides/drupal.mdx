@@ -1,0 +1,97 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Panduan/Integrasi Drupal" />
+
+# Integrasi Drupal
+
+Morphis adalah HTML native + satu file JS kecil + satu file token CSS.
+**Tidak ada framework JavaScript yang perlu dipasang di Drupal.**
+
+## 1. Salin file ke tema
+
+```
+themes/custom/mytheme/libraries/morphis/
+├── morphis.js
+└── tokens.css
+```
+
+## 2. Definisikan Drupal library
+
+`themes/custom/mytheme/mytheme.libraries.yml`:
+
+```yaml
+morphis:
+  version: 0.1.0
+  css:
+    base:
+      libraries/morphis/tokens.css: {}
+  js:
+    libraries/morphis/morphis.js:
+      attributes:
+        type: module
+```
+
+## 3. Attach library
+
+Global (`mytheme.info.yml`):
+
+```yaml
+libraries:
+  - mytheme/morphis
+```
+
+Atau per template Twig:
+
+```twig
+{{ attach_library('mytheme/morphis') }}
+```
+
+## 4. Tempel markup
+
+```twig
+{{ attach_library('mytheme/morphis') }}
+
+<ui-button variant="{{ button_variant|default('primary') }}">
+  <span slot="icon">{{ icon }}</span>
+  {{ label }}
+</ui-button>
+
+<ui-card variant="outlined">
+  <span slot="header">{{ title }}</span>
+  {{ body }}
+  <span slot="footer">{{ footer }}</span>
+</ui-card>
+```
+
+> Jangan menulis utility Tailwind di markup Twig. Gunakan atribut publik
+> komponen, token `--ui-*`, atau `::part()`.
+
+## 5. Theming
+
+```css
+:root {
+  --ui-color-primary: #e11d48;
+}
+```
+
+## 6. Anti-FOUC
+
+```css
+:not(:defined) {
+  visibility: hidden;
+}
+```
+
+## Alternatif CDN
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@morphis/components/dist/tokens.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@morphis/components/dist/morphis.js"></script>
+```
+
+## Checklist
+
+- [ ] `tokens.css` dimuat **sebelum** markup komponen.
+- [ ] `morphis.js` dimuat dengan `type: module`.
+- [ ] Override token ditulis setelah `tokens.css`.
+- [ ] Cache dibersihkan setelah mengganti file (`drush cr`).

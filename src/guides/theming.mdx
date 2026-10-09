@@ -1,0 +1,73 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Panduan/Theming" />
+
+# Theming
+
+Semua kustomisasi runtime lewat **CSS custom property** (`--ui-*`) dan **Shadow
+Parts** (`::part()`). Tanpa build ulang.
+
+## Design token
+
+Token global dihasilkan dari `src/tokens/tokens.json` ke `dist/tokens.css`.
+
+| Token | Default | Dipakai oleh |
+| --- | --- | --- |
+| `--ui-color-primary` | `#2563eb` | button primary, ring input |
+| `--ui-color-primary-hover` | `#1d4ed8` | button primary hover |
+| `--ui-color-on-primary` | `#ffffff` | teks di atas primary |
+| `--ui-color-surface` | `#ffffff` | latar button secondary, input, card, select |
+| `--ui-color-on-surface` | `#111827` | teks utama |
+| `--ui-color-border` | `#e5e7eb` | border input, card, select, pemisah |
+
+Custom property **diwariskan menembus Shadow DOM**, jadi override di level mana
+pun akan sampai ke dalam komponen.
+
+```css
+/* global */
+:root {
+  --ui-color-primary: #e11d48;
+}
+
+/* scoped ke sebuah seksi */
+.theme-dark {
+  --ui-color-surface: #0b1020;
+  --ui-color-on-surface: #e5e7eb;
+}
+```
+
+```html
+<ui-button variant="primary" style="--ui-color-primary:#16a34a">Simpan</ui-button>
+```
+
+## Shadow Parts
+
+Tata elemen internal tanpa menyentuh sumber:
+
+```css
+ui-button::part(button) {
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+ui-input::part(input) {
+  border-radius: 9999px;
+}
+```
+
+Daftar `part` tiap komponen ada di tabel **CSS Parts** pada halaman komponen.
+
+## Konten slot
+
+```css
+ui-button::slotted(span[slot='icon']) {
+  font-size: 1.25rem;
+}
+```
+
+## Mengganti tampilan total
+
+Edit `src/components/<name>/<name>.css` lalu `npm run build`. Aturan disiplin:
+Tailwind hanya lewat `@apply` di CSS komponen, rule BEM terpisah di
+`@layer components`, dan file CSS komponen wajib diawali
+`@reference "../../styles/base.css"`.

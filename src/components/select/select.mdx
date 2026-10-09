@@ -1,6 +1,6 @@
-import { Meta, Canvas, Controls, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks';
 import * as Stories from './select.stories';
-import { FrameworkSnippet } from '../../../.storybook/blocks/FrameworkSnippet';
+import '../../component-meta/component-api';
 
 <Meta of={Stories} />
 
@@ -16,9 +16,10 @@ lewat property `options` atau atribut `options` (JSON). Mengikuti pola ARIA
 
 ## Snippet penggunaan
 
-<FrameworkSnippet tag="ui-select" />
+<Canvas of={Stories.Snippet} />
 
 ## API
 
 <Controls of={Stories.Default} />
-<ArgTypes of={Stories.Default} />
+
+<ui-component-api tag="ui-select"></ui-component-api>

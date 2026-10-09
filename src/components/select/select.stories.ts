@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UiSelect, type SelectOption } from './select';
+import { renderSnippet } from '../../component-meta/snippet-story';
 
 const OPTIONS: SelectOption[] = [
   { value: 'native', label: 'Native HTML' },
@@ -43,3 +44,7 @@ export const Default: Story = {};
 export const Empty: Story = { args: { value: '' } };
 
 export const Disabled: Story = { args: { disabled: true } };
+
+export const Snippet: Story = {
+  render: (_args, context) => renderSnippet('ui-select', context.globals),
+};

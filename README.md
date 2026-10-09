@@ -20,7 +20,8 @@ npm run build              # tokens + komponen + types + CEM + markup -> dist/
 npm test                   # Vitest + @open-wc/testing (unit + integrasi React/Vue)
 npm run test:e2e           # Playwright: visual regression + audit a11y (axe)
 npm run test:e2e:update    # regenerasi baseline screenshot
-npm run storybook          # Storybook dev di :6006
+npm run storybook          # Storybook (workbench + dokumentasi lengkap) di :6006
+npm run build-storybook    # build Storybook statis -> storybook-static/
 npm run typecheck          # tsc --noEmit
 npm run lint               # ESLint
 npm run lint:styles        # Stylelint
@@ -57,19 +58,21 @@ import '@morphis/components/tokens.css';
 <Button variant="primary" onUiClick={(e) => console.log(e.detail)}>Simpan</Button>
 ```
 
-React ≥19 tidak butuh wrapper. Lihat [`docs/frameworks.md`](docs/frameworks.md).
+React ≥19 tidak butuh wrapper. Lihat panduan **Framework** di Storybook.
 
 ## Dokumentasi & contoh
 
-- [`npm run dev`](http://localhost:5173) — **docs UI**: sidebar komponen, preview
-  interaktif, tabel API (dari CEM), dan snippet per-framework (Native/Twig/React/Vue/Angular)
-- [`npm run storybook`](http://localhost:6006) — Storybook: docs per komponen +
-  panduan (Intro/Theming/Drupal/Accessibility) + addon a11y
-- [`docs/architecture.md`](docs/architecture.md) — arsitektur lengkap
-- [`docs/drupal-integration.md`](docs/drupal-integration.md) — cara menyalin ke Drupal/Twig
-- [`docs/theming.md`](docs/theming.md) — token, `::part()`, daftar event/slot/atribut
-- [`docs/frameworks.md`](docs/frameworks.md) — integrasi React/Vue/Svelte/Angular/Solid
-- [`examples/playground.html`](examples/playground.html) — demo semua komponen (jalankan `npx serve .`)
+Satu permukaan dokumentasi (**Storybook**), satu sumber data
+(`custom-elements.json` + `*.markup.html`):
+
+- [`npm run storybook`](http://localhost:6006) — **dokumentasi lengkap**:
+  - per komponen: contoh live, tabel API (Attributes/Events/Slots/CSS Parts/CSS
+    Custom Properties dari CEM), dan snippet per-framework lewat toolbar
+    **Framework** (Native/Twig/React/Vue/Angular);
+  - panduan: Mulai, Theming, Integrasi Drupal, Framework, Accessibility;
+  - addon a11y.
+- `docs/architecture.md` — arsitektur lengkap
+- [`examples/playground.html`](examples/playground.html) — demo semua komponen (jalankan `npm run serve`)
 - [`examples/drupal/`](examples/drupal) — `morphis.libraries.yml` + contoh Twig
 
 ## Menambah komponen
@@ -78,23 +81,21 @@ React ≥19 tidak butuh wrapper. Lihat [`docs/frameworks.md`](docs/frameworks.md
 npm run gen -- component <nama>   # buat .ts/.css/template/markup/stories/test + daftarkan di src/index.ts
 ```
 
-Tambahkan anotasi JSDoc `@attr` pada komponen agar tabel & kontrol di docs UI
-terisi otomatis (tipe, default, deskripsi).
+Tambahkan anotasi JSDoc `@attr`/`@slot`/`@csspart`/`@fires`/`@cssprop` pada
+komponen. CEM hasilnya mengisi **tabel API Storybook** secara otomatis.
 
 ## Pengembangan lokal
 
 ```bash
 npm run storybook   # Storybook (HMR) di :6006
-npm run dev         # docs UI live (HMR) di :5173 dari src/
 npm run serve       # pratinjau hasil build dist/ di :4399
 ```
 
-- `npm run dev` memuat komponen langsung dari `src/` sehingga edit `.ts/.css/
-  .template.html` langsung tampil (full reload otomatis).
-- Docs UI mengambil data API dari `custom-elements.json` (dibangun otomatis oleh
-  `npm run dev`) dan contoh dari `*.markup.html`.
-- Perubahan token (`src/tokens/tokens.json`) perlu `npm run build:tokens` lalu
-  reload.
+- Perubahan token (`src/tokens/tokens.json`) perlu `npm run build` (atau
+  `build:tokens`) lalu reload.
+- Halaman API di Storybook dibaca dari `custom-elements.json`, jadi jalankan
+  `npm run build:cem` (sudah termasuk pada `npm run storybook`) setelah mengubah
+  JSDoc komponen.
 
 ## Publikasi
 

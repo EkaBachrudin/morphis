@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UiInput } from './input';
+import { renderSnippet } from '../../component-meta/snippet-story';
 
 const meta: Meta = {
   title: 'Components/Input',
@@ -45,3 +46,7 @@ export const WithValue: Story = { args: { value: 'halo@morphis.id' } };
 export const Invalid: Story = { args: { invalid: true } };
 
 export const Disabled: Story = { args: { disabled: true } };
+
+export const Snippet: Story = {
+  render: (_args, context) => renderSnippet('ui-input', context.globals),
+};
