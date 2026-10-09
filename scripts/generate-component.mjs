@@ -202,6 +202,51 @@ describe('${tag}', () => {
   )}\n`,
 };
 
+function insertBefore(file, anchor, line, duplicate) {
+  const path = join(root, file);
+  const content = readFileSync(path, 'utf8');
+  if (content.includes(duplicate)) return false;
+  const lines = content.split('\n');
+  const index = lines.findIndex((current) => current.includes(anchor));
+  if (index === -1) {
+    console.warn(`  ! anchor tidak ditemukan di ${file}, lewati wiring alias.`);
+    return false;
+  }
+  lines.splice(index, 0, line);
+  writeFileSync(path, lines.join('\n'));
+  return true;
+}
+
+function wireComponent(name) {
+  const wired = [
+    insertBefore(
+      '.storybook/main.ts',
+      "{ find: /^@morphis\\/react$/, replacement: root('packages/react/src/index.tsx') },",
+      `        { find: /^@morphis\\/${name}$/, replacement: root('packages/components/${name}/src/${name}.ts') },`,
+      `@morphis\\/${name}$`,
+    ),
+    insertBefore(
+      'vite.config.ts',
+      "{ find: /^@morphis\\/react$/, replacement: resolve(root, 'packages/react/src/index.tsx') },",
+      `      { find: /^@morphis\\/${name}$/, replacement: resolve(root, 'packages/components/${name}/src/${name}.ts') },`,
+      `@morphis\\/${name}$`,
+    ),
+    insertBefore(
+      'tsconfig.json',
+      '"@morphis/react": ["./packages/react/src/index.tsx"],',
+      `      "@morphis/${name}": ["./packages/components/${name}/src/${name}.ts"],`,
+      `"@morphis/${name}"`,
+    ),
+    insertBefore(
+      'packages/components/package.json',
+      '"@morphis/select": "^0.1.0"',
+      `    "@morphis/${name}": "^0.1.0",`,
+      `"@morphis/${name}"`,
+    ),
+  ];
+  return wired.filter(Boolean).length;
+}
+
 for (const [file, content] of Object.entries(files)) {
   const target = file === 'package.json' || file === 'tsconfig.json' ? join(dir, file) : join(srcDir, file);
   writeFileSync(target, content);
@@ -224,10 +269,13 @@ if (!index.includes(importLine)) {
   writeFileSync(metaIndexPath, index);
 }
 
+const wired = wireComponent(name);
+
 console.log(`Komponen dibuat: packages/components/${name}/`);
 for (const file of Object.keys(files)) {
   const target = file === 'package.json' || file === 'tsconfig.json' ? '' : 'src/';
   console.log(`  - ${target}${file}`);
 }
 console.log(`Terdaftar di packages/components/src/index.ts sebagai <${tag}>.`);
+console.log(`Wiring alias ke ${wired}/4 file (.storybook/main.ts, vite.config.ts, tsconfig.json, packages/components/package.json).`);
 console.log('Langkah berikut: npm install (link workspace) lalu npm run build.');
