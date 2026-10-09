@@ -20,10 +20,11 @@ const force = flags.includes('--force');
 const dir = join(root, 'packages', 'components', name);
 const srcDir = join(dir, 'src');
 const tag = `ui-${name}`;
-const className = `Ui${name
+const componentName = name
   .split('-')
   .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-  .join('')}`;
+  .join('');
+const className = `Ui${componentName}`;
 
 if (existsSync(dir) && !force) {
   console.error(`Komponen "${name}" sudah ada di ${dir}. Gunakan --force untuk menimpa.`);
@@ -131,7 +132,7 @@ import { ${className} } from './${name}';
 import { renderSnippet } from '@morphis/component-meta/snippet-story';
 
 const meta: Meta = {
-  title: 'Components/${className}',
+  title: 'Components/${componentName}',
   component: '${tag}',
   render: () => document.createElement('${tag}') as ${className},
 };
