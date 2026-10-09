@@ -4,6 +4,7 @@ export default tseslint.config(
   {
     ignores: [
       '**/dist/**',
+      'downloads/**',
       '**/node_modules/**',
       'storybook-static/**',
       'custom-elements.json',

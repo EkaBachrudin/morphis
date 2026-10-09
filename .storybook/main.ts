@@ -12,6 +12,7 @@ const config: StorybookConfig = {
     '../packages/components/*/src/**/*.mdx',
   ],
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
+  staticDirs: [{ from: '../downloads', to: '/downloads' }],
   framework: {
     name: '@storybook/web-components-vite',
     options: {},
