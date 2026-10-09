@@ -102,6 +102,30 @@ export class ${className} extends MorphisElement {
 
 define('${tag}', ${className});
 `,
+  [`${name}.mdx`]: `import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks';
+import * as Stories from './${name}.stories';
+import '@morphis/component-meta/component-api';
+
+<Meta of={Stories} />
+
+# ${tag}
+
+<ui-component-version tag="${tag}"></ui-component-version>
+
+## Contoh
+
+<Canvas of={Stories.Default} />
+
+## Snippet penggunaan
+
+<Canvas of={Stories.Snippet} />
+
+## API
+
+<Controls of={Stories.Default} />
+
+<ui-component-api tag="${tag}"></ui-component-api>
+`,
   [`${name}.stories.ts`]: `import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { ${className} } from './${name}';
 import { renderSnippet } from '@morphis/component-meta/snippet-story';
@@ -109,7 +133,6 @@ import { renderSnippet } from '@morphis/component-meta/snippet-story';
 const meta: Meta = {
   title: 'Components/${className}',
   component: '${tag}',
-  tags: ['autodocs'],
   render: () => document.createElement('${tag}') as ${className},
 };
 

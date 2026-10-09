@@ -6,6 +6,11 @@ const markups = import.meta.glob('../../packages/components/*/src/*.markup.html'
   eager: true,
 }) as Record<string, string>;
 
+const componentPackages = import.meta.glob('../../packages/components/*/package.json', {
+  import: 'default',
+  eager: true,
+}) as Record<string, { version?: string }>;
+
 export interface AttrDoc {
   name: string;
   type?: string;
@@ -46,6 +51,7 @@ export interface ComponentDoc {
   parts: PartDoc[];
   cssProps: CssPropDoc[];
   markup: string;
+  version?: string;
   source: string;
 }
 
@@ -81,6 +87,12 @@ function markupFor(dir: string): string {
   const suffix = `/components/${dir}/src/${dir}.markup.html`;
   const key = Object.keys(markups).find((k) => k.endsWith(suffix));
   return key ? stripComment(markups[key]) : '';
+}
+
+function versionFor(dir: string): string | undefined {
+  const suffix = `/components/${dir}/package.json`;
+  const key = Object.keys(componentPackages).find((k) => k.endsWith(suffix));
+  return key ? componentPackages[key]?.version : undefined;
 }
 
 export function listComponents(): ComponentDoc[] {
@@ -124,6 +136,7 @@ export function listComponents(): ComponentDoc[] {
           description: c.description,
         })),
         markup: markupFor(dir),
+        version: versionFor(dir),
         source,
       });
     }

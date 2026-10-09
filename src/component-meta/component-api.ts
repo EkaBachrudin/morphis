@@ -1,5 +1,6 @@
 import { define } from '@morphis/core';
 import { findComponent, type ComponentDoc } from './model';
+import './component-version';
 
 const STYLE_ID = 'morphis-component-api-styles';
 
