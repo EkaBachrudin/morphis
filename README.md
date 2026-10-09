@@ -9,8 +9,41 @@ framework apa pun, HTML biasa, maupun Twig/Drupal.
 - Styling: Tailwind v4 (build-time, `@apply`) + design token `--ui-*`
 - Theming: CSS custom property + `::part()` + `::slotted()`
 - Distribusi: **paket npm per komponen** (versioning independen) + markup HTML untuk Drupal
+- Prinsip: *build once, run anywhere* — tanpa compiler framework, tanpa version floor, tanpa lock-in
 
 Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
+
+## Masalah developer & solusinya
+
+| Masalah umum | Solusi Morphis |
+| --- | --- |
+| Komponen harus ditulis ulang per framework (React/Vue/Angular/Svelte). | Satu Custom Element native (`<ui-button>`) berjalan di semua framework karena browser memperlakukannya sebagai elemen HTML biasa. |
+| Library framework punya *version floor* — artefak build hanya jalan di konsumen ≥ versi build. | **Nol version floor**: hanya memakai standar web (Custom Elements, Shadow DOM, ES Modules), bukan compiler framework. |
+| Menambah framework/versi baru menuntut build ulang. | Tidak ada multi-target compile; satu bundel cukup untuk semua konsumen. |
+| CSS library bertabrakan dengan CSS aplikasi induk. | **Shadow DOM** (`mode: 'open'`) mengenkapsulasi style & markup penuh — tak bocor keluar dan tak terpengaruh CSS aplikasi. |
+| Ganti tema/warna butuh rebuild library. | Theming runtime via design token `--ui-*` yang **diwariskan menembus shadow boundary**; override tanpa build ulang. |
+| Susah menata elemen internal komponen dari luar. | Ekspos lewat `part="..."` (`ui-button::part(label)`) dan `::slotted()` untuk konten slot. |
+| Integrasi ke CMS/Drupal ribet, butuh build tooling. | Cukup salin **tiga file** (`tokens.css`, `*.iife.js`, `*.markup.html`) — script klasik tanpa `type="module"`. |
+| Memperbaiki satu komponen memaksa penaikan versi semua komponen. | **Paket npm per komponen** dengan semver independen (Changesets); memperbaiki `card` tidak menaikkan `button`. |
+| Dokumentasi API cepat usang / drift dengan kode. | **Custom Elements Manifest** (`custom-elements.json`) men-generate tabel API Storybook otomatis dari anotasi JSDoc. |
+| Runtime framework membengkakkan ukuran bundel. | **0 runtime** (native browser API) + entry per komponen sehingga tree-shakable. |
+| Event komponen tidak sampai ke framework induk. | `CustomEvent` dengan `bubbles: true, composed: true` menembus shadow dan ditangkap framework induk. |
+
+## Kemudahan (Developer Experience)
+
+- **Generator komponen** — `npm run gen -- component badge` langsung membuat paket
+  `@morphis/<nama>` (package.json, tsconfig, `src/{nama}.ts`, `.css`,
+  `.template.html`, `.markup.html`, `.stories.ts`, `.test.ts`) dan mendaftarkannya di meta.
+- **Satu permukaan dokumentasi (Storybook)** — contoh live, controls, **tabel API
+  otomatis** (Attributes/Events/Slots/CSS Parts/CSS Custom Properties dari CEM),
+  snippet per-framework lewat toolbar **Framework** (Native/Twig/React/Vue/Angular),
+  panduan, dan addon a11y.
+- **Snippet siap tempel** — tiap paket menghasilkan `<nama>.js` (ESM), `<nama>.iife.js`
+  (script klasik untuk Drupal), dan `<nama>.markup.html` (markup untuk Twig).
+- **Wrapper React opsional** (`@morphis/react`) untuk React 16.8–18; React ≥19 tidak butuh wrapper.
+- **Rantai kualitas** — Vitest + `@open-wc/testing` (unit + integrasi React/Vue),
+  Playwright (visual regression + audit a11y axe), ESLint + Stylelint, `tsc --noEmit`.
+- **Rilis per paket** — Changesets dengan semver independen + CI otomatis.
 
 ## Paket
 
@@ -45,6 +78,17 @@ npm run release            # build + publish paket yang berubah
 > chromium`). Baseline disimpan di `e2e/**-snapshots/`. Jalankan
 > `test:e2e:update` hanya setelah perubahan tampilan yang disengaja.
 
+## Arsitektur singkat
+
+- **Base class** `MorphisElement` (`@morphis/core`): attach shadow, adopsi
+  stylesheet, render template, lifecycle reaktif, dan `emit` event.
+- **Enkapsulasi**: Shadow DOM (`mode: 'open'`) agar DevTools, testing, dan
+  `::part()` bekerja.
+- **Styling**: Tailwind v4 hanya di *build-time* melalui `@apply` pada file CSS
+  komponen; hasilnya di-inject ke shadow root, bukan global.
+- **Token**: `--ui-*` didefinisikan global (`tokens.css`), fallback ditulis di
+  `:host`, dan diwariskan menembus shadow.
+
 ## Konsumsi
 
 ### Meta-bundle (semua komponen sekaligus)
@@ -76,6 +120,17 @@ Salin **tiga file** dari paket yang dipakai ke tema Drupal:
 `*.iife.js` adalah script klasik (tidak butuh `type="module"`); `*.js` ESM
 tersedia untuk bundler modern. Lihat [`examples/drupal/`](examples/drupal).
 
+Contoh Twig:
+
+```twig
+{{ attach_library('tema/morphis') }}
+
+<ui-button variant="{{ button_variant|default('primary') }}">
+  <span slot="icon">{{ icon }}</span>
+  {{ label }}
+</ui-button>
+```
+
 ## Theming runtime (tanpa rebuild)
 
 ```css
@@ -83,6 +138,18 @@ tersedia untuk bundler modern. Lihat [`examples/drupal/`](examples/drupal).
   --ui-color-primary: #e11d48;
 }
 ```
+
+| Kebutuhan | Cara |
+| --- | --- |
+| Ganti warna/spacing global | Override `--ui-*` di `:root` |
+| Ganti warna per instance | Set `--ui-*` di atribut `style` elemen |
+| Tata elemen internal tertentu | `ui-button::part(label) { ... }` |
+| Tata konten slot | `ui-button::slotted(p) { ... }` |
+| Ganti total tampilan | `overrides/` atau ganti file `<nama>.css` |
+
+Karena custom property diwariskan, override di `:root`, `.tema`, atau langsung di
+elemen (`<ui-button style="--ui-color-primary:#e11d48">`) tetap sampai ke dalam
+shadow — **tanpa rebuild**.
 
 ## React wrapper (opsional, untuk React <19)
 
@@ -107,6 +174,7 @@ Satu permukaan dokumentasi (**Storybook**), satu sumber data
   - panduan: Mulai, Theming, Integrasi Drupal, Framework, Accessibility;
   - addon a11y.
 - `docs/architecture.md` — arsitektur lengkap
+- [`docs/publishing.md`](docs/publishing.md) — panduan rilis Changesets
 - [`examples/playground.html`](examples/playground.html) — demo semua komponen (jalankan `npm run serve`)
 - [`examples/drupal/`](examples/drupal) — `morphis.libraries.yml` + contoh Twig
 
@@ -136,6 +204,23 @@ npm run serve       # pratinjau hasil build di :4399
   `npm run build:cem` (sudah termasuk pada `npm run storybook`) setelah mengubah
   JSDoc komponen.
 
+## Support matrix
+
+Tidak ada **version floor**: arsitektur ini berjalan di framework/versi apa pun
+yang bisa merender HTML. Yang ada hanyalah **catatan integrasi** kecil per framework.
+
+| Target | Dukungan | Catatan integrasi |
+| --- | --- | --- |
+| HTML / Twig / Drupal | Langsung | Import `morphis.js` + `tokens.css`; theming via `--ui-*` / `::part()` |
+| React ≥19 | Langsung | Property & event custom element deklaratif |
+| React 16.8–18 | Langsung + wrapper | Atribut string; custom event via `ref` atau `@morphis/react` |
+| Angular | Langsung | `CUSTOM_ELEMENTS_SCHEMA`; import sekali di `main.ts` |
+| Vue 3 | Langsung | `compilerOptions.isCustomElement` untuk prefix `ui-` |
+| Vue 2 | Langsung (opsional) | Gunakan via tag HTML; hindari binding Vue-specific |
+| Svelte | Langsung | Import sekali; event `on:ui-*` |
+| Solid / Qwik | Langsung | Import sekali; event seperti DOM biasa |
+| Meta-framework (Next/Nuxt/SvelteKit) | Client hydration | Import di boundary client; anti-FOUC via tokens global |
+
 ## Publikasi (versioning independen)
 
 Rilis diatur dengan [Changesets](https://github.com/changesets/changesets):
@@ -164,3 +249,12 @@ Storybook → **Panduan/Publikasi**).
   tidak pernah di markup. Markup hanya berisi struktur + BEM + `<slot>`.
 - Setiap file CSS komponen wajib diawali
   `@reference "../../../../src/styles/base.css"`.
+
+## Catatan & batasan
+
+- **Client-side / progressive enhancement** — Web Component baru aktif setelah JS
+  jalan. Risiko FOUC dimitigasi dengan `tokens.css` global, style host minimal,
+  `:not(:defined)`, dan define-on-client.
+- **SSR + Shadow DOM** tergolong rumit, sehingga SSR tidak menjadi target utama.
+- **React <19** tidak dapat bind custom event secara deklaratif → gunakan `ref`
+  atau wrapper `@morphis/react`.
