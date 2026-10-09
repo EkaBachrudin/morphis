@@ -13,10 +13,10 @@ export const globalTypes = {
       icon: 'code',
       items: [
         { value: 'native', title: 'Native HTML' },
-        { value: 'twig', title: 'Twig (Drupal)' },
+        { value: 'angular', title: 'Angular' },
         { value: 'react', title: 'React' },
         { value: 'vue', title: 'Vue' },
-        { value: 'angular', title: 'Angular' },
+        { value: 'twig', title: 'Twig (Drupal)' },
       ],
       dynamicTitle: true,
     },
@@ -25,4 +25,16 @@ export const globalTypes = {
 
 export const initialGlobals = {
   framework: 'native',
+};
+
+export const parameters = {
+  options: {
+    storySort: {
+      order: [
+        'Panduan',
+        ['Mulai', 'Paket Baru', 'Publikasi', 'Theming', 'Integrasi Drupal', 'Framework', 'Accessibility'],
+        'Components',
+      ],
+    },
+  },
 };

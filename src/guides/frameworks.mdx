@@ -5,14 +5,16 @@ import { Meta } from '@storybook/addon-docs/blocks';
 # Framework
 
 Prinsipnya: **import sekali** agar custom element terdaftar, lalu pakai tag
-HTML-nya. Karena `<ui-*>` elemen native, **semua versi framework** bekerja tanpa
-build khusus.
+HTML-nya. Karena `<ui-*>` adalah elemen native, **semua versi framework**
+bekerja tanpa build khusus.
 
 ```ts
 import '@morphis/button'; // daftarkan <ui-button>
 ```
 
 ## Kontrak umum
+
+Terlepas dari framework-nya, semua komponen mengikuti kontrak yang sama:
 
 | Interaksi | Mekanisme |
 | --- | --- |
@@ -22,11 +24,13 @@ import '@morphis/button'; // daftarkan <ui-button>
 | Gaya | Shadow DOM + `::part()` |
 | Tema | CSS custom property `--ui-*` |
 
-Nama event: `ui-click`, `ui-input`, `ui-change`.
+Event yang dipancarkan: `ui-click`, `ui-input`, `ui-change`. Listener menerima
+`CustomEvent`, jadi nilainya dibaca dari `event.detail`.
 
 ## React
 
-React ≥19 mendukung property dan custom event deklaratif:
+**React ≥ 19** sudah meneruskan property dan custom event secara deklaratif,
+jadi cukup render tag-nya langsung:
 
 ```tsx
 import '@morphis/button';
@@ -39,7 +43,8 @@ export function App() {
 }
 ```
 
-React 16.8–18: pakai wrapper `@morphis/react`.
+**React 16.8–18** belum meneruskan property/custom event ke custom element,
+jadi pakai wrapper `@morphis/react`:
 
 ```tsx
 import { Button, Input, Card } from '@morphis/react';
@@ -48,7 +53,32 @@ import '@morphis/tokens/tokens.css';
 <Button variant="primary" onUiClick={(e) => console.log(e.detail)}>Simpan</Button>
 ```
 
+## Angular
+
+Daftarkan elemen sekali di entry point, lalu izinkan custom element lewat
+`CUSTOM_ELEMENTS_SCHEMA`:
+
+```ts
+// main.ts
+import '@morphis/button';
+import '@morphis/tokens/tokens.css';
+```
+
+```ts
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+
+@NgModule({ schemas: [CUSTOM_ELEMENTS_SCHEMA] })
+export class AppModule {}
+```
+
+```html
+<ui-button variant="primary" (ui-click)="onClick($event)">Simpan</ui-button>
+```
+
 ## Vue 3
+
+Beri tahu compiler bahwa tag `ui-*` adalah custom element (bukan komponen Vue),
+lalu binding event memakai `@ui-*`:
 
 ```ts
 // vite.config.ts
@@ -87,25 +117,6 @@ function onClick(event: CustomEvent) {
 <ui-button variant="primary" on:ui-click={onClick}>Simpan</ui-button>
 ```
 
-## Angular
-
-```ts
-// main.ts
-import '@morphis/button';
-import '@morphis/tokens/tokens.css';
-```
-
-```ts
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-
-@NgModule({ schemas: [CUSTOM_ELEMENTS_SCHEMA] })
-export class AppModule {}
-```
-
-```html
-<ui-button variant="primary" (ui-click)="onClick($event)">Simpan</ui-button>
-```
-
 ## Solid / Qwik
 
 ```tsx
@@ -122,7 +133,8 @@ import '@morphis/button';
 
 ## Data kompleks
 
-Atribut hanya string. Untuk nilai kompleks, set property lewat ref:
+Atribut hanya menerima string. Untuk nilai kompleks (objek/array), set property
+lewat `ref`:
 
 ```tsx
 const ref = useRef<HTMLElement>(null);

@@ -1,5 +1,6 @@
 import type { StorybookConfig } from '@storybook/web-components-vite';
 import tailwindcss from '@tailwindcss/vite';
+import remarkGfm from 'remark-gfm';
 import { fileURLToPath } from 'node:url';
 
 const root = (path: string) => fileURLToPath(new URL(`../${path}`, import.meta.url));
@@ -11,7 +12,19 @@ const config: StorybookConfig = {
     '../packages/components/*/src/**/*.stories.@(ts|js)',
     '../packages/components/*/src/**/*.mdx',
   ],
-  addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
+  addons: [
+    {
+      name: '@storybook/addon-docs',
+      options: {
+        mdxPluginOptions: {
+          mdxCompileOptions: {
+            remarkPlugins: [remarkGfm],
+          },
+        },
+      },
+    },
+    '@storybook/addon-a11y',
+  ],
   staticDirs: [{ from: '../downloads', to: '/downloads' }],
   framework: {
     name: '@storybook/web-components-vite',

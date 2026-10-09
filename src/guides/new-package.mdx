@@ -1,0 +1,126 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Panduan/Paket Baru" />
+
+# Paket baru
+
+Panduan membuat **paket komponen baru** dari nol sampai rilis pertama. Setiap
+komponen dipublikasikan sebagai paket npm tersendiri (mis. `@morphis/badge`)
+dengan versi independen. Untuk mekanik rilis umum (changeset, versi, CI), lihat
+**Panduan/Publikasi**.
+
+## Ringkasan
+
+1. Scaffold paket dengan generator.
+2. Link workspace.
+3. Lengkapi komponen + anotasi.
+4. Verifikasi lokal.
+5. Rilis pertama.
+
+## 1. Scaffold
+
+```bash
+npm run gen -- component badge
+```
+
+Generator membuat `packages/components/badge/`:
+
+```
+packages/components/badge/
+├── package.json                 # @morphis/badge, versi 0.1.0
+├── tsconfig.json
+└── src/
+    ├── badge.ts                 # kelas <ui-badge>
+    ├── badge.css                # gaya (Tailwind lewat @apply)
+    ├── badge.template.html      # template Shadow DOM
+    ├── badge.markup.html        # markup siap tempel (Twig/HTML)
+    ├── badge.stories.ts         # contoh Storybook
+    ├── badge.mdx                # halaman Docs komponen
+    └── badge.test.ts            # tes Vitest
+```
+
+Ia juga mendaftarkan paket ke meta-bundle `packages/components/src/index.ts`
+(sehingga ikut masuk `@morphis/components`), dan memakai tag `ui-badge`.
+
+> Nama harus kebab-case, mis. `badge` atau `data-table`. Paket yang sudah ada
+> ditolak kecuali memakai `--force`.
+
+## 2. Link workspace
+
+```bash
+npm install
+```
+
+npm workspaces menautkan `@morphis/badge` ke `node_modules` agar bisa diimpor
+dari paket lain dan dari Storybook.
+
+## 3. Lengkapi komponen
+
+Sunting `src/badge.ts` (dan `.css`/`.template.html`), lalu tambahkan anotasi
+JSDoc. CEM membacanya dan mengisi **tabel API Storybook** secara otomatis:
+
+```ts
+/**
+ * @element ui-badge
+ *
+ * @attr {string} label - Teks badge.
+ * @slot - Konten utama.
+ * @csspart root - Elemen pembungkus.
+ * @fires ui-click - Saat badge diklik.
+ * @cssprop [--ui-color-primary=#2563eb] - Warna utama.
+ */
+```
+
+Aturan CSS: file komponen wajib diawali
+`@reference "../../../../src/styles/base.css"`, dan utility Tailwind hanya lewat
+`@apply` (tidak pernah di markup).
+
+## 4. Verifikasi lokal
+
+```bash
+npm run build     # hasilkan dist/ paket + meta-bundle
+npm test          # Vitest + @open-wc/testing
+npm run storybook # HMR di :6006
+```
+
+Halaman komponen dan Docs muncul otomatis dari `badge.stories.ts` +
+`badge.mdx`.
+
+**Alias Storybook.** `npm run storybook` tidak menjalankan `build:components`,
+jadi tambahkan alias di `.storybook/main.ts` agar dev me-resolve sumber
+komponen (bukan `dist/` yang belum ada):
+
+```ts
+{ find: /^@morphis\/badge$/, replacement: root('packages/components/badge/src/badge.ts') },
+```
+
+## 5. Rilis pertama
+
+Generator memakai versi `0.1.0`, dan `changeset publish` menerbitkan versi yang
+**belum ada di registry** — jadi rilis pertama bisa langsung terbit.
+
+```bash
+npm run typecheck && npm test && npm run build
+npx changeset --minor @morphis/badge -m "feat: komponen badge"   # atau: npm run changeset
+npm run version-packages
+npm run release
+```
+
+> Alternatif bila ingin lewat bump: set versi paket ke `0.0.0` lalu beri
+> changeset `minor` → `0.1.0`.
+
+## Checklist paket baru
+
+- [ ] `npm run gen -- component <nama>` dijalankan.
+- [ ] Paket terdaftar di `packages/components/src/index.ts`.
+- [ ] `npm install` (link workspace).
+- [ ] Anotasi JSDoc lengkap → tabel API terisi.
+- [ ] Alias ditambahkan di `.storybook/main.ts`.
+- [ ] `npm run build`, `npm test`, `npm run storybook` hijau.
+- [ ] Changeset dibuat & rilis pertama dipublikasikan.
+
+## Referensi
+
+- `README.md` → bagian **Menambah komponen**.
+- `docs/architecture.md` — arsitektur monorepo & pipeline build.
+- `scripts/generate-component.mjs` — isi generator.
