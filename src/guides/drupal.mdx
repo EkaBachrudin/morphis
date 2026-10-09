@@ -4,16 +4,25 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Integrasi Drupal
 
-Morphis adalah HTML native + satu file JS kecil + satu file token CSS.
-**Tidak ada framework JavaScript yang perlu dipasang di Drupal.**
+Morphis adalah HTML native + file JS per komponen + satu file token CSS.
+**Tidak ada framework JavaScript yang perlu dipasang di Drupal** dan **tidak
+perlu CDN** — cukup salin file yang dipakai dari paket npm ke tema.
 
 ## 1. Salin file ke tema
 
+Setiap komponen punya paket sendiri (`@morphis/button`, `@morphis/card`, …).
+Ambil dari `node_modules` (atau dari tarball) hanya yang dibutuhkan:
+
 ```
 themes/custom/mytheme/libraries/morphis/
-├── morphis.js
-└── tokens.css
+├── tokens.css        # dari @morphis/tokens/dist/tokens.css
+├── button.iife.js    # dari @morphis/button/dist/button.iife.js
+├── card.iife.js      # dari @morphis/card/dist/card.iife.js
+└── input.iife.js     # dari @morphis/input/dist/input.iife.js
 ```
+
+Gunakan varian **`*.iife.js`** (script klasik) agar tidak butuh
+`<script type="module">`. Bila memakai bundler modern, gunakan `*.js` (ESM).
 
 ## 2. Definisikan Drupal library
 
@@ -26,9 +35,9 @@ morphis:
     base:
       libraries/morphis/tokens.css: {}
   js:
-    libraries/morphis/morphis.js:
-      attributes:
-        type: module
+    libraries/morphis/button.iife.js: {}
+    libraries/morphis/card.iife.js: {}
+    libraries/morphis/input.iife.js: {}
 ```
 
 ## 3. Attach library
@@ -47,6 +56,9 @@ Atau per template Twig:
 ```
 
 ## 4. Tempel markup
+
+Markup tiap komponen tersedia di `dist/<nama>.html` (atau
+`packages/components/<nama>/src/<nama>.markup.html`):
 
 ```twig
 {{ attach_library('mytheme/morphis') }}
@@ -82,7 +94,9 @@ Atau per template Twig:
 }
 ```
 
-## Alternatif CDN
+## Alternatif: meta-bundle / CDN
+
+Bila ingin semua komponen sekaligus:
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@morphis/components/dist/tokens.css">
@@ -92,6 +106,6 @@ Atau per template Twig:
 ## Checklist
 
 - [ ] `tokens.css` dimuat **sebelum** markup komponen.
-- [ ] `morphis.js` dimuat dengan `type: module`.
+- [ ] File `*.iife.js` dimuat sebagai script biasa (tanpa `type: module`).
 - [ ] Override token ditulis setelah `tokens.css`.
 - [ ] Cache dibersihkan setelah mengganti file (`drush cr`).

@@ -1,6 +1,6 @@
 import rawManifest from '../../custom-elements.json';
 
-const markups = import.meta.glob('../components/*/*.markup.html', {
+const markups = import.meta.glob('../../packages/components/*/src/*.markup.html', {
   query: '?raw',
   import: 'default',
   eager: true,
@@ -78,7 +78,7 @@ function stripComment(html: string): string {
 }
 
 function markupFor(dir: string): string {
-  const suffix = `/components/${dir}/${dir}.markup.html`;
+  const suffix = `/components/${dir}/src/${dir}.markup.html`;
   const key = Object.keys(markups).find((k) => k.endsWith(suffix));
   return key ? stripComment(markups[key]) : '';
 }

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createApp, h } from 'vue';
-import '../components/button/button';
-import '../components/input/input';
+import '@morphis/button';
+import '@morphis/input';
 
 describe('Vue integration', () => {
   it('renders ui-button and binds the ui-click event', async () => {

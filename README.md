@@ -1,4 +1,4 @@
-# Morphis — `@morphis/components`
+# Morphis — monorepo komponen
 
 Pustaka komponen **framework-agnostic** yang dibangun sekali sebagai **Custom
 Elements** (Web Components native) dengan TypeScript, lalu dapat dipakai di
@@ -8,15 +8,25 @@ framework apa pun, HTML biasa, maupun Twig/Drupal.
 - Enkapsulasi: Shadow DOM (`mode: 'open'`)
 - Styling: Tailwind v4 (build-time, `@apply`) + design token `--ui-*`
 - Theming: CSS custom property + `::part()` + `::slotted()`
-- Distribusi: satu paket npm + CDN + markup HTML untuk Drupal
+- Distribusi: **paket npm per komponen** (versioning independen) + markup HTML untuk Drupal
 
 Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
+
+## Paket
+
+| Paket | Isi |
+| --- | --- |
+| `@morphis/core` | Base class `MorphisElement` + helper (`define`, `emit`, `interpolate`, `applyStyles`) |
+| `@morphis/tokens` | `tokens.css` (design token `--ui-*`) |
+| `@morphis/button`, `@morphis/card`, `@morphis/input`, `@morphis/select`, … | Satu Web Component per paket (versi independen) |
+| `@morphis/react` | Wrapper tipis untuk React 16.8–18 |
+| `@morphis/components` | Meta-bundle: `morphis.js` (semua komponen) + `tokens.css` |
 
 ## Perintah
 
 ```bash
 npm install
-npm run build              # tokens + komponen + types + CEM + markup -> dist/
+npm run build              # tokens + core + semua paket komponen + types + CEM
 npm test                   # Vitest + @open-wc/testing (unit + integrasi React/Vue)
 npm run test:e2e           # Playwright: visual regression + audit a11y (axe)
 npm run test:e2e:update    # regenerasi baseline screenshot
@@ -25,14 +35,19 @@ npm run build-storybook    # build Storybook statis -> storybook-static/
 npm run typecheck          # tsc --noEmit
 npm run lint               # ESLint
 npm run lint:styles        # Stylelint
-npm run gen -- component badge   # scaffold komponen baru
+npm run gen -- component badge   # scaffold paket komponen baru
+npm run changeset          # catat perubahan untuk rilis
+npm run version-packages   # naikkan versi paket yang berubah
+npm run release            # build + publish paket yang berubah
 ```
 
 > Visual regression memakai Chromium milik Playwright (`npx playwright install
 > chromium`). Baseline disimpan di `e2e/**-snapshots/`. Jalankan
 > `test:e2e:update` hanya setelah perubahan tampilan yang disengaja.
 
-## Konsumsi (HTML / CDN)
+## Konsumsi
+
+### Meta-bundle (semua komponen sekaligus)
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@morphis/components/dist/tokens.css">
@@ -40,6 +55,26 @@ npm run gen -- component badge   # scaffold komponen baru
 
 <ui-button variant="primary">Simpan</ui-button>
 ```
+
+### Per komponen (versi independen)
+
+```js
+import '@morphis/button';   // mendaftarkan <ui-button>
+import '@morphis/tokens/tokens.css';
+```
+
+### Drupal (comot native, tanpa CDN)
+
+Salin **tiga file** dari paket yang dipakai ke tema Drupal:
+
+```
+@morphis/tokens/dist/tokens.css        -> libraries/morphis/tokens.css
+@morphis/button/dist/button.iife.js    -> libraries/morphis/button.iife.js
+@morphis/button/dist/button.html       -> markup siap tempel ke Twig
+```
+
+`*.iife.js` adalah script klasik (tidak butuh `type="module"`); `*.js` ESM
+tersedia untuk bundler modern. Lihat [`examples/drupal/`](examples/drupal).
 
 ## Theming runtime (tanpa rebuild)
 
@@ -52,8 +87,8 @@ npm run gen -- component badge   # scaffold komponen baru
 ## React wrapper (opsional, untuk React <19)
 
 ```tsx
-import { Button, Input, Card } from '@morphis/components/react';
-import '@morphis/components/tokens.css';
+import { Button, Input, Card } from '@morphis/react';
+import '@morphis/tokens/tokens.css';
 
 <Button variant="primary" onUiClick={(e) => console.log(e.detail)}>Simpan</Button>
 ```
@@ -78,8 +113,12 @@ Satu permukaan dokumentasi (**Storybook**), satu sumber data
 ## Menambah komponen
 
 ```bash
-npm run gen -- component <nama>   # buat .ts/.css/template/markup/stories/test + daftarkan di src/index.ts
+npm run gen -- component <nama>   # buat paket @morphis/<nama> + daftarkan di meta
+npm install                       # link workspace
 ```
+
+Generator membuat `packages/components/<nama>/` berisi `package.json`,
+`tsconfig.json`, dan `src/{<nama>.ts,.css,.template.html,.markup.html,.stories.ts,.test.ts}`.
 
 Tambahkan anotasi JSDoc `@attr`/`@slot`/`@csspart`/`@fires`/`@cssprop` pada
 komponen. CEM hasilnya mengisi **tabel API Storybook** secara otomatis.
@@ -88,24 +127,31 @@ komponen. CEM hasilnya mengisi **tabel API Storybook** secara otomatis.
 
 ```bash
 npm run storybook   # Storybook (HMR) di :6006
-npm run serve       # pratinjau hasil build dist/ di :4399
+npm run serve       # pratinjau hasil build di :4399
 ```
 
-- Perubahan token (`src/tokens/tokens.json`) perlu `npm run build` (atau
-  `build:tokens`) lalu reload.
+- Perubahan token (`packages/tokens/src/tokens.json`) perlu `npm run build`
+  (atau `npm run build:tokens`) lalu reload.
 - Halaman API di Storybook dibaca dari `custom-elements.json`, jadi jalankan
   `npm run build:cem` (sudah termasuk pada `npm run storybook`) setelah mengubah
   JSDoc komponen.
 
-## Publikasi
+## Publikasi (versioning independen)
+
+Rilis diatur dengan [Changesets](https://github.com/changesets/changesets):
 
 ```bash
-npm run build            # prepublishOnly menjalankan ini otomatis
-npm pack --dry-run       # cek isi paket (hanya dist/ + custom-elements.json)
-npm publish              # scoped -> access: public (lihat publishConfig)
+npm run changeset          # pilih paket + jenis bump, tulis ringkasan
+npm run version-packages   # naikkan versi HANYA paket yang berubah
+npm run release            # build + publish paket yang berubah
+npm pack --dry-run -w @morphis/button   # cek isi satu paket
 ```
 
-Versi dinaikkan manual (`npm version patch|minor|major`) sebelum publish.
+Paket yang tidak berubah tidak di-publish dan versinya tetap. CI menjalankan
+alur ini otomatis lewat `.github/workflows/release.yml`.
+
+Panduan lengkap: [`docs/publishing.md`](docs/publishing.md) (juga tersedia di
+Storybook → **Panduan/Publikasi**).
 
 ## Catatan teknis penting
 
@@ -116,4 +162,5 @@ Versi dinaikkan manual (`npm version patch|minor|major`) sebelum publish.
   `gradient`, `translate`, dll. tetap bekerja.
 - Utilitas Tailwind **hanya** dipakai di dalam `@apply` pada file CSS komponen,
   tidak pernah di markup. Markup hanya berisi struktur + BEM + `<slot>`.
-- Setiap file CSS komponen wajib diawali `@reference "../../styles/base.css"`.
+- Setiap file CSS komponen wajib diawali
+  `@reference "../../../../src/styles/base.css"`.

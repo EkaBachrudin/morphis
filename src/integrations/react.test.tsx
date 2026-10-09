@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import { Button, Input, Card } from '../react';
+import { Button, Input, Card } from '@morphis/react';
 
 describe('React wrapper', () => {
   it('renders ui-button and applies props as attributes', () => {

@@ -1,7 +1,7 @@
 import { setCustomElementsManifest } from '@storybook/web-components';
 import manifest from '../custom-elements.json';
-import '../src/index';
-import '../dist/tokens.css';
+import '../packages/components/src/index';
+import '../packages/tokens/dist/tokens.css';
 
 setCustomElementsManifest(manifest);
 

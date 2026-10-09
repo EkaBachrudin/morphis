@@ -1,0 +1,30 @@
+{
+  "name": "@morphis/button",
+  "version": "0.1.0",
+  "description": "Framework-agnostic button Web Component by Morphis",
+  "license": "MIT",
+  "author": "Morphis",
+  "type": "module",
+  "main": "./dist/button.js",
+  "module": "./dist/button.js",
+  "types": "./dist/types/button.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/button.d.ts",
+      "default": "./dist/button.js"
+    },
+    "./markup": "./dist/button.html"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@morphis/core": "^0.1.0"
+  }
+}

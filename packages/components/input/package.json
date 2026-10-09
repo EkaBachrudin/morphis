@@ -1,0 +1,30 @@
+{
+  "name": "@morphis/input",
+  "version": "0.1.0",
+  "description": "Framework-agnostic input Web Component by Morphis",
+  "license": "MIT",
+  "author": "Morphis",
+  "type": "module",
+  "main": "./dist/input.js",
+  "module": "./dist/input.js",
+  "types": "./dist/types/input.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/input.d.ts",
+      "default": "./dist/input.js"
+    },
+    "./markup": "./dist/input.html"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@morphis/core": "^0.1.0"
+  }
+}

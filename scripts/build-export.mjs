@@ -1,23 +1,14 @@
-import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { copyFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
-const componentsDir = join(root, 'src', 'components');
-const outDir = join(root, 'dist', 'markup');
+const source = resolve(root, 'custom-elements.json');
+const target = resolve(root, 'packages/components/custom-elements.json');
 
-mkdirSync(outDir, { recursive: true });
-
-let count = 0;
-for (const entry of readdirSync(componentsDir, { withFileTypes: true })) {
-  if (!entry.isDirectory()) continue;
-  const dir = join(componentsDir, entry.name);
-  for (const file of readdirSync(dir)) {
-    if (!file.endsWith('.markup.html')) continue;
-    const name = file.replace('.markup.html', '');
-    const source = readFileSync(join(dir, file), 'utf8');
-    writeFileSync(join(outDir, `${name}.html`), source);
-    count += 1;
-  }
+if (!existsSync(source)) {
+  console.error('custom-elements.json belum dibuat — jalankan build:cem dulu.');
+  process.exit(1);
 }
 
-console.log(`markup -> dist/markup (${count} file)`);
+copyFileSync(source, target);
+console.log('manifest -> packages/components/custom-elements.json');

@@ -11,9 +11,18 @@ HTML biasa, maupun Twig/Drupal.
 - Enkapsulasi: Shadow DOM (`mode: 'open'`)
 - Styling: Tailwind v4 (build-time, `@apply`) + design token `--ui-*`
 - Theming: CSS custom property + `::part()` + `::slotted()`
-- Distribusi: satu paket npm + CDN + markup HTML untuk Drupal
+- Distribusi: paket npm per komponen (versioning independen) + meta-bundle + markup HTML untuk Drupal
 
 ## Konsumsi
+
+Per komponen (disarankan, versi independen):
+
+```js
+import '@morphis/button';   // mendaftarkan <ui-button>
+import '@morphis/tokens/tokens.css';
+```
+
+Atau meta-bundle semua komponen:
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@morphis/components/dist/tokens.css">
@@ -25,9 +34,10 @@ HTML biasa, maupun Twig/Drupal.
 ## Panduan
 
 - **Panduan/Theming** — token `--ui-*`, `::part()`, `::slotted()`
-- **Panduan/Integrasi Drupal** — menyalin `dist/` ke tema, `libraries.yml`, Twig
+- **Panduan/Integrasi Drupal** — salin file per komponen ke tema, `libraries.yml`, Twig
 - **Panduan/Framework** — React, Vue, Svelte, Angular, Solid, Qwik
 - **Panduan/Accessibility** — catatan a11y dan audit otomatis
+- **Panduan/Publikasi** — alur Changesets: catat perubahan, naikkan versi, rilis per paket
 
 Komponen tersedia di grup **Components**; setiap halaman menampilkan preview
 live, tabel API (Attributes/Events/Slots/CSS Parts/CSS Custom Properties), dan

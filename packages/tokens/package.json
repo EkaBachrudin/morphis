@@ -1,0 +1,24 @@
+{
+  "name": "@morphis/tokens",
+  "version": "0.1.0",
+  "description": "Design tokens (CSS custom properties) for Morphis components",
+  "license": "MIT",
+  "author": "Morphis",
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./dist/tokens.css",
+    ".": "./dist/tokens.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node scripts/build-tokens.mjs"
+  },
+  "devDependencies": {
+    "style-dictionary": "^5.0.0"
+  }
+}

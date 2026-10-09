@@ -1,0 +1,38 @@
+@reference "../../../../src/styles/base.css";
+
+:host {
+  --color-primary: var(--ui-color-primary, #2563eb);
+  --color-surface: var(--ui-color-surface, #ffffff);
+  --color-on-surface: var(--ui-color-on-surface, #111827);
+  --color-border: var(--ui-color-border, #e5e7eb);
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+@layer components {
+  .ui-card {
+    @apply flex flex-col overflow-hidden rounded-lg bg-surface text-on-surface;
+  }
+
+  .ui-card--elevated {
+    @apply shadow-md;
+  }
+
+  .ui-card--outlined {
+    @apply border border-border;
+  }
+
+  .ui-card__header {
+    @apply border-b border-border px-4 py-3 font-medium;
+  }
+
+  .ui-card__body {
+    @apply px-4 py-3;
+  }
+
+  .ui-card__footer {
+    @apply border-t border-border px-4 py-3;
+  }
+}

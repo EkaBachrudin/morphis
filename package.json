@@ -1,69 +1,24 @@
 {
-  "name": "@morphis/components",
-  "version": "0.1.0",
-  "description": "Framework-agnostic Web Components by Morphis",
+  "name": "morphis",
+  "private": true,
+  "description": "Morphis monorepo — framework-agnostic Web Components",
   "license": "MIT",
   "author": "Morphis",
-  "keywords": [
-    "web-components",
-    "custom-elements",
-    "shadow-dom",
-    "design-system",
-    "framework-agnostic",
-    "drupal",
-    "twig",
-    "react",
-    "vue"
-  ],
   "type": "module",
-  "main": "./dist/morphis.js",
-  "module": "./dist/morphis.js",
-  "types": "./dist/types/index.d.ts",
-  "customElements": "custom-elements.json",
-  "exports": {
-    ".": {
-      "types": "./dist/types/index.d.ts",
-      "default": "./dist/morphis.js"
-    },
-    "./react": {
-      "types": "./dist/types/react/index.d.ts",
-      "default": "./dist/react.js"
-    },
-    "./tokens.css": "./dist/tokens.css",
-    "./components/*": {
-      "types": "./dist/types/components/*/*.d.ts",
-      "default": "./dist/components/*.js"
-    },
-    "./markup/*": "./dist/markup/*.html",
-    "./custom-elements.json": "./custom-elements.json"
-  },
-  "files": [
-    "dist",
-    "custom-elements.json"
+  "workspaces": [
+    "packages/*",
+    "packages/components/*"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "sideEffects": [
-    "**/*.js",
-    "**/*.css",
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "peerDependencies": {
-    "react": ">=16.8"
-  },
-  "peerDependenciesMeta": {
-    "react": {
-      "optional": true
-    }
+  "engines": {
+    "node": ">=22"
   },
   "scripts": {
-    "clean": "rm -rf dist custom-elements.json",
-    "build": "npm run clean && npm run build:tokens && npm run build:components && npm run build:types && npm run build:cem && npm run build:export",
-    "build:tokens": "node scripts/build-tokens.mjs",
+    "clean": "rm -rf custom-elements.json packages/*/dist packages/components/dist packages/components/*/dist",
+    "build": "npm run clean && npm run build:tokens && npm run build:core && npm run build:components && npm run build:types && npm run build:cem && npm run build:export",
+    "build:core": "npm run build -w @morphis/core",
+    "build:tokens": "npm run build -w @morphis/tokens",
     "build:components": "node scripts/build-components.mjs",
-    "build:types": "tsc -p tsconfig.build.json",
+    "build:types": "node scripts/build-types.mjs",
     "build:cem": "cem analyze",
     "build:export": "node scripts/build-export.mjs",
     "gen": "node scripts/generate-component.mjs",
@@ -75,16 +30,16 @@
     "test:e2e:update": "playwright test --update-snapshots",
     "serve": "node scripts/serve.mjs",
     "lint": "eslint .",
-    "lint:styles": "stylelint \"src/**/*.css\"",
+    "lint:styles": "stylelint \"src/**/*.css\" \"packages/components/*/src/**/*.css\"",
     "storybook": "npm run build:tokens && npm run build:cem && storybook dev -p 6006",
     "build-storybook": "npm run build:tokens && npm run build:cem && storybook build",
-    "prepublishOnly": "npm run build"
-  },
-  "engines": {
-    "node": ">=22"
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "npm run build && changeset publish"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@changesets/cli": "^3.0.3",
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "@open-wc/testing": "^5.0.0",
     "@playwright/test": "^1.64.0",
@@ -112,5 +67,6 @@
     "vite": "^8.0.0",
     "vitest": "^5.0.0",
     "vue": "^3.5.43"
-  }
+  },
+  "customElements": "custom-elements.json"
 }

@@ -16,8 +16,15 @@
     "resolveJsonModule": true,
     "useDefineForClassFields": true,
     "paths": {
-      "@morphis/core": ["./src/core/index.ts"]
+      "@morphis/core": ["./packages/core/src/index.ts"],
+      "@morphis/button": ["./packages/components/button/src/button.ts"],
+      "@morphis/card": ["./packages/components/card/src/card.ts"],
+      "@morphis/input": ["./packages/components/input/src/input.ts"],
+      "@morphis/select": ["./packages/components/select/src/select.ts"],
+      "@morphis/react": ["./packages/react/src/index.tsx"],
+      "@morphis/component-meta": ["./src/component-meta/index.ts"],
+      "@morphis/component-meta/*": ["./src/component-meta/*"]
     }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "packages", "vite.config.ts"]
 }

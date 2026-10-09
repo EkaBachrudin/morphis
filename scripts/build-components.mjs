@@ -1,50 +1,35 @@
 import { build } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 import { globSync } from 'glob';
-import { resolve } from 'node:path';
+import { copyFileSync, mkdirSync } from 'node:fs';
+import { resolve, dirname, basename, join } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
-const alias = { '@morphis/core': resolve(root, 'src/core/index.ts') };
 
-const componentEntries = Object.fromEntries(
-  globSync('src/components/*/*.ts', {
-    cwd: root,
-    ignore: ['**/*.stories.ts', '**/*.test.ts'],
-  }).map((file) => [
-    file.replace(/^src\//, '').replace(/\.ts$/, ''),
-    { entry: resolve(root, file) },
-  ]),
-);
+const aliases = {
+  '@morphis/core': resolve(root, 'packages/core/src/index.ts'),
+  '@morphis/button': resolve(root, 'packages/components/button/src/button.ts'),
+  '@morphis/card': resolve(root, 'packages/components/card/src/card.ts'),
+  '@morphis/input': resolve(root, 'packages/components/input/src/input.ts'),
+  '@morphis/select': resolve(root, 'packages/components/select/src/select.ts'),
+};
 
-const targets = [
-  { name: 'morphis', entry: resolve(root, 'src/index.ts') },
-  {
-    name: 'react',
-    entry: resolve(root, 'src/react/index.tsx'),
-    external: ['react', 'react/jsx-runtime'],
-  },
-  ...Object.entries(componentEntries).map(([name, value]) => ({
-    name,
-    entry: value.entry,
-  })),
-];
-
-// Each entry is built in its own pass so the output is fully self-contained
-// (no shared Rollup chunk), which keeps `dist/components/*.js` usable via CDN.
-for (const { name, entry, external } of targets) {
+async function buildEntry({ entry, outDir, fileName, format, external, name }) {
   await build({
     root,
     configFile: false,
     logLevel: 'warn',
     plugins: [tailwindcss()],
-    resolve: { alias },
+    resolve: { alias: aliases },
     build: {
       target: 'es2021',
       emptyOutDir: false,
+      outDir,
       lib: {
         entry,
-        formats: ['es'],
-        fileName: () => `${name}.js`,
+        formats: [format],
+        fileName: () => fileName,
+        ...(name ? { name } : {}),
       },
       rollupOptions: { external: external ?? [] },
       cssCodeSplit: false,
@@ -52,5 +37,61 @@ for (const { name, entry, external } of targets) {
       write: true,
     },
   });
-  console.log(`components -> dist/${name}.js`);
 }
+
+function pascal(value) {
+  return value
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
+}
+
+const componentFiles = globSync('packages/components/*/src/*.ts', {
+  cwd: root,
+  ignore: ['**/*.stories.ts', '**/*.test.ts'],
+});
+
+for (const file of componentFiles) {
+  const entry = resolve(root, file);
+  const pkgDir = resolve(root, dirname(dirname(file)));
+  const name = basename(pkgDir);
+  const outDir = join(pkgDir, 'dist');
+
+  await buildEntry({ entry, outDir, fileName: `${name}.js`, format: 'es' });
+  await buildEntry({
+    entry,
+    outDir,
+    fileName: `${name}.iife.js`,
+    format: 'iife',
+    name: `Morphis${pascal(name)}`,
+  });
+
+  mkdirSync(outDir, { recursive: true });
+  copyFileSync(
+    join(pkgDir, 'src', `${name}.markup.html`),
+    join(outDir, `${name}.html`),
+  );
+
+  console.log(`components -> packages/components/${name}/dist (${name}.js, ${name}.iife.js, ${name}.html)`);
+}
+
+await buildEntry({
+  entry: resolve(root, 'packages/components/src/index.ts'),
+  outDir: resolve(root, 'packages/components/dist'),
+  fileName: 'morphis.js',
+  format: 'es',
+});
+copyFileSync(
+  resolve(root, 'packages/tokens/dist/tokens.css'),
+  resolve(root, 'packages/components/dist/tokens.css'),
+);
+console.log('components -> packages/components/dist (morphis.js, tokens.css)');
+
+await buildEntry({
+  entry: resolve(root, 'packages/react/src/index.tsx'),
+  outDir: resolve(root, 'packages/react/dist'),
+  fileName: 'react.js',
+  format: 'es',
+  external: ['react', 'react/jsx-runtime'],
+});
+console.log('components -> packages/react/dist (react.js)');

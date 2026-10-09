@@ -1,0 +1,39 @@
+{
+  "name": "@morphis/react",
+  "version": "0.1.0",
+  "description": "Thin React wrappers for Morphis Web Components (React 16.8–18)",
+  "license": "MIT",
+  "author": "Morphis",
+  "type": "module",
+  "main": "./dist/react.js",
+  "module": "./dist/react.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/react.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@morphis/button": "^0.1.0",
+    "@morphis/card": "^0.1.0",
+    "@morphis/input": "^0.1.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}

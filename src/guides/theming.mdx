@@ -9,7 +9,8 @@ Parts** (`::part()`). Tanpa build ulang.
 
 ## Design token
 
-Token global dihasilkan dari `src/tokens/tokens.json` ke `dist/tokens.css`.
+Token global dihasilkan dari `packages/tokens/src/tokens.json` ke
+`packages/tokens/dist/tokens.css` (dipublikasikan sebagai `@morphis/tokens`).
 
 | Token | Default | Dipakai oleh |
 | --- | --- | --- |
@@ -67,7 +68,7 @@ ui-button::slotted(span[slot='icon']) {
 
 ## Mengganti tampilan total
 
-Edit `src/components/<name>/<name>.css` lalu `npm run build`. Aturan disiplin:
-Tailwind hanya lewat `@apply` di CSS komponen, rule BEM terpisah di
+Edit `packages/components/<name>/src/<name>.css` lalu `npm run build`. Aturan
+disiplin: Tailwind hanya lewat `@apply` di CSS komponen, rule BEM terpisah di
 `@layer components`, dan file CSS komponen wajib diawali
-`@reference "../../styles/base.css"`.
+`@reference "../../../../src/styles/base.css"`.

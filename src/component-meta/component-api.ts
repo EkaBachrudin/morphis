@@ -1,4 +1,4 @@
-import { define } from '../core';
+import { define } from '@morphis/core';
 import { findComponent, type ComponentDoc } from './model';
 
 const STYLE_ID = 'morphis-component-api-styles';

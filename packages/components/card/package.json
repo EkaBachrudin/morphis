@@ -1,0 +1,30 @@
+{
+  "name": "@morphis/card",
+  "version": "0.1.0",
+  "description": "Framework-agnostic card Web Component by Morphis",
+  "license": "MIT",
+  "author": "Morphis",
+  "type": "module",
+  "main": "./dist/card.js",
+  "module": "./dist/card.js",
+  "types": "./dist/types/card.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/card.d.ts",
+      "default": "./dist/card.js"
+    },
+    "./markup": "./dist/card.html"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@morphis/core": "^0.1.0"
+  }
+}

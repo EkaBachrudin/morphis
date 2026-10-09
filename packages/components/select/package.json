@@ -1,0 +1,30 @@
+{
+  "name": "@morphis/select",
+  "version": "0.1.0",
+  "description": "Framework-agnostic select Web Component by Morphis",
+  "license": "MIT",
+  "author": "Morphis",
+  "type": "module",
+  "main": "./dist/select.js",
+  "module": "./dist/select.js",
+  "types": "./dist/types/select.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/select.d.ts",
+      "default": "./dist/select.js"
+    },
+    "./markup": "./dist/select.html"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@morphis/core": "^0.1.0"
+  }
+}

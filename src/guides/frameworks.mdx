@@ -9,7 +9,7 @@ HTML-nya. Karena `<ui-*>` elemen native, **semua versi framework** bekerja tanpa
 build khusus.
 
 ```ts
-import '@morphis/components';
+import '@morphis/button'; // daftarkan <ui-button>
 ```
 
 ## Kontrak umum
@@ -29,7 +29,8 @@ Nama event: `ui-click`, `ui-input`, `ui-change`.
 React ≥19 mendukung property dan custom event deklaratif:
 
 ```tsx
-import '@morphis/components';
+import '@morphis/button';
+import '@morphis/tokens/tokens.css';
 import { useRef } from 'react';
 
 export function App() {
@@ -38,11 +39,11 @@ export function App() {
 }
 ```
 
-React 16.8–18: pakai wrapper `@morphis/components/react`.
+React 16.8–18: pakai wrapper `@morphis/react`.
 
 ```tsx
-import { Button, Input, Card } from '@morphis/components/react';
-import '@morphis/components/tokens.css';
+import { Button, Input, Card } from '@morphis/react';
+import '@morphis/tokens/tokens.css';
 
 <Button variant="primary" onUiClick={(e) => console.log(e.detail)}>Simpan</Button>
 ```
@@ -60,7 +61,8 @@ vue({
 
 ```vue
 <script setup lang="ts">
-import '@morphis/components';
+import '@morphis/button';
+import '@morphis/input';
 function onClick(event: CustomEvent) {
   console.log(event.detail);
 }
@@ -76,7 +78,7 @@ function onClick(event: CustomEvent) {
 
 ```svelte
 <script lang="ts">
-  import '@morphis/components';
+  import '@morphis/button';
   function onClick(event: CustomEvent) {
     console.log(event.detail);
   }
@@ -89,8 +91,8 @@ function onClick(event: CustomEvent) {
 
 ```ts
 // main.ts
-import '@morphis/components';
-import '@morphis/components/tokens.css';
+import '@morphis/button';
+import '@morphis/tokens/tokens.css';
 ```
 
 ```ts
@@ -107,7 +109,7 @@ export class AppModule {}
 ## Solid / Qwik
 
 ```tsx
-import '@morphis/components';
+import '@morphis/button';
 ```
 
 ```tsx

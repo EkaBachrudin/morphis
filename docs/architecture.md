@@ -6,17 +6,17 @@
 > versi berapa saja** maupun HTML/Twig native — dengan theming runtime memakai
 > **CSS custom property** dan `::part()`.
 
-- **Status**: Draf arsitektur (disetujui untuk dieksekusi)
+- **Status**: Monorepo aktif (migrasi dari single-package selesai)
 - **Namespace**: `ui-` (tag custom element, class internal, `part`)
-- **Nama paket**: `@morphis/components` (satu paket npm)
-- **Struktur**: Satu paket npm — tanpa workspace, turbo, atau changesets.
+- **Nama paket**: `@morphis/*` (paket per komponen + `@morphis/components` meta + `@morphis/core` + `@morphis/tokens` + `@morphis/react`)
+- **Struktur**: npm workspaces + Changesets (versioning independen per paket)
 - **Prinsip**: build once, run anywhere — tanpa version floor, tanpa lock-in.
 
 ---
 
 ## 1. Ringkasan
 
-Morphis adalah satu paket npm untuk membangun pustaka komponen UI yang:
+Morphis adalah monorepo npm untuk membangun pustaka komponen UI yang:
 
 1. Ditulis **sekali** sebagai **Custom Element** (Vanilla Web Component + TypeScript).
 2. Berjalan langsung di **semua framework & semua versi** karena browser
@@ -39,11 +39,11 @@ Morphis adalah satu paket npm untuk membangun pustaka komponen UI yang:
 | Theming | **CSS custom property `--ui-*`** (diwariskan menembus shadow) + `::part()` + `::slotted()` |
 | Komunikasi | **Atribut/property** + **`CustomEvent`** (`bubbles: true, composed: true`) |
 | Build | **Vite (library mode)** → ESM; bundle penuh + entry per komponen |
-| Distribusi | Satu paket npm + CDN (jsDelivr/unpkg) + markup HTML |
-| Integrasi Drupal | **Tidak ada paket khusus**; developer Drupal mencomot dari `dist/` |
+| Distribusi | Paket npm **per komponen** (versioning independen) + meta-bundle `@morphis/components` + markup HTML + varian IIFE |
+| Integrasi Drupal | **Tidak ada paket khusus**; developer Drupal menyalin `dist/*.iife.js` + `tokens.css` + markup |
 | SSR | Client-side / progressive enhancement |
 | Dokumentasi | Storybook + Custom Elements Manifest |
-| Struktur repo | **Satu paket npm** (single-package); tanpa pnpm workspace/turbo/changesets |
+| Struktur repo | **npm workspaces** (paket per komponen) + **Changesets** untuk versioning independen |
 
 ---
 
@@ -208,49 +208,54 @@ semua rule BEM dibungkus `@layer components`.
 
 ---
 
-## 5. Struktur Repo (Single-Package)
+## 5. Struktur Repo (Monorepo / npm Workspaces)
 
 ```
 reusable-components/
-├── package.json
-├── tsconfig.json / tsconfig.build.json
+├── package.json                 # private workspace root (workspaces: packages/*, packages/components/*)
+├── tsconfig.json / tsconfig.package.json
 ├── vite.config.ts
 ├── custom-elements-manifest.config.mjs
+├── .changeset/                  # Changesets (versioning independen)
 ├── .storybook/
 │   ├── main.ts
 │   └── preview.ts
-├── src/
-│   ├── index.ts                 # auto-register semua komponen
-│   ├── tokens/tokens.json       # Style Dictionary → dist/tokens.css
+├── packages/
+│   ├── core/                    # @morphis/core — MorphisElement + helper
+│   │   └── src/{element,sheet,emit,define,interpolate,index}.ts
+│   ├── tokens/                  # @morphis/tokens
+│   │   ├── src/tokens.json      # Style Dictionary → dist/tokens.css
+│   │   └── scripts/build-tokens.mjs
+│   ├── components/              # @morphis/components (meta-bundle)
+│   │   ├── package.json
+│   │   ├── src/index.ts         # re-export semua komponen
+│   │   └── dist/morphis.js, tokens.css, custom-elements.json
+│   │   └── button/              # @morphis/button (versi independen)
+│   │       ├── package.json, tsconfig.json
+│   │       └── src/{button.ts, button.css, button.template.html,
+│   │                button.markup.html, button.stories.ts, button.test.ts, button.mdx}
+│   │   └── card/  input/  select/ ...
+│   └── react/                   # @morphis/react — wrapper React <19
+├── src/                         # dev app Storybook (bukan paket terbit)
 │   ├── styles/base.css          # konteks @apply + blok @theme
-│   ├── core/                    # base class MorphisElement + helper
-│   │   └── {element.ts, sheet.ts, emit.ts, define.ts, interpolate.ts, index.ts}
-│   ├── component-meta/          # model docs (dari CEM) + generator snippet + tabel API (Storybook)
-│   └── components/              # SUMBER KEBENARAN (vanilla custom elements)
-│       ├── button/{button.ts, button.css, button.template.html, button.markup.html, button.stories.ts}
-│       ├── input/...
-│       └── card/...
-├── scripts/
-│   ├── build-tokens.mjs         # Style Dictionary
-│   └── build-export.mjs         # salin markup ke dist/
-├── dist/                        # ARTEFAK "comot" untuk Drupal/HTML
-│   ├── morphis.js               # bundle penuh (auto-register semua)
-│   ├── components/*.js          # entry per komponen (tree-shakable)
-│   ├── tokens.css
-│   ├── markup/*.html
-│   └── types/                   # deklarasi TypeScript
-├── custom-elements.json         # hasil CEM
+│   ├── component-meta/          # model docs (dari CEM) + snippet + tabel API
+│   ├── guides/                  # panduan Storybook (*.mdx)
+│   └── integrations/            # uji integrasi React/Vue
+├── scripts/                     # build-components.mjs, build-types.mjs, build-export.mjs, generate-component.mjs
+├── custom-elements.json         # hasil CEM (root)
 └── docs/                        # dokumen internal (architecture.md)
 ```
 
-Tidak ada paket hasil kompilasi framework (`react/`, `vue/`, `svelte/`,
-`solid/`, `qwik/`, `angular/`, `wc/`) — hanya satu paket sumber.
+Tiap paket komponen punya `dist/` sendiri berisi: `<nama>.js` (ESM),
+`<nama>.iife.js` (script klasik), `<nama>.html` (markup), dan `types/` —
+semuanya siap disalin ("dicomot") untuk Drupal/HTML.
 
-> **Mengapa single-package?** Distribusi utama memang satu paket npm. Memecah
-> `core`/`tokens` menjadi paket terpisah hanya berguna bila keduanya perlu
-> semver independen atau dikonsumsi pihak lain secara terpisah. Selama belum,
-> satu paket menghilangkan overhead workspace/turbo/changesets tanpa kehilangan
-> apa pun. Migrasi ke monorepo tetap terbuka bila kebutuhan itu muncul.
+> **Mengapa per komponen?** Agar setiap komponen punya **semver independen**:
+> memperbaiki `card` tidak memaksa menaikkan versi `button`. npm hanya
+> mem-version satu paket per nama, jadi ini mengharuskan paket terpisah dengan
+> npm workspaces + Changesets. Meta-bundle `@morphis/components` tetap
+> disediakan untuk konsumen yang ingin semua komponen sekaligus (versinya naik
+> bila salah satu komponen naik).
 
 ---
 
@@ -599,7 +604,7 @@ bekerja tanpa build khusus.
 **React** — import sekali + pakai tag; interaksi lewat `ref`:
 
 ```tsx
-import '@morphis/components';
+import '@morphis/button';
 import { useRef } from 'react';
 
 export function App() {
@@ -617,7 +622,7 @@ export function App() {
 
 ```ts
 // main.ts
-import '@morphis/components';
+import '@morphis/button';
 ```
 
 ```ts
@@ -647,7 +652,7 @@ export default defineConfig({
 
 ```vue
 <script setup>
-import '@morphis/components';
+import '@morphis/button';
 </script>
 
 <template>
@@ -684,12 +689,12 @@ ditangkap seperti event DOM biasa (`on:ui-click` / `onui-click`).
 ## 10. Dokumentasi
 
 Satu permukaan dokumentasi (**Storybook**), satu sumber data
-(`custom-elements.json` + `src/components/*/*.markup.html`):
+(`custom-elements.json` + `packages/components/*/src/*.markup.html`):
 
 - **Storybook** (`@storybook/web-components-vite`) di `.storybook/` — dokumentasi
   lengkap sekaligus *workbench*: story per komponen
-  (`src/components/<name>/<name>.stories.ts`), MDX per komponen
-  (`src/components/<name>/<name>.mdx`) dengan contoh live, controls, dan tabel API
+  (`packages/components/<name>/src/<name>.stories.ts`), MDX per komponen
+  (`packages/components/<name>/src/<name>.mdx`) dengan contoh live, controls, dan tabel API
   lengkap.
 - **Doc block `ui-component-api`** (`src/component-meta/component-api.ts`)
   merender tabel **Attributes/Events/Slots/CSS Parts/CSS Custom Properties** dari
@@ -711,13 +716,13 @@ mencegah duplikasi logika data/snippet.
 
 | Kebutuhan | Sentuh | Efek |
 |---|---|---|
-| Ubah tampilan komponen | `src/components/<name>/<name>.ts` + `<name>.css` | semua konsumen berubah saat build |
-| Ubah CSS satu komponen | `src/components/<name>/<name>.css` | hanya komponen itu berubah |
+| Ubah tampilan komponen | `packages/components/<name>/src/<name>.ts` + `<name>.css` | semua konsumen paket itu berubah saat build |
+| Ubah CSS satu komponen | `packages/components/<name>/src/<name>.css` | hanya komponen itu berubah |
 | Beda perilaku khusus | override class / extend `MorphisElement` | tanpa ubah sumber inti |
-| Ganti warna/spacing global | `src/tokens/tokens.json` | semua komponen ikut |
+| Ganti warna/spacing global | `packages/tokens/src/tokens.json` | semua komponen ikut |
 | Themer ganti tema | `--ui-*` di `:root` | tanpa build ulang |
 | Tata elemen internal | `ui-x::part(...)` | tanpa build ulang |
-| Tambah komponen | `npm run gen component` (generator ditunda) | scaffold TS + CSS + story + markup |
+| Tambah komponen | `npm run gen -- component <nama>` | scaffold paket baru (@morphis/<nama>) + register di meta |
 
 ---
 

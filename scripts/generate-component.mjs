@@ -17,7 +17,8 @@ if (!/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name)) {
 }
 
 const force = flags.includes('--force');
-const dir = join(root, 'src', 'components', name);
+const dir = join(root, 'packages', 'components', name);
+const srcDir = join(dir, 'src');
 const tag = `ui-${name}`;
 const className = `Ui${name
   .split('-')
@@ -29,10 +30,10 @@ if (existsSync(dir) && !force) {
   process.exit(1);
 }
 
-mkdirSync(dir, { recursive: true });
+mkdirSync(srcDir, { recursive: true });
 
 const files = {
-  [`${name}.css`]: `@reference "../../styles/base.css";
+  [`${name}.css`]: `@reference "../../../../src/styles/base.css";
 
 :host {
   --color-surface: var(--ui-color-surface, #ffffff);
@@ -54,7 +55,7 @@ const files = {
   <slot></slot>
 </div>
 `,
-  [`${name}.markup.html`]: `<!-- Consumer markup — paste into Twig or plain HTML. Load dist/morphis.js + dist/tokens.css once. -->
+  [`${name}.markup.html`]: `<!-- Consumer markup — paste into Twig or plain HTML. Load @morphis/${name} (dist/${name}.js atau ${name}.iife.js) + @morphis/tokens tokens.css once. -->
 <${tag}>Konten</${tag}>
 `,
   [`${name}.ts`]: `import { MorphisElement, define, interpolate } from '@morphis/core';
@@ -103,6 +104,7 @@ define('${tag}', ${className});
 `,
   [`${name}.stories.ts`]: `import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { ${className} } from './${name}';
+import { renderSnippet } from '@morphis/component-meta/snippet-story';
 
 const meta: Meta = {
   title: 'Components/${className}',
@@ -115,6 +117,10 @@ export default meta;
 type Story = StoryObj;
 
 export const Default: Story = {};
+
+export const Snippet: Story = {
+  render: (_args, context) => renderSnippet('${tag}', context.globals),
+};
 `,
   [`${name}.test.ts`]: `import { describe, it, expect } from 'vitest';
 import { fixture, html } from '@open-wc/testing';
@@ -131,29 +137,73 @@ describe('${tag}', () => {
   });
 });
 `,
+  [`package.json`]: `${JSON.stringify(
+    {
+      name: `@morphis/${name}`,
+      version: '0.1.0',
+      description: `Framework-agnostic ${name} Web Component by Morphis`,
+      license: 'MIT',
+      author: 'Morphis',
+      type: 'module',
+      main: `./dist/${name}.js`,
+      module: `./dist/${name}.js`,
+      types: `./dist/types/${name}.d.ts`,
+      exports: {
+        '.': {
+          types: `./dist/types/${name}.d.ts`,
+          default: `./dist/${name}.js`,
+        },
+        './markup': `./dist/${name}.html`,
+      },
+      files: ['dist'],
+      sideEffects: ['**/*.js'],
+      publishConfig: { access: 'public' },
+      dependencies: { '@morphis/core': '^0.1.0' },
+    },
+    null,
+    2,
+  )}\n`,
+  [`tsconfig.json`]: `${JSON.stringify(
+    {
+      extends: '../../../tsconfig.package.json',
+      compilerOptions: {
+        rootDir: 'src',
+        outDir: 'dist/types',
+      },
+      include: ['src/**/*.ts'],
+      exclude: ['src/**/*.stories.ts', 'src/**/*.test.ts'],
+    },
+    null,
+    2,
+  )}\n`,
 };
 
 for (const [file, content] of Object.entries(files)) {
-  writeFileSync(join(dir, file), content);
+  const target = file === 'package.json' || file === 'tsconfig.json' ? join(dir, file) : join(srcDir, file);
+  writeFileSync(target, content);
 }
 
-const indexPath = join(root, 'src', 'index.ts');
-const importLine = `import './components/${name}/${name}';`;
-const exportLine = `export * from './components/${name}/${name}';`;
+const metaIndexPath = join(root, 'packages', 'components', 'src', 'index.ts');
+const importLine = `import '@morphis/${name}';`;
+const exportLine = `export * from '@morphis/${name}';`;
 
-let index = readFileSync(indexPath, 'utf8');
+let index = readFileSync(metaIndexPath, 'utf8');
 if (!index.includes(importLine)) {
   const lines = index.split('\n').filter((line) => line.trim() !== '');
-  const imports = lines.filter((line) => line.startsWith('import ')).sort();
-  const exports = lines.filter((line) => line.startsWith('export ')).sort();
+  const imports = lines.filter((line) => line.startsWith('import '));
+  const exports = lines.filter((line) => line.startsWith('export '));
   imports.push(importLine);
   exports.push(exportLine);
   imports.sort();
   exports.sort();
   index = `${[...imports, '', ...exports].join('\n')}\n`;
-  writeFileSync(indexPath, index);
+  writeFileSync(metaIndexPath, index);
 }
 
-console.log(`Komponen dibuat: src/components/${name}/`);
-for (const file of Object.keys(files)) console.log(`  - ${file}`);
-console.log(`Terdaftar di src/index.ts sebagai <${tag}>.`);
+console.log(`Komponen dibuat: packages/components/${name}/`);
+for (const file of Object.keys(files)) {
+  const target = file === 'package.json' || file === 'tsconfig.json' ? '' : 'src/';
+  console.log(`  - ${target}${file}`);
+}
+console.log(`Terdaftar di packages/components/src/index.ts sebagai <${tag}>.`);
+console.log('Langkah berikut: npm install (link workspace) lalu npm run build.');

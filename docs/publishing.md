@@ -1,0 +1,143 @@
+# Panduan Publikasi (Changesets)
+
+Repositori ini memakai **npm workspaces** + **Changesets** untuk mem-publish
+**per paket dengan versi independen**. Memperbaiki `@morphis/card` tidak memaksa
+menaikkan versi `@morphis/button`.
+
+## Prasyarat
+
+- Node ≥ 22.
+- Akses scope npm `@morphis`; semua paket sudah
+  `"publishConfig": { "access": "public" }`.
+- Auth: lokal `npm login`; CI butuh secret **`NPM_TOKEN`**.
+
+## Ringkasan alur
+
+```bash
+# 1. siapkan perubahan kode + verifikasi
+npm run typecheck && npm test && npm run build
+
+# 2. catat perubahan (pilih paket + jenis bump)
+npm run changeset
+
+# 3. commit & push (atau buka PR) file .changeset/*.md
+
+# 4. naikkan versi HANYA paket yang berubah
+npm run version-packages
+
+# 5. build + publish paket yang belum ada di registry
+npm run release
+```
+
+## 1. Catat perubahan — `npm run changeset`
+
+`changeset add` bersifat **interaktif**. Ia mendeteksi paket berubah lewat git
+diff terhadap `baseBranch` (`master`) dan mengelompokkannya menjadi
+**"changed packages"** / **"unchanged packages"**. Pilih paket + jenis bump +
+tulis ringkasan.
+
+Contoh file hasil (`.changeset/<acak>.md`):
+
+```md
+---
+"@morphis/card": patch
+---
+
+fix: perbaiki padding card saat header kosong
+```
+
+Non-interaktif:
+
+```bash
+npx changeset --patch @morphis/card -m "fix: padding card"
+npx changeset --minor @morphis/badge -m "feat: komponen badge"
+```
+
+Perubahan yang tidak perlu rilis: `npx changeset add --empty`.
+
+> Jika bump sebuah dependensi membuat rentang di paket lain tidak lagi memenuhi
+> (mis. meta `@morphis/components` `"@morphis/x": "^0.1.0"` lalu x → 0.2.0),
+> Changesets otomatis ikut menaikkan paket dependen itu.
+
+## 2. (Opsional) Preview
+
+```bash
+npm run changeset status                 # changeset yang ada + paket yang akan naik
+npx changeset status --verbose
+npx changeset publish-plan               # paket yang siap di-publish/tag (tanpa publish)
+```
+
+## 3. Naikkan versi — `npm run version-packages`
+
+`= changeset version` (tanpa argumen paket). Ia menerapkan **semua** changeset
+pending, menaikkan versi hanya paket yang tercantum, memperbarui `CHANGELOG.md`
+dan rentang dependensi internal. Commit hasilnya.
+
+```bash
+npm run version-packages
+git add -A && git commit -m "chore: version packages"
+```
+
+## 4. Build + publish — `npm run release`
+
+`= npm run build && changeset publish`.
+
+- `changeset publish` (tanpa argumen) hanya mem-publish paket yang **versinya
+  belum ada di npm**, lalu membuat git tag (mis. `@morphis/card@0.1.1`).
+- **Catatan:** `npm run build` membangun **semua** paket (build global), bukan
+  hanya yang berubah — hanya *publish* yang ter-scope.
+
+```bash
+npm run release
+```
+
+## Paket baru (publish pertama)
+
+- `npm run gen -- component badge` membuat `@morphis/badge` versi `0.1.0`.
+- `changeset publish` menerbitkan versi yang belum ada di registry, jadi
+  `0.1.0` bisa langsung terbit.
+- Bila ingin rilis pertama lewat bump: set versi paket ke `0.0.0` lalu beri
+  changeset `minor` → `0.1.0`.
+- Pastikan scope `@morphis` terdaftar dan Anda punya hak publish.
+
+## Publikasi via CI (disarankan)
+
+`.github/workflows/release.yml` menjalankan alur ini otomatis saat push ke
+`master`:
+
+- bot membuka PR **"Version Packages"** (hasil `version-packages`);
+- saat PR di-merge, `npm run release` dijalankan (`changesets/action`) dengan
+  `NODE_AUTH_TOKEN = secrets.NPM_TOKEN`.
+
+## Pre-release (opsional)
+
+```bash
+npx changeset pre enter next      # mode prerelease (tag `next`)
+npm run changeset && npm run version-packages && npm run release
+npx changeset pre exit
+```
+
+## Troubleshooting
+
+- **"No unpublished projects to publish"** — tidak ada versi baru; jalankan
+  `version-packages` dulu.
+- **Lupa changeset** — tambah changeset lalu `version-packages` + `release`.
+- **Salah publish** — `npm deprecate <pkg>@<version> "pesan"`; `npm unpublish`
+  hanya dalam 72 jam dan hindari untuk versi yang sudah dipakai.
+- **2FA** — siapkan OTP; CI pakai automation token.
+- **Scope/izin** — pastikan `@morphis` milik akun/org dan token punya hak
+  `publish`.
+
+## Checklist rilis
+
+- [ ] `npm run typecheck`, `npm test`, `npm run build` hijau.
+- [ ] `npm pack --dry-run -w @morphis/<pkg>` berisi `dist/` saja.
+- [ ] Changeset dibuat & di-commit.
+- [ ] `npm run version-packages` dijalankan.
+- [ ] `npm run release` (atau PR "Version Packages" di-merge).
+- [ ] Verifikasi di npm + git tag dibuat.
+
+## Referensi
+
+- Changesets: https://github.com/changesets/changesets
+- `npm publish` / `npm deprecate`: https://docs.npmjs.com/cli/
