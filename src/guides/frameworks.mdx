@@ -48,11 +48,15 @@ export function App() {
 }
 ```
 
-**React 16.8–18** belum meneruskan property/custom event ke custom element,
-jadi pakai wrapper `@eka-morphis/react`:
+> TypeScript tidak mengenali `<ui-*>` sebagai elemen intrinsik. Tambahkan
+> augmentasi JSX (lihat [`docs/react-typescript.md`](../../docs/react-typescript.md))
+> atau gunakan wrapper di bawah.
+
+**React 16.8+** (semua versi) juga bisa memakai wrapper bertipe
+`@eka-morphis/react` yang menangani property, atribut, dan event:
 
 ```tsx
-import { Button, Input, Card } from '@eka-morphis/react';
+import { Button, Input, Card, Select, OtherOffer } from '@eka-morphis/react';
 import '@eka-morphis/tokens/tokens.css';
 
 <Button variant="primary" onUiClick={(e) => console.log(e.detail)}>Simpan</Button>

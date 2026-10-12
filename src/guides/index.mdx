@@ -16,6 +16,14 @@ biasa, maupun Twig/Drupal.
 
 ## Konsumsi
 
+Paket diterbitkan ke **GitHub Packages**. Tambahkan `.npmrc` di project konsumen
+(butuh PAT `read:packages`):
+
+```
+@eka-morphis:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=<PAT>
+```
+
 Per komponen (disarankan, versi independen):
 
 ```js
@@ -23,11 +31,11 @@ import '@eka-morphis/button';   // mendaftarkan <ui-button>
 import '@eka-morphis/tokens/tokens.css';
 ```
 
-Atau meta-bundle semua komponen:
+Atau meta-bundle semua komponen (dari `node_modules`, karena tidak ada CDN publik):
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/tokens.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/morphis.js"></script>
+<link rel="stylesheet" href="node_modules/@eka-morphis/components/dist/tokens.css">
+<script type="module" src="node_modules/@eka-morphis/components/dist/morphis.js"></script>
 
 <ui-button variant="primary">Simpan</ui-button>
 ```

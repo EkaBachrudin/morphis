@@ -7,9 +7,13 @@ menaikkan versi `@eka-morphis/button`.
 ## Prasyarat
 
 - Node ≥ 22.
-- Akses scope npm `@eka-morphis`; semua paket sudah
-  `"publishConfig": { "access": "public" }`.
-- Auth: lokal `npm login`; CI butuh secret **`NPM_TOKEN`**.
+- Registry: **GitHub Packages** (`https://npm.pkg.github.com`). Semua paket
+  scoped `@eka-morphis/*` dan sudah menyetel
+  `"publishConfig": { "access": "public", "registry": "https://npm.pkg.github.com" }`.
+- Repo berada di org `eka-morphis` (scope paket harus sama dengan pemilik repo).
+- Auth: **PAT classic** dengan scope `write:packages`, `read:packages`, `repo`
+  (GitHub Packages tidak menerima fine-grained token). CI memakai
+  **`secrets.GITHUB_TOKEN`**.
 
 ## Ringkasan alur
 
@@ -27,12 +31,30 @@ npm run version-packages
 
 # 5. build + publish paket yang belum ada di registry
 npm run release
+
+# 6. tandai rilis di git (changeset publish tidak push tag)
+npx changeset git-tag && git push origin --tags
 ```
+
+## Autentikasi
+
+GitHub Packages tidak mendukung alur login browser default npm. Pakai salah satu:
+
+```bash
+# Opsi A — login legacy
+npm login --scope=@eka-morphis --auth-type=legacy --registry=https://npm.pkg.github.com
+# Username: <username GitHub huruf kecil>  Password: <PAT classic>
+
+# Opsi B — tulis token langsung ke ~/.npmrc
+# //npm.pkg.github.com/:_authToken=ghp_xxx
+```
+
+Verifikasi: `npm whoami --registry=https://npm.pkg.github.com`.
 
 ## 1. Catat perubahan — `npm run changeset`
 
 `changeset add` bersifat **interaktif**. Ia mendeteksi paket berubah lewat git
-diff terhadap `baseBranch` (`master`) dan mengelompokkannya menjadi
+diff terhadap `baseBranch` (`main`) dan mengelompokkannya menjadi
 **"changed packages"** / **"unchanged packages"**. Pilih paket + jenis bump +
 tulis ringkasan.
 
@@ -105,14 +127,32 @@ npm run release
   changeset `minor` → `0.1.0`.
 - Pastikan scope `@eka-morphis` terdaftar dan Anda punya hak publish.
 
-## Publikasi via CI (disarankan)
+## Publikasi via CI (opsional)
 
 `.github/workflows/release.yml` menjalankan alur ini otomatis saat push ke
-`master`:
+`main`:
 
 - bot membuka PR **"Version Packages"** (hasil `version-packages`);
 - saat PR di-merge, `npm run release` dijalankan (`changesets/action`) dengan
-  `NODE_AUTH_TOKEN = secrets.NPM_TOKEN`.
+  `NODE_AUTH_TOKEN = secrets.GITHUB_TOKEN` dan permission `packages: write`.
+
+Rilis manual dari lokal (tanpa CI) tetap didukung dan menjadi alur default di
+dokumen ini.
+
+## Konsumsi (di project framework)
+
+GitHub Packages **selalu butuh autentikasi untuk install**. Di tiap project
+konsumen, tambahkan `.npmrc`:
+
+```
+@eka-morphis:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=<PAT_dengan_read:packages>
+```
+
+Lalu `npm install @eka-morphis/other-offer @eka-morphis/tokens`. Panduan per
+framework (React wrapper, Vue `isCustomElement`, Angular `CUSTOM_ELEMENTS_SCHEMA`,
+tag mentah + augmentasi TS) ada di [`docs/react-typescript.md`](react-typescript.md)
+dan README.
 
 ## Pre-release (opsional)
 
@@ -140,7 +180,8 @@ npx changeset pre exit
 - [ ] Changeset dibuat & di-commit.
 - [ ] `npm run version-packages` dijalankan.
 - [ ] `npm run release` (atau PR "Version Packages" di-merge).
-- [ ] Verifikasi di npm + git tag dibuat.
+- [ ] `npx changeset git-tag && git push origin --tags`.
+- [ ] Verifikasi di GitHub Packages + git tag dibuat.
 
 ## Referensi
 

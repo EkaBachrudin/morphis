@@ -41,7 +41,7 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
   panduan, dan addon a11y.
 - **Snippet siap tempel** — tiap paket menghasilkan `<nama>.js` (ESM), `<nama>.iife.js`
   (script klasik untuk Drupal), dan `<nama>.markup.html` (markup untuk Twig).
-- **Wrapper React opsional** (`@eka-morphis/react`) untuk React 16.8–18; React ≥19 tidak butuh wrapper.
+- **Wrapper React opsional** (`@eka-morphis/react`) untuk semua React 16.8+; React ≥19 juga bisa pakai tag mentah (dengan augmentasi JSX untuk TS).
 - **Rantai kualitas** — Vitest + `@open-wc/testing-helpers` (unit + integrasi React/Vue),
   Playwright (visual regression + audit a11y axe), ESLint (TypeScript via `typescript-eslint`,
   CSS via `@eslint/css`), `tsc --noEmit`.
@@ -54,7 +54,7 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 | `@eka-morphis/core` | Base class `MorphisElement` (extends `LitElement`) + helper (`define`, `emit`, `litStyles`) + re-export Lit (`html`, `css`, `nothing`, `property`, `state`, `repeat`) |
 | `@eka-morphis/tokens` | `tokens.css` (design token `--ui-*`) |
 | `@eka-morphis/button`, `@eka-morphis/card`, `@eka-morphis/input`, `@eka-morphis/select`, … | Satu Web Component per paket (versi independen) |
-| `@eka-morphis/react` | Wrapper tipis untuk React 16.8–18 |
+| `@eka-morphis/react` | Wrapper tipis untuk React (16.8+): `Button`, `Input`, `Card`, `Select`, `OtherOffer` |
 | `@eka-morphis/components` | Meta-bundle: `morphis.js` (semua komponen) + `tokens.css` |
 
 ## Perintah
@@ -96,11 +96,29 @@ npm run release            # build + publish paket yang berubah
 
 ## Konsumsi
 
+> **Registri**: paket diterbitkan ke **GitHub Packages** (bukan npmjs.org), dan
+> install **selalu butuh autentikasi**. Tambahkan `.npmrc` di project konsumen:
+>
+> ```
+> @eka-morphis:registry=https://npm.pkg.github.com
+> //npm.pkg.github.com/:_authToken=<PAT_dengan_read:packages>
+> ```
+>
+> Lalu `npm install @eka-morphis/other-offer @eka-morphis/tokens`.
+
 ### Meta-bundle (semua komponen sekaligus)
 
+```js
+import '@eka-morphis/components';          // semua <ui-*> terdaftar
+import '@eka-morphis/components/tokens.css';
+```
+
+Untuk HTML polos tanpa bundler, pakai file IIFE dari `node_modules` (atau
+`downloads/`):
+
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/tokens.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/morphis.js"></script>
+<link rel="stylesheet" href="node_modules/@eka-morphis/components/dist/tokens.css">
+<script src="node_modules/@eka-morphis/button/dist/button.iife.js"></script>
 
 <ui-button variant="primary">Simpan</ui-button>
 ```
@@ -108,9 +126,30 @@ npm run release            # build + publish paket yang berubah
 ### Per komponen (versi independen)
 
 ```js
-import '@eka-morphis/button';   // mendaftarkan <ui-button>
+import '@eka-morphis/other-offer';        // mendaftarkan <ui-other-offer>
 import '@eka-morphis/tokens/tokens.css';
 ```
+
+### React
+
+```tsx
+import { OtherOffer } from '@eka-morphis/react';
+import '@eka-morphis/tokens/tokens.css';
+
+export function Example() {
+  return (
+    <OtherOffer
+      title="Penawaran Paket Lainnya"
+      footerLabel="Lihat Selengkapnya"
+      cards={[{ offer: 'roaming', label: 'Roaming', badge: 'Streaming', title: 'Roaming' }]}
+      onUiOfferClick={(event) => console.log((event as CustomEvent).detail)}
+    />
+  );
+}
+```
+
+Untuk memakai tag mentah `<ui-*>` di TSX (atau framework lain), lihat
+[`docs/react-typescript.md`](docs/react-typescript.md).
 
 ### Drupal (comot native, tanpa CDN)
 
@@ -156,16 +195,18 @@ Karena custom property diwariskan, override di `:root`, `.tema`, atau langsung d
 elemen (`<ui-button style="--ui-color-primary:#e11d48">`) tetap sampai ke dalam
 shadow — **tanpa rebuild**.
 
-## React wrapper (opsional, untuk React <19)
+## React wrapper (opsional, React 16.8+)
 
 ```tsx
-import { Button, Input, Card } from '@eka-morphis/react';
+import { Button, Input, Card, Select, OtherOffer } from '@eka-morphis/react';
 import '@eka-morphis/tokens/tokens.css';
 
 <Button variant="primary" onUiClick={(e) => console.log(e.detail)}>Simpan</Button>
 ```
 
-React ≥19 tidak butuh wrapper. Lihat panduan **Framework** di Storybook.
+React ≥19 juga bisa merender tag mentah; untuk TypeScript tambahkan augmentasi
+JSX (lihat [`docs/react-typescript.md`](docs/react-typescript.md)). Panduan
+lengkap ada di **Panduan/Framework** Storybook.
 
 ## Dokumentasi & contoh
 
@@ -223,7 +264,7 @@ yang bisa merender HTML. Yang ada hanyalah **catatan integrasi** kecil per frame
 | --- | --- | --- |
 | HTML / Twig / Drupal | Langsung | Import `morphis.js` + `tokens.css`; theming via `--ui-*` / `::part()` |
 | React ≥19 | Langsung | Property & event custom element deklaratif |
-| React 16.8–18 | Langsung + wrapper | Atribut string; custom event via `ref` atau `@eka-morphis/react` |
+| React 16.8+ | Langsung + wrapper | Wrapper bertipe `@eka-morphis/react` (`Button`, `Input`, `Card`, `Select`, `OtherOffer`) |
 | Angular | Langsung | `CUSTOM_ELEMENTS_SCHEMA`; import sekali di `main.ts` |
 | Vue 3 | Langsung | `compilerOptions.isCustomElement` untuk prefix `ui-` |
 | Vue 2 | Langsung (opsional) | Gunakan via tag HTML; hindari binding Vue-specific |
@@ -231,19 +272,24 @@ yang bisa merender HTML. Yang ada hanyalah **catatan integrasi** kecil per frame
 | Solid / Qwik | Langsung | Import sekali; event seperti DOM biasa |
 | Meta-framework (Next/Nuxt/SvelteKit) | Client hydration | Import di boundary client; anti-FOUC via tokens global |
 
+> TypeScript + tag mentah `<ui-*>`: lihat [`docs/react-typescript.md`](docs/react-typescript.md).
+
 ## Publikasi (versioning independen)
 
-Rilis diatur dengan [Changesets](https://github.com/changesets/changesets):
+Rilis diatur dengan [Changesets](https://github.com/changesets/changesets) dan
+diterbitkan ke **GitHub Packages** (`@eka-morphis`):
 
 ```bash
 npm run changeset          # pilih paket + jenis bump, tulis ringkasan
 npm run version-packages   # naikkan versi HANYA paket yang berubah
 npm run release            # build + publish paket yang berubah
+npx changeset git-tag && git push origin --tags   # tandai rilis di git
 npm pack --dry-run -w @eka-morphis/button   # cek isi satu paket
 ```
 
-Paket yang tidak berubah tidak di-publish dan versinya tetap. CI menjalankan
-alur ini otomatis lewat `.github/workflows/release.yml`.
+Auth lokal memakai PAT classic lewat `npm login --auth-type=legacy` atau
+`~/.npmrc`. Paket yang tidak berubah tidak di-publish dan versinya tetap. CI
+menjalankan alur ini otomatis lewat `.github/workflows/release.yml`.
 
 Panduan lengkap: [`docs/publishing.md`](docs/publishing.md) (juga tersedia di
 Storybook → **Panduan/Publikasi**).

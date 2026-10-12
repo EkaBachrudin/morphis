@@ -238,7 +238,7 @@ reusable-components/
 │   │       └── src/{button.ts, button.css,
 │   │                button.markup.html, button.stories.ts, button.test.ts, button.mdx}
 │   │   └── card/  input/  select/ ...
-│   └── react/                   # @eka-morphis/react — wrapper React <19
+│   └── react/                   # @eka-morphis/react — wrapper React (Button/Input/Card/Select/OtherOffer)
 ├── src/                         # dev app Storybook (bukan paket terbit)
 │   ├── styles/base.css          # konteks @apply + blok @theme
 │   ├── component-meta/          # model docs (dari CEM) + snippet + tabel API
@@ -577,14 +577,21 @@ Contoh `markup/button.html` (siap tempel ke Twig):
 </ui-button>
 ```
 
-### 9.1 Konsumsi HTML / CDN (tanpa framework)
+### 9.1 Konsumsi HTML (tanpa framework)
+
+Paket diterbitkan ke **GitHub Packages**, jadi tidak tersedia lewat CDN publik
+seperti jsDelivr. Install lewat npm (butuh `.npmrc` + PAT `read:packages`), lalu
+rujuk file dari `node_modules` atau `downloads/`:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/tokens.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/morphis.js"></script>
+<link rel="stylesheet" href="node_modules/@eka-morphis/components/dist/tokens.css">
+<script src="node_modules/@eka-morphis/components/dist/morphis.js" type="module"></script>
 
 <ui-button variant="primary">Simpan</ui-button>
 ```
+
+Untuk HTML/Twig tanpa bundler, gunakan varian IIFE self-contained
+(`dist/<nama>.iife.js`) yang ikut ter-publish di tiap paket komponen.
 
 ### 9.2 Konsumsi per-framework
 
@@ -607,7 +614,11 @@ export function App() {
 - React ≥19 mendukung property & event custom element secara deklaratif.
 - **React <19**: atribut dikirim sebagai string dan custom event tidak bisa
   di-bind deklaratif. Solusi: pasang `addEventListener` lewat `ref`, atau pakai
-  wrapper tipis `@eka-morphis/react` (opsional, Fase 3).
+  wrapper tipis `@eka-morphis/react` (`Button`, `Input`, `Card`, `Select`,
+  `OtherOffer`).
+- **TypeScript + tag mentah**: React tidak mengenali `<ui-*>` sebagai elemen
+  intrinsik. Gunakan wrapper di atas, atau tambahkan augmentasi JSX
+  (lihat [`docs/react-typescript.md`](react-typescript.md)).
 
 **Angular** — izinkan elemen tak dikenal + import sekali:
 
@@ -799,7 +810,7 @@ kecil) per framework.
 |---|---|---|
 | HTML / Twig / Drupal | Langsung | Import `morphis.js` + `tokens.css`; theming via `--ui-*` / `::part()` |
 | React ≥19 | Langsung | Property & event custom element deklaratif |
-| React 16.8–18 | Langsung + wrapper | Atribut string; custom event via `ref` atau `@eka-morphis/react` |
+| React 16.8+ | Langsung + wrapper | Atribut string; custom event via `ref` atau `@eka-morphis/react` |
 | Angular | Langsung | `CUSTOM_ELEMENTS_SCHEMA`; import sekali di `main.ts` |
 | Vue 3 | Langsung | `compilerOptions.isCustomElement` untuk prefix `ui-` |
 | Vue 2 | Langsung (opsional) | Gunakan via tag HTML; hindari binding Vue-specific |
