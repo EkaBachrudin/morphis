@@ -1,10 +1,29 @@
-import { MorphisElement, define, interpolate } from '@morphis/core';
+import {
+  MorphisElement,
+  define,
+  html,
+  nothing,
+  property,
+  state,
+  repeat,
+  litStyles,
+  type PropertyValues,
+} from '@morphis/core';
 import style from './select.css?inline';
-import template from './select.template.html?raw';
 
 export interface SelectOption {
   value: string;
   label: string;
+}
+
+function parseOptions(value: string | null): SelectOption[] {
+  if (!value) return [];
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) ? (parsed as SelectOption[]) : [];
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -14,11 +33,6 @@ export interface SelectOption {
  * atribut `options` berisi JSON. Nilai terpilih lewat atribut/property `value`.
  *
  * @element ui-select
- *
- * @attr {string} [value] - Nilai opsi terpilih.
- * @attr {boolean} [disabled=false] - Menonaktifkan kontrol.
- * @attr {string} [label] - Label di atas trigger.
- * @attr {string} [placeholder=Pilih…] - Teks saat belum ada nilai.
  *
  * @fires ui-change - Saat pilihan berubah. `detail: { value, label }`.
  *
@@ -36,239 +50,172 @@ export interface SelectOption {
  * @cssprop [--ui-color-primary=#2563eb] - Warna aksen opsi aktif/terpilih.
  */
 export class UiSelect extends MorphisElement {
-  static override styles = [style];
-  static override template = template;
+  static override styles = litStyles(style);
 
-  #trigger?: HTMLButtonElement;
-  #valueEl?: HTMLElement;
-  #labelEl?: HTMLElement;
-  #listbox?: HTMLElement;
-  #options: SelectOption[] = [];
-  #activeIndex = -1;
-  #open = false;
-  #built = false;
+  /** Daftar opsi `{ value, label }`. Bisa di-set sebagai JSON pada atribut. */
+  @property({ converter: { fromAttribute: parseOptions } })
+  options: SelectOption[] = [];
+
+  /** Nilai opsi terpilih. */
+  @property({ reflect: true }) value = '';
+
+  /** Menonaktifkan kontrol. */
+  @property({ type: Boolean, reflect: true }) disabled = false;
+
+  /** Label di atas trigger. */
+  @property() label = '';
+
+  /** Teks saat belum ada nilai. */
+  @property() placeholder = 'Pilih…';
+
+  @state() private _open = false;
+  @state() private _activeIndex = -1;
+
   #typeahead = '';
   #typeaheadTimer?: ReturnType<typeof setTimeout>;
   #uid = `ui-select-${Math.random().toString(36).slice(2, 8)}`;
 
-  static get observedAttributes(): string[] {
-    return ['value', 'disabled', 'label', 'placeholder', 'options'];
-  }
-
-  get options(): SelectOption[] {
-    return this.#options;
-  }
-
-  set options(next: SelectOption[]) {
-    this.#setOptions(Array.isArray(next) ? next : []);
-  }
-
-  get value(): string {
-    return this.getAttribute('value') ?? '';
-  }
-
-  set value(next: string) {
-    this.setAttribute('value', next);
-  }
-
-  get disabled(): boolean {
-    return this.hasAttribute('disabled');
-  }
-
-  set disabled(next: boolean) {
-    this.toggleAttribute('disabled', next);
-  }
-
-  attributeChangedCallback(name: string): void {
-    if (name === 'options') {
-      this.#applyOptionsAttribute();
-      return;
-    }
-    if (this.isConnected) this.render();
-  }
-
-  protected override render(): void {
-    super.render();
-    if (!this.#built) {
-      this.#built = true;
-      this.#trigger = this.root.querySelector<HTMLButtonElement>('.ui-select__trigger') ?? undefined;
-      this.#valueEl = this.root.querySelector<HTMLElement>('.ui-select__value') ?? undefined;
-      this.#labelEl = this.root.querySelector<HTMLElement>('.ui-select__label') ?? undefined;
-      this.#listbox = this.root.querySelector<HTMLElement>('.ui-select__listbox') ?? undefined;
-      if (this.#labelEl) this.#labelEl.id = `${this.#uid}-label`;
-      if (this.#listbox) this.#listbox.id = `${this.#uid}-listbox`;
-      this.#trigger?.setAttribute('aria-controls', `${this.#uid}-listbox`);
-      this.#renderOptions();
-    }
-    this.#sync();
-  }
-
-  protected override renderTemplate(): void {
-    if (this.#built) return;
-    this.root.innerHTML = interpolate(UiSelect.template, {
-      label: this.getAttribute('label') ?? '',
-    });
-  }
-
-  protected attachEventListeners(): void {
-    this.root.addEventListener('click', this.#onRootClick);
-    this.root.addEventListener('mouseover', this.#onRootMouseover);
-    this.root.addEventListener('keydown', this.#onRootKeydown);
-  }
-
-  protected onConnected(): void {
+  override connectedCallback(): void {
+    super.connectedCallback();
     document.addEventListener('pointerdown', this.#onDocumentPointerDown, true);
   }
 
-  protected onDisconnected(): void {
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
     document.removeEventListener('pointerdown', this.#onDocumentPointerDown, true);
   }
 
-  #setOptions(next: SelectOption[]): void {
-    this.#options = next
+  override willUpdate(changed: PropertyValues): void {
+    if (changed.has('options')) this._activeIndex = -1;
+  }
+
+  override updated(): void {
+    if (this._open && this._activeIndex >= 0) {
+      const active = this.renderRoot.querySelector<HTMLElement>('.ui-select__option.is-active');
+      active?.scrollIntoView?.({ block: 'nearest' });
+    }
+  }
+
+  override render() {
+    const options = this.#options();
+    const selected = options.find((option) => option.value === this.value);
+    const hasLabel = this.label !== '';
+    const ariaLabel = this.getAttribute('aria-label');
+    const activeDescendant =
+      this._open && this._activeIndex >= 0 ? `${this.#uid}-opt-${this._activeIndex}` : nothing;
+
+    return html`
+      <div
+        class="ui-select"
+        part="field"
+        @click=${this.#onRootClick}
+        @mouseover=${this.#onRootMouseover}
+        @keydown=${this.#onRootKeydown}
+      >
+        <span
+          class="ui-select__label"
+          part="label"
+          id=${`${this.#uid}-label`}
+          ?hidden=${!hasLabel}
+          >${this.label}</span
+        >
+        <button
+          class="ui-select__trigger ${this._open ? 'is-open' : ''}"
+          part="trigger"
+          type="button"
+          role="combobox"
+          aria-haspopup="listbox"
+          aria-expanded=${String(this._open)}
+          aria-controls=${`${this.#uid}-listbox`}
+          aria-labelledby=${hasLabel ? `${this.#uid}-label` : nothing}
+          aria-label=${!hasLabel && ariaLabel ? ariaLabel : nothing}
+          aria-activedescendant=${activeDescendant}
+          ?disabled=${this.disabled}
+        >
+          <span
+            class="ui-select__value ${selected ? '' : 'is-placeholder'}"
+            part="value"
+            >${selected?.label ?? this.placeholder}</span
+          >
+          <span class="ui-select__chevron" part="chevron" aria-hidden="true"></span>
+        </button>
+        <ul
+          class="ui-select__listbox"
+          part="listbox"
+          id=${`${this.#uid}-listbox`}
+          role="listbox"
+          ?hidden=${!this._open}
+        >
+          ${repeat(
+            options,
+            (option) => option.value,
+            (option, index) => html`
+              <li
+                class="ui-select__option ${index === this._activeIndex
+                  ? 'is-active'
+                  : ''} ${option.value === this.value ? 'is-selected' : ''}"
+                part="option"
+                role="option"
+                id=${`${this.#uid}-opt-${index}`}
+                data-index=${String(index)}
+                aria-selected=${String(option.value === this.value)}
+              >${option.label}</li>
+            `,
+          )}
+        </ul>
+      </div>
+    `;
+  }
+
+  #options(): SelectOption[] {
+    if (!Array.isArray(this.options)) return [];
+    return this.options
       .filter((option) => option && typeof option.value === 'string')
       .map((option) => ({ value: option.value, label: String(option.label ?? option.value) }));
-    if (this.#built) {
-      this.#activeIndex = -1;
-      this.#renderOptions();
-      this.#sync();
-    }
   }
 
-  #applyOptionsAttribute(): void {
-    const raw = this.getAttribute('options');
-    if (!raw) return;
-    try {
-      const parsed: unknown = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        this.#setOptions(parsed as SelectOption[]);
-      }
-    } catch {
-      /* abaikan JSON tidak valid */
-    }
-  }
-
-  #renderOptions(): void {
-    const listbox = this.#listbox;
-    if (!listbox) return;
-    listbox.innerHTML = '';
-    this.#options.forEach((option, index) => {
-      const item = document.createElement('li');
-      item.className = 'ui-select__option';
-      item.setAttribute('part', 'option');
-      item.setAttribute('role', 'option');
-      item.id = `${this.#uid}-opt-${index}`;
-      item.dataset.index = String(index);
-      item.textContent = option.label;
-      listbox.append(item);
-    });
-  }
-
-  #sync(): void {
-    const selected = this.#options.find((option) => option.value === this.value);
-    if (this.#valueEl) {
-      this.#valueEl.textContent =
-        selected?.label ?? this.getAttribute('placeholder') ?? 'Pilih…';
-      this.#valueEl.classList.toggle('is-placeholder', !selected);
-    }
-    if (this.#labelEl) {
-      const label = this.getAttribute('label') ?? '';
-      this.#labelEl.textContent = label;
-      this.#labelEl.hidden = label === '';
-    }
-    if (this.#trigger) {
-      this.#trigger.disabled = this.disabled;
-      const label = this.getAttribute('label') ?? '';
-      const ariaLabel = this.getAttribute('aria-label');
-      if (label) {
-        this.#trigger.setAttribute('aria-labelledby', `${this.#uid}-label`);
-        this.#trigger.removeAttribute('aria-label');
-      } else if (ariaLabel) {
-        this.#trigger.setAttribute('aria-label', ariaLabel);
-        this.#trigger.removeAttribute('aria-labelledby');
-      } else {
-        this.#trigger.removeAttribute('aria-labelledby');
-        this.#trigger.removeAttribute('aria-label');
-      }
-    }
-    this.#renderOptionStates();
-    this.#reflectOpen();
-  }
-
-  #renderOptionStates(): void {
-    const listbox = this.#listbox;
-    const trigger = this.#trigger;
-    if (!listbox || !trigger) return;
-    Array.from(listbox.children).forEach((child, index) => {
-      const item = child as HTMLElement;
-      const option = this.#options[index];
-      const isSelected = option?.value === this.value;
-      item.classList.toggle('is-selected', isSelected);
-      item.setAttribute('aria-selected', String(isSelected));
-      item.classList.toggle('is-active', index === this.#activeIndex);
-    });
-    if (this.#open && this.#activeIndex >= 0) {
-      trigger.setAttribute('aria-activedescendant', `${this.#uid}-opt-${this.#activeIndex}`);
-    } else {
-      trigger.removeAttribute('aria-activedescendant');
-    }
-  }
-
-  #reflectOpen(): void {
-    this.#trigger?.setAttribute('aria-expanded', String(this.#open));
-    this.#trigger?.classList.toggle('is-open', this.#open);
-    if (this.#listbox) this.#listbox.hidden = !this.#open;
-    if (this.#open) {
-      const active = this.#listbox?.querySelector<HTMLElement>('.is-active');
-      if (active && typeof active.scrollIntoView === 'function') {
-        active.scrollIntoView({ block: 'nearest' });
-      }
-    }
+  #trigger(): HTMLButtonElement | null {
+    return this.renderRoot.querySelector<HTMLButtonElement>('.ui-select__trigger');
   }
 
   #setActive(index: number): void {
-    if (this.#options.length === 0) return;
-    const count = this.#options.length;
-    this.#activeIndex = ((index % count) + count) % count;
-    this.#renderOptionStates();
+    const count = this.#options().length;
+    if (count === 0) return;
+    this._activeIndex = ((index % count) + count) % count;
   }
 
   #moveActive(delta: number): void {
-    if (this.#options.length === 0) return;
-    if (!this.#open) {
+    if (this.#options().length === 0) return;
+    if (!this._open) {
       this.#openList();
       return;
     }
-    const base = this.#activeIndex < 0 ? (delta > 0 ? -1 : 0) : this.#activeIndex;
+    const base = this._activeIndex < 0 ? (delta > 0 ? -1 : 0) : this._activeIndex;
     this.#setActive(base + delta);
   }
 
   #openList(): void {
-    if (this.disabled || this.#open || this.#options.length === 0) return;
-    this.#open = true;
-    const selectedIndex = this.#options.findIndex((option) => option.value === this.value);
-    this.#activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
-    this.#reflectOpen();
-    this.#renderOptionStates();
+    if (this.disabled || this._open || this.#options().length === 0) return;
+    const selectedIndex = this.#options().findIndex((option) => option.value === this.value);
+    this._activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
+    this._open = true;
   }
 
   #closeList(focusTrigger = true): void {
-    if (!this.#open) return;
-    this.#open = false;
-    this.#activeIndex = -1;
-    this.#reflectOpen();
-    this.#renderOptionStates();
-    if (focusTrigger && this.disabled === false) this.#trigger?.focus();
+    if (!this._open) return;
+    this._open = false;
+    this._activeIndex = -1;
+    if (focusTrigger && !this.disabled) this.#trigger()?.focus();
   }
 
   #selectActive(): void {
-    const option = this.#options[this.#activeIndex];
+    const option = this.#options()[this._activeIndex];
     if (option) this.#commit(option);
   }
 
   #commit(option: SelectOption): void {
     const changed = option.value !== this.value;
-    if (changed) this.setAttribute('value', option.value);
+    if (changed) this.value = option.value;
     this.#closeList();
     if (changed) this.emit('ui-change', { value: option.value, label: option.label });
   }
@@ -279,8 +226,8 @@ export class UiSelect extends MorphisElement {
     this.#typeaheadTimer = setTimeout(() => {
       this.#typeahead = '';
     }, 500);
-    if (!this.#open) this.#openList();
-    const match = this.#options.findIndex((option) =>
+    if (!this._open) this.#openList();
+    const match = this.#options().findIndex((option) =>
       option.label.toLowerCase().startsWith(this.#typeahead),
     );
     if (match >= 0) this.#setActive(match);
@@ -290,13 +237,13 @@ export class UiSelect extends MorphisElement {
     if (this.disabled) return;
     const target = event.target as HTMLElement;
     if (target.closest('.ui-select__trigger')) {
-      if (this.#open) this.#closeList();
+      if (this._open) this.#closeList();
       else this.#openList();
       return;
     }
     const item = target.closest<HTMLElement>('.ui-select__option');
     if (item) {
-      this.#activeIndex = Number(item.dataset.index);
+      this._activeIndex = Number(item.dataset.index);
       this.#selectActive();
     }
   };
@@ -305,10 +252,7 @@ export class UiSelect extends MorphisElement {
     const item = (event.target as HTMLElement).closest<HTMLElement>('.ui-select__option');
     if (!item) return;
     const index = Number(item.dataset.index);
-    if (index !== this.#activeIndex) {
-      this.#activeIndex = index;
-      this.#renderOptionStates();
-    }
+    if (index !== this._activeIndex) this._activeIndex = index;
   };
 
   #onRootKeydown = (event: Event): void => {
@@ -321,21 +265,21 @@ export class UiSelect extends MorphisElement {
       event.preventDefault();
       this.#moveActive(-1);
     } else if (key === 'Home') {
-      if (this.#open) {
+      if (this._open) {
         event.preventDefault();
         this.#setActive(0);
       }
     } else if (key === 'End') {
-      if (this.#open) {
+      if (this._open) {
         event.preventDefault();
-        this.#setActive(this.#options.length - 1);
+        this.#setActive(this.#options().length - 1);
       }
     } else if (key === 'Enter' || key === ' ') {
       event.preventDefault();
-      if (this.#open) this.#selectActive();
+      if (this._open) this.#selectActive();
       else this.#openList();
     } else if (key === 'Escape') {
-      if (this.#open) {
+      if (this._open) {
         event.preventDefault();
         this.#closeList();
       }
@@ -347,7 +291,7 @@ export class UiSelect extends MorphisElement {
   };
 
   #onDocumentPointerDown = (event: Event): void => {
-    if (!this.#open) return;
+    if (!this._open) return;
     if (event.composedPath().includes(this)) return;
     this.#closeList(false);
   };

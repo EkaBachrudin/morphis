@@ -57,7 +57,16 @@ for (const file of componentFiles) {
   const name = basename(pkgDir);
   const outDir = join(pkgDir, 'dist');
 
-  await buildEntry({ entry, outDir, fileName: `${name}.js`, format: 'es' });
+  // ESM per komponen: `lit` + `@morphis/core` di-external agar konsumen
+  // (bundler) men-dedupe runtime dan komponen tetap tree-shakable.
+  await buildEntry({
+    entry,
+    outDir,
+    fileName: `${name}.js`,
+    format: 'es',
+    external: [/^lit($|\/)/, '@morphis/core'],
+  });
+  // IIFE untuk Drupal: self-contained (Lit + core ikut dibundel).
   await buildEntry({
     entry,
     outDir,
@@ -92,6 +101,6 @@ await buildEntry({
   outDir: resolve(root, 'packages/react/dist'),
   fileName: 'react.js',
   format: 'es',
-  external: ['react', 'react/jsx-runtime'],
+  external: ['react', 'react/jsx-runtime', /^@morphis\//],
 });
 console.log('components -> packages/react/dist (react.js)');

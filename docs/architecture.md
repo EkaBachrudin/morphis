@@ -18,7 +18,7 @@
 
 Morphis adalah monorepo npm untuk membangun pustaka komponen UI yang:
 
-1. Ditulis **sekali** sebagai **Custom Element** (Vanilla Web Component + TypeScript).
+1. Ditulis **sekali** sebagai **Custom Element** (Lit 3 + TypeScript).
 2. Berjalan langsung di **semua framework & semua versi** karena browser
    memperlakukan tag custom (`<ui-button>`) sebagai elemen HTML native.
 3. Menghasilkan **HTML + CSS + JS** siap pakai yang bisa "dicomot" langsung
@@ -33,8 +33,8 @@ Morphis adalah monorepo npm untuk membangun pustaka komponen UI yang:
 
 | Aspek | Keputusan |
 |---|---|
-| Sumber kebenaran | **Vanilla Custom Elements + TypeScript** |
-| Runtime | **Native browser API** (Custom Elements, Shadow DOM, Template, ES Modules) |
+| Sumber kebenaran | **Lit 3 (LitElement) + TypeScript** |
+| Runtime | **Lit 3** + native API (Custom Elements, Shadow DOM, ES Modules) |
 | Enkapsulasi style | **Shadow DOM** (`mode: 'open'`) |
 | Theming | **CSS custom property `--ui-*`** (diwariskan menembus shadow) + `::part()` + `::slotted()` |
 | Komunikasi | **Atribut/property** + **`CustomEvent`** (`bubbles: true, composed: true`) |
@@ -77,22 +77,24 @@ berbasis CSS variable** + **`::part()`** + **light-weight base class**.
 
 ## 3. Perbandingan Strategi (dan alasan pemilihan)
 
-| Kriteria | Stencil | Lit | **Vanilla WC** | Mitosis |
+| Kriteria | Stencil | **Lit** | Vanilla WC | Mitosis |
 |---|---|---|---|---|
-| Output framework native | Wrapper otomatis | Tidak | **Tidak perlu** | Ya, semua |
-| Output Web Component | Ya | Ya | **Ya** | Ya |
-| Jalan di semua versi framework | Ya (CE) | Ya (CE) | **Ya (CE)** | Tidak (version floor) |
-| Runtime ekstra | Compiler + runtime | ~5KB | **0 (native)** | Per-target |
+| Output framework native | Wrapper otomatis | Tidak | Tidak perlu | Ya, semua |
+| Output Web Component | Ya | **Ya** | Ya | Ya |
+| Jalan di semua versi framework | Ya (CE) | **Ya (CE)** | Ya (CE) | Tidak (version floor) |
+| Runtime ekstra | Compiler + runtime | **±5–6 KB gzip** | 0 (native) | Per-target |
 | DX reaktif | Tinggi | **Tinggi** | Manual (base class) | Tinggi |
-| Ukuran paket | Sedang | Kecil | **Terkecil** | Besar (banyak target) |
-| Lock-in | Compiler | Rendah | **Nol** | Medium |
-| Dokumentasi otomatis | CEM | CEM | **CEM** | Manual |
-| **Keputusan** | | | **Dipilih** | |
+| Ukuran paket | Sedang | **Kecil** | Terkecil | Besar (banyak target) |
+| Lock-in | Compiler | **Rendah** | Nol | Medium |
+| Dokumentasi otomatis | CEM | **CEM** | CEM | Manual |
+| **Keputusan** | | **Dipilih** | | |
 
-**Alasan memilih Vanilla Web Components**: nol runtime, nol lock-in, dan
-memenuhi tujuan "framework apa saja, versi berapa saja". Lit tetap dicatat
-sebagai jalur migrasi DX jika proyek membesar (Lit juga menghasilkan custom
-element yang sama, jadi kompatibel).
+**Alasan memilih Lit**: DX reaktif tinggi (reactive properties, `render()`
+deklaratif dengan `html`, update differential yang menjaga fokus/selection),
+didukung CEM (`litelement`) untuk auto-API, dan tetap menghasilkan **custom
+element standar** sehingga klaim "framework apa saja, versi berapa saja"
+terjaga. Trade-off: runtime ±5–6 KB gzip (di-*share* lintas komponen) yang
+menggantikan klaim "0 runtime" pada iterasi vanilla sebelumnya.
 
 ---
 
@@ -103,8 +105,9 @@ element yang sama, jadi kompatibel).
 - **Shadow DOM** (`attachShadow({ mode: 'open' })`) untuk enkapsulasi penuh.
   `mode: 'open'` dipilih agar DevTools, testing, dan `::part()` bekerja.
 - Tailwind v4 dipakai **hanya di build-time** per komponen untuk menulis style
-  dengan `@apply`. Hasil CSS final **di-inject ke dalam shadow root**, bukan
-  ditempel global.
+  dengan `@apply`. CSS hasil build di-*inline* sebagai string, lalu diserahkan
+  ke Lit lewat helper `litStyles()` dan diadopsi ke shadow root
+  (`adoptedStyleSheets`), bukan ditempel global.
 - **Jembatan `@theme`**: agar `@apply bg-primary` (dan utility token lain) valid,
   token wajib didaftarkan di blok `@theme` pada `base.css`, mis.
   `--color-primary: var(--ui-color-primary, #2563eb)`. `:host` boleh menimpanya
@@ -221,8 +224,8 @@ reusable-components/
 │   ├── main.ts
 │   └── preview.ts
 ├── packages/
-│   ├── core/                    # @morphis/core — MorphisElement + helper
-│   │   └── src/{element,sheet,emit,define,interpolate,index}.ts
+│   ├── core/                    # @morphis/core — MorphisElement (extends LitElement) + helper
+│   │   └── src/{element,sheet,emit,define,index}.ts
 │   ├── tokens/                  # @morphis/tokens
 │   │   ├── src/tokens.json      # Style Dictionary → dist/tokens.css
 │   │   └── scripts/build-tokens.mjs
@@ -232,7 +235,7 @@ reusable-components/
 │   │   └── dist/morphis.js, tokens.css, custom-elements.json
 │   │   └── button/              # @morphis/button (versi independen)
 │   │       ├── package.json, tsconfig.json
-│   │       └── src/{button.ts, button.css, button.template.html,
+│   │       └── src/{button.ts, button.css,
 │   │                button.markup.html, button.stories.ts, button.test.ts, button.mdx}
 │   │   └── card/  input/  select/ ...
 │   └── react/                   # @morphis/react — wrapper React <19
@@ -341,6 +344,7 @@ Output:
     "vite": "^8.0.0",
     "@tailwindcss/vite": "^4.0.0",
     "tailwindcss": "^4.0.0",
+    "lit": "^3.0.0",
     "style-dictionary": "^5.0.0",
     "@custom-elements-manifest/analyzer": "^0.11.0",
     "storybook": "^10.0.0",
@@ -349,63 +353,36 @@ Output:
 }
 ```
 
-> `cem analyze` dipakai **tanpa** flag `--litelement` karena sumbernya vanilla
-> custom element, bukan Lit. (Flag itu khusus Lit dan akan salah membaca metadata.)
+> `@morphis/core` mendeklarasikan **`lit`** sebagai `dependency`; paket komponen
+> cukup bergantung pada `@morphis/core`. Build ESM menge-*external* `lit` &
+> `@morphis/core`, sedangkan varian IIFE dan meta-bundle membundel keduanya.
+
+> `cem analyze` dikonfigurasi dengan **`litelement: true`** (`custom-elements-manifest.config.mjs`)
+> karena sumbernya Lit. Plugin Lit membaca `@property` untuk **Attributes**,
+> serta template `html` untuk **Slots**/**CSS Parts**; anotasi JSDoc `@slot`,
+> `@csspart`, `@cssprop`, dan `@fires` melengkapi sisanya.
 
 ### 6.3 Base class `MorphisElement`
 
-Bertanggung jawab atas: attach shadow, adopsi stylesheet, rendering template,
-lifecycle reaktif, dan emit event.
+`MorphisElement` menurunkan **`LitElement`** sehingga komponen mendapatkan
+reactive properties, `render()` deklaratif (`html`), dan siklus update Lit.
+Base class hanya menambahkan helper `emit()` dan re-export API Lit.
 
 ```ts
 // src/core/element.ts
-import { sheetFrom } from './sheet';
+import { LitElement } from 'lit';
 import { emit } from './emit';
 
-export abstract class MorphisElement extends HTMLElement {
-  static styles: string[] = [];
-  static template = '';
-  protected root: ShadowRoot;
-  #listenersAttached = false;
-
-  constructor() {
-    super();
-    this.root = this.attachShadow({ mode: 'open' });
-  }
-
-  connectedCallback() {
-    if (!this.#listenersAttached) {
-      this.#listenersAttached = true;
-      this.attachEventListeners?.();
-    }
-    this.render();
-    this.onConnected?.();
-  }
-
-  protected render() {
-    this.renderTemplate();
-    this.root.adoptedStyleSheets = (this.constructor as typeof MorphisElement)
-      .styles.map(sheetFrom);
-  }
-
-  protected renderTemplate() {
-    this.root.innerHTML = (this.constructor as typeof MorphisElement)
-      .template;
-  }
-
-  protected emit<T>(type: string, detail: T) {
+export abstract class MorphisElement extends LitElement {
+  protected emit<T>(type: string, detail: T): void {
     emit(this, type, detail);
   }
-
-  // Hook sekali-pasang untuk listener (delegasi di shadow root).
-  protected attachEventListeners?(): void;
-  protected onConnected?(): void;
 }
 ```
 
 ```ts
 // src/core/emit.ts
-export function emit<T>(host: HTMLElement, type: string, detail: T) {
+export function emit<T>(host: HTMLElement, type: string, detail: T): void {
   host.dispatchEvent(
     new CustomEvent(type, { detail, bubbles: true, composed: true }),
   );
@@ -414,21 +391,24 @@ export function emit<T>(host: HTMLElement, type: string, detail: T) {
 
 ```ts
 // src/core/sheet.ts
-const cache = new Map<string, CSSStyleSheet>();
-export function sheetFrom(css: string): CSSStyleSheet {
-  let sheet = cache.get(css);
-  if (!sheet) {
-    sheet = new CSSStyleSheet();
-    sheet.replaceSync(css);
-    cache.set(css, sheet);
-  }
-  return sheet;
+import { unsafeCSS, type CSSResult } from 'lit';
+
+// Tailwind v4 memancarkan rule `@property` yang diabaikan di dalam Shadow DOM;
+// rule ini diangkat ke `document.adoptedStyleSheets` sekali (tailwindcss#15005),
+// lalu CSS dikembalikan sebagai `CSSResult` untuk `static styles` Lit.
+function hoistCustomProperties(css: string): void {
+  /* ...pindai CSSPropertyRule, dedup, sisipkan ke satu stylesheet global... */
+}
+
+export function litStyles(css: string): CSSResult {
+  hoistCustomProperties(css);
+  return unsafeCSS(css);
 }
 ```
 
 ```ts
 // src/core/define.ts
-export function define(tag: string, ctor: CustomElementConstructor) {
+export function define(tag: string, ctor: CustomElementConstructor): void {
   if (typeof customElements !== 'undefined' && !customElements.get(tag)) {
     customElements.define(tag, ctor);
   }
@@ -436,25 +416,30 @@ export function define(tag: string, ctor: CustomElementConstructor) {
 ```
 
 ```ts
-// src/core/interpolate.ts
-export function interpolate(
-  template: string,
-  values: Record<string, string | number>,
-): string {
-  return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, key: string) =>
-    key in values ? String(values[key]) : '',
-  );
-}
+// src/core/index.ts — permukaan publik
+export {
+  html, css, nothing, LitElement,
+  type TemplateResult, type CSSResult, type PropertyValues,
+} from 'lit';
+export { repeat } from 'lit/directives/repeat.js';
+export { property, state } from 'lit/decorators.js';
+export { MorphisElement } from './element';
+export { emit } from './emit';
+export { define } from './define';
+export { litStyles } from './sheet';
 ```
 
-> Fallback: jika `adoptedStyleSheets` tidak tersedia (browser lama), inject
-> `<style>` ke template. Karena target kita evergreen, fallback bersifat opsional.
+> `interpolate()` dan adopsi stylesheet manual tidak lagi diperlukan: template
+> ditangani `lit-html` lewat `render()`, sedangkan style diadopsi Lit dari
+> `static styles`. `litStyles()` tetap ada khusus untuk workaround `@property`
+> Tailwind dan sebagai pembungkus `unsafeCSS` untuk CSS hasil build.
 
 ### 6.4 Storybook & CEM
 
 - Storybook dengan `@storybook/web-components-vite`; story menampilkan props,
   event, slot, dan `part` yang tersedia.
-- `cem analyze` menghasilkan `custom-elements.json` untuk auto API docs.
+- `cem analyze` menghasilkan `custom-elements.json` untuk auto API docs, dengan
+  `litelement: true` sehingga **Attributes** diambil otomatis dari `@property`.
 - `.storybook/preview.ts` memuat manifest itu dengan
   `setCustomElementsManifest(manifest)` sehingga panel docs/controls terisi
   otomatis, dan meng-import `dist/tokens.css` + `src/index.ts`.
@@ -464,73 +449,50 @@ export function interpolate(
 ## 7. Kontrak Komponen
 
 ```ts
-// src/components/button/button.ts
-import { MorphisElement, define, interpolate } from '@morphis/core';
+// packages/components/button/src/button.ts
+import { MorphisElement, define, html, property, litStyles } from '@morphis/core';
 import style from './button.css?inline';
-import template from './button.template.html?raw';
 
 export type ButtonVariant = 'primary' | 'secondary';
 
 export class UiButton extends MorphisElement {
-  static styles = [style];
-  static template = template;
+  static override styles = litStyles(style);
 
-  static get observedAttributes() {
-    return ['variant', 'disabled'];
-  }
+  @property({ reflect: true }) variant: ButtonVariant = 'primary';
+  @property({ type: Boolean, reflect: true }) disabled = false;
 
-  get variant(): ButtonVariant {
-    return (this.getAttribute('variant') as ButtonVariant) ?? 'primary';
-  }
-  set variant(value: ButtonVariant) {
-    this.setAttribute('variant', value);
-  }
-
-  get disabled(): boolean {
-    return this.hasAttribute('disabled');
-  }
-  set disabled(value: boolean) {
-    this.toggleAttribute('disabled', value);
-  }
-
-  attributeChangedCallback() {
-    if (this.isConnected) this.render();
+  override render() {
+    return html`
+      <button
+        class="ui-button ui-button--${this.variant}"
+        part="button"
+        type="button"
+        ?disabled=${this.disabled}
+        @click=${this.#onClick}
+      >
+        <slot name="icon" part="icon"></slot>
+        <span class="ui-button__label" part="label"><slot></slot></span>
+      </button>
+    `;
   }
 
-  // Dipasang sekali saat connect; memakai delegasi agar tahan re-render.
-  protected attachEventListeners() {
-    this.root.addEventListener('click', (event) => {
-      const button = (event.target as HTMLElement).closest('.ui-button');
-      if (!button || this.disabled) return;
-      this.emit('ui-click', { variant: this.variant });
-    });
-  }
-
-  protected renderTemplate() {
-    this.root.innerHTML = interpolate(UiButton.template, { variant: this.variant });
-    const button = this.root.querySelector('.ui-button');
-    button?.toggleAttribute('disabled', this.disabled);
-  }
+  #onClick = (): void => {
+    if (this.disabled) return;
+    this.emit('ui-click', { variant: this.variant });
+  };
 }
 
 define('ui-button', UiButton);
 ```
 
-```html
-<!-- src/components/button/button.template.html -->
-<button class="ui-button ui-button--{{variant}}" part="button" type="button">
-  <slot name="icon" part="icon"></slot>
-  <span class="ui-button__label" part="label"><slot></slot></span>
-</button>
-```
+> **Binding template**: template hidup di dalam `render()` sebagai tagged
+> template `html`, sehingga binding atribut (`variant`), boolean (`?disabled`),
+> dan event (`@click`) semuanya deklaratif. lit-html melakukan update
+> *differential* — hanya node yang berubah yang disentuh, sehingga fokus,
+> posisi kursor, dan scroll internal terjaga. Style **tidak** ikut di markup; ia
+> diserahkan lewat `static styles` (`litStyles()` → `adoptedStyleSheets`, §6.3).
 
-> **Binding template**: file `.html?raw` diimpor sebagai string, jadi tidak ada
-> ekspresi JS yang dievaluasi di dalamnya. Placeholder `{{...}}` diganti oleh
-> helper `interpolate()` (`src/core/interpolate.ts`), lalu state seperti
-> `disabled` diterapkan lewat DOM setelah `innerHTML`. Style **tidak** ikut di
-> template; ia di-adopt dari `static styles` via `adoptedStyleSheets` (lihat §6.3).
-
-- **Props/atribut** → `observedAttributes` + getter/setter.
+- **Props/atribut** → `@property`/`@state` (reactive properties Lit).
 - **Slots** → `<slot>` / `<slot name="...">` untuk komposisi konten.
 - **Parts** → `part="..."` untuk styling dari luar.
 - **Events** → `emit('ui-*', detail)`; `bubbles` + `composed` agar menembus
@@ -546,18 +508,21 @@ src/tokens/tokens.json ──► dist/tokens.css ──────────�
                                                               │ (global, dimuat sekali)
  base.css (@reference + @theme) ──┐                           │
                                   ▼                           │
- src/components/*/{ts,css,template} ─► Vite ─┬─► dist/components/*.js ──┐
-                                             ├─► dist/morphis.js ───────┤
-                                             └─► custom-elements.json ──┤
-                                                                        ▼
+ packages/components/*/src/{ts,css} ─► Vite ─┬─► dist/*.js (ESM, external lit+core) ─┐
+                                             ├─► dist/*.iife.js (self-contained) ────┤
+                                             ├─► dist/morphis.js (meta, self-contained)
+                                             └─► custom-elements.json ────────────────┤
+                                                                                     ▼
                                             Storybook ◄── stories   dist/markup/*.html
                                                         per komponen (referensi Twig)
 ```
 
-Pipeline (semua dalam satu paket): tiap komponen dikompilasi sebagai entry Vite
-terpisah; CSS komponen di-adopt ke shadow. `tokens.css` di-ship terpisah dan
-dimuat konsumen. `morphis.js` adalah bundel penuh untuk konsumsi CDN. CEM dan
-markup dihasilkan dari sumber yang sama ke `custom-elements.json` dan `dist/`.
+Pipeline: tiap komponen dikompilasi sebagai entry Vite terpisah. Varian **ESM**
+menge-*external* `lit` & `@morphis/core` (konsumen/bundler men-dedupe runtime),
+sedangkan varian **IIFE** (`*.iife.js`, untuk Drupal) dan **meta-bundle**
+(`morphis.js`, untuk CDN) membundel Lit + core agar self-contained. `tokens.css`
+di-ship terpisah dan dimuat konsumen. CEM dan markup dihasilkan dari sumber yang
+sama ke `custom-elements.json` dan `dist/`.
 
 ---
 
@@ -739,9 +704,13 @@ mencegah duplikasi logika data/snippet.
 | `@apply` gagal di entry terpisah | Wajib `@reference "../../styles/base.css"`; rule BEM di `@layer components` |
 | CSS nesting tak bisa `&--modifier` | Tulis rule BEM terpisah; enforce via stylelint |
 | `customElements.define` dobel | `define()` menjaga dengan `customElements.get` |
-| CEM tidak membaca getter/setter kompleks | Anotasi JSDoc + `@attr`/`@slot`/`@part`/`@event` |
+| CEM tidak membaca getter/setter kompleks | `litelement: true` membaca `@property` otomatis untuk **Attributes**; anotasi `@slot`/`@csspart`/`@cssprop`/`@fires` melengkapi slot/part/event. |
+| `useDefineForClassFields` meng-override accessor Lit | Set `false` di tsconfig (proyek memakai decorator legacy Lit). |
+| `@property` Tailwind diabaikan di Shadow DOM | `litStyles()` mengangkat rule ke `document.adoptedStyleSheets` sekali (lihat §6.3). |
+| Duplikasi runtime Lit di banyak entry | ESM menge-*external* `lit` + `@morphis/core`; IIFE/meta-bundle membundel (lihat §8). |
+| Update Lit asinkron → assertion test terlalu awal | Tunggu `await el.updateComplete` (atau `elementUpdated` dari `@open-wc/testing`). |
 | Slot tanpa konten merusak a11y | Slot default + fallback; uji dengan addon a11y |
-| Bundel membesar | `preserveModules`/entry per komponen; audit ukuran di CI |
+| Bundel membesar (Lit ±5–6 KB gzip) | Runtime di-*share* lintas komponen; entry per komponen tetap tree-shakable; audit ukuran di CI |
 
 ---
 
@@ -750,12 +719,12 @@ mencegah duplikasi logika data/snippet.
 **Fase 0 — Fondasi**
 - Init single-package npm (`package.json`, `tsconfig`, `vite.config.ts`).
 - `src/tokens` (Style Dictionary) → `dist/tokens.css`.
-- `src/core` (`MorphisElement`, `sheet`, `emit`, `define`, `interpolate`).
+- `src/core` (`MorphisElement`, `sheet`, `emit`, `define`). *Catatan: `interpolate` awalnya dipakai di iterasi vanilla dan dihapus pada Fase 5 (Lit).*
 - `src/styles/base.css` (konteks `@apply` + blok `@theme`, tidak di-ship global).
 - Lint (stylelint + eslint), CI dasar.
 
 **Fase 1 — PoC 3 komponen**
-- `button`, `input`, `card` sebagai custom element vanilla + Shadow DOM.
+- `button`, `input`, `card` sebagai custom element + Shadow DOM (awalnya vanilla, kini berbasis Lit).
 - CSS `ui-*` per komponen, di-adopt ke shadow.
 - Vite build: bundle penuh + entry per komponen + `dist/tokens.css`.
 - Storybook (`web-components-vite`) di `.storybook/` + controls + a11y.
@@ -779,6 +748,14 @@ mencegah duplikasi logika data/snippet.
   Custom Properties secara dinamis.
 - Pencarian Storybook, deploy statis (`storybook-static/`), dan migrasi panduan
   dari `docs/`.
+
+**Fase 5 — Migrasi fondasi ke Lit (selesai)**
+- `MorphisElement` menurunkan `LitElement`; `interpolate()`/`*.template.html`
+  dihapus; reactive properties + `render()` deklaratif + `litStyles()`.
+- CEM beralih ke `litelement: true`; build ESM menge-*external* `lit` &
+  `@morphis/core`, IIFE/meta membundel.
+- Seluruh dokumentasi (`README.md`, `docs/architecture.md`, panduan Storybook,
+  generator) disesuaikan.
 
 ---
 
@@ -815,4 +792,7 @@ kecil) per framework.
 - Tailwind Functions & Directives (`@reference`, `@apply`): https://tailwindcss.com/docs/functions-and-directives
 - Vite Library Mode: https://vite.dev/guide/build.html#library-mode
 - Lit: https://lit.dev/
+- Lit — Reactive properties: https://lit.dev/docs/components/properties/
+- Lit — Templates & directives: https://lit.dev/docs/templates/overview/
+- Lit — Decorators: https://lit.dev/docs/components/decorators/
 - Storybook Web Components: https://storybook.js.org/docs/web-components

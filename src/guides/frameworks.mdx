@@ -8,6 +8,11 @@ Prinsipnya: **import sekali** agar custom element terdaftar, lalu pakai tag
 HTML-nya. Karena `<ui-*>` adalah elemen native, **semua versi framework**
 bekerja tanpa build khusus.
 
+> **Catatan internal**: komponen dibangun dengan **Lit 3**, tetapi Lit hanya
+> dipakai di dalam implementasi. Permukaan publik tetap custom element murni
+> (atribut/property, `CustomEvent`, slot, `::part()`) — tidak ada API Lit yang
+> bocor ke konsumen.
+
 ```ts
 import '@morphis/button'; // daftarkan <ui-button>
 ```

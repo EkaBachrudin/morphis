@@ -14,7 +14,8 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "useDefineForClassFields": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
     "paths": {
       "@morphis/core": ["./packages/core/src/index.ts"],
       "@morphis/button": ["./packages/components/button/src/button.ts"],

@@ -3,6 +3,12 @@ import { createApp, h } from 'vue';
 import '@morphis/button';
 import '@morphis/input';
 
+/** Menunggu siklus update Lit (render async) sebelum assertion DOM. */
+async function settle(el: Element): Promise<void> {
+  const updatable = el as unknown as { updateComplete?: Promise<unknown> };
+  if (updatable.updateComplete) await updatable.updateComplete;
+}
+
 describe('Vue integration', () => {
   it('renders ui-button and binds the ui-click event', async () => {
     const onClick = vi.fn();
@@ -16,6 +22,7 @@ describe('Vue integration', () => {
     await Promise.resolve();
 
     const el = host.querySelector('ui-button') as HTMLElement;
+    await settle(el);
     expect(el.getAttribute('variant')).toBe('primary');
     expect(el.shadowRoot?.querySelector('.ui-button--primary')).not.toBeNull();
 
@@ -37,6 +44,7 @@ describe('Vue integration', () => {
     await Promise.resolve();
 
     const el = host.querySelector('ui-input') as HTMLElement;
+    await settle(el);
     expect(el.getAttribute('type')).toBe('email');
     expect(el.getAttribute('placeholder')).toBe('a@b.c');
 

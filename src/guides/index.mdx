@@ -5,12 +5,13 @@ import { Meta } from '@storybook/addon-docs/blocks';
 # Morphis
 
 Pustaka komponen **framework-agnostic** yang dibangun sekali sebagai **Custom
-Elements** (Web Components native), lalu dapat dipakai di framework apa pun,
-HTML biasa, maupun Twig/Drupal.
+Elements** (Lit 3 + TypeScript), lalu dapat dipakai di framework apa pun, HTML
+biasa, maupun Twig/Drupal.
 
 - Enkapsulasi: Shadow DOM (`mode: 'open'`)
 - Styling: Tailwind v4 (build-time, `@apply`) + design token `--ui-*`
 - Theming: CSS custom property + `::part()` + `::slotted()`
+- Runtime: **Lit 3** (±5–6 KB gzip, di-*share* lintas komponen; tetap custom element standar)
 - Distribusi: paket npm per komponen (versioning independen) + meta-bundle + markup HTML untuk Drupal
 
 ## Konsumsi

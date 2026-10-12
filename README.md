@@ -1,15 +1,15 @@
 # Morphis — monorepo komponen
 
 Pustaka komponen **framework-agnostic** yang dibangun sekali sebagai **Custom
-Elements** (Web Components native) dengan TypeScript, lalu dapat dipakai di
-framework apa pun, HTML biasa, maupun Twig/Drupal.
+Elements** (Web Components native) dengan **Lit 3 + TypeScript**, lalu dapat
+dipakai di framework apa pun, HTML biasa, maupun Twig/Drupal.
 
-- Sumber kebenaran: Vanilla Custom Elements + TypeScript
+- Sumber kebenaran: Lit 3 (LitElement) + TypeScript
 - Enkapsulasi: Shadow DOM (`mode: 'open'`)
 - Styling: Tailwind v4 (build-time, `@apply`) + design token `--ui-*`
 - Theming: CSS custom property + `::part()` + `::slotted()`
 - Distribusi: **paket npm per komponen** (versioning independen) + markup HTML untuk Drupal
-- Prinsip: *build once, run anywhere* — tanpa compiler framework, tanpa version floor, tanpa lock-in
+- Prinsip: *build once, run anywhere* — custom element standar (Lit), tanpa compiler framework per-target, tanpa version floor
 
 Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 
@@ -26,14 +26,14 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 | Integrasi ke CMS/Drupal ribet, butuh build tooling. | Cukup salin **tiga file** (`tokens.css`, `*.iife.js`, `*.markup.html`) — script klasik tanpa `type="module"`. |
 | Memperbaiki satu komponen memaksa penaikan versi semua komponen. | **Paket npm per komponen** dengan semver independen (Changesets); memperbaiki `card` tidak menaikkan `button`. |
 | Dokumentasi API cepat usang / drift dengan kode. | **Custom Elements Manifest** (`custom-elements.json`) men-generate tabel API Storybook otomatis dari anotasi JSDoc. |
-| Runtime framework membengkakkan ukuran bundel. | **0 runtime** (native browser API) + entry per komponen sehingga tree-shakable. |
+| Runtime framework membengkakkan ukuran bundel. | **Runtime minimal** (Lit ±5–6 KB gzip, di-*share* lintas komponen) + entry per komponen sehingga tree-shakable. |
 | Event komponen tidak sampai ke framework induk. | `CustomEvent` dengan `bubbles: true, composed: true` menembus shadow dan ditangkap framework induk. |
 
 ## Kemudahan (Developer Experience)
 
 - **Generator komponen** — `npm run gen -- component badge` langsung membuat paket
   `@morphis/<nama>` (package.json, tsconfig, `src/{nama}.ts`, `.css`,
-  `.template.html`, `.markup.html`, `.stories.ts`, `.test.ts`) dan mendaftarkannya di meta.
+  `.markup.html`, `.stories.ts`, `.test.ts`) dan mendaftarkannya di meta.
 - **Satu permukaan dokumentasi (Storybook)** — contoh live, controls, **tabel API
   otomatis** (Attributes/Events/Slots/CSS Parts/CSS Custom Properties dari CEM),
   snippet per-framework lewat toolbar **Framework** (Native/Twig/React/Vue/Angular),
@@ -49,7 +49,7 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 
 | Paket | Isi |
 | --- | --- |
-| `@morphis/core` | Base class `MorphisElement` + helper (`define`, `emit`, `interpolate`, `applyStyles`) |
+| `@morphis/core` | Base class `MorphisElement` (extends `LitElement`) + helper (`define`, `emit`, `litStyles`) + re-export Lit (`html`, `css`, `nothing`, `property`, `state`, `repeat`) |
 | `@morphis/tokens` | `tokens.css` (design token `--ui-*`) |
 | `@morphis/button`, `@morphis/card`, `@morphis/input`, `@morphis/select`, … | Satu Web Component per paket (versi independen) |
 | `@morphis/react` | Wrapper tipis untuk React 16.8–18 |
@@ -80,8 +80,9 @@ npm run release            # build + publish paket yang berubah
 
 ## Arsitektur singkat
 
-- **Base class** `MorphisElement` (`@morphis/core`): attach shadow, adopsi
-  stylesheet, render template, lifecycle reaktif, dan `emit` event.
+- **Base class** `MorphisElement` (`@morphis/core`): turunan `LitElement`
+  (reactive properties + `render()` deklaratif dengan `html`), ditambah helper
+  `emit` event.
 - **Enkapsulasi**: Shadow DOM (`mode: 'open'`) agar DevTools, testing, dan
   `::part()` bekerja.
 - **Styling**: Tailwind v4 hanya di *build-time* melalui `@apply` pada file CSS
@@ -186,10 +187,13 @@ npm install                       # link workspace
 ```
 
 Generator membuat `packages/components/<nama>/` berisi `package.json`,
-`tsconfig.json`, dan `src/{<nama>.ts,.css,.template.html,.markup.html,.stories.ts,.test.ts}`.
+`tsconfig.json`, dan `src/{<nama>.ts,.css,.markup.html,.stories.ts,.test.ts}`.
+Komponen dibuat dengan Lit: `render()` mengembalikan template `html`, dan state
+dideklarasikan lewat `@property`/`@state`.
 
-Tambahkan anotasi JSDoc `@attr`/`@slot`/`@csspart`/`@fires`/`@cssprop` pada
-komponen. CEM hasilnya mengisi **tabel API Storybook** secara otomatis.
+Anotasi JSDoc `@slot`/`@csspart`/`@fires`/`@cssprop` pada komponen mengisi
+**tabel API Storybook** secara otomatis. Atribut **tidak** perlu `@attr` manual:
+CEM (`litelement: true`) membacanya dari `@property`.
 
 ## Pengembangan lokal
 
@@ -241,9 +245,9 @@ Storybook → **Panduan/Publikasi**).
 ## Catatan teknis penting
 
 - **Tailwind v4 `@property` tidak berlaku di dalam Shadow DOM**
-  (tailwindlabs/tailwindcss#15005). `MorphisElement` mengekstrak rule
-  `@property` dari tiap stylesheet komponen dan mengangkatnya ke
-  `document.adoptedStyleSheets` sekali, sehingga utility `ring`, `shadow`,
+  (tailwindlabs/tailwindcss#15005). Helper `litStyles()` (`@morphis/core`)
+  mengekstrak rule `@property` dari tiap stylesheet komponen dan mengangkatnya
+  ke `document.adoptedStyleSheets` sekali, sehingga utility `ring`, `shadow`,
   `gradient`, `translate`, dll. tetap bekerja.
 - Utilitas Tailwind **hanya** dipakai di dalam `@apply` pada file CSS komponen,
   tidak pernah di markup. Markup hanya berisi struktur + BEM + `<slot>`.

@@ -59,6 +59,11 @@ Perubahan yang tidak perlu rilis: `npx changeset add --empty`.
 > (mis. meta `@morphis/components` `"@morphis/x": "^0.1.0"` lalu x → 0.2.0),
 > Changesets otomatis ikut menaikkan paket dependen itu.
 
+> **Catatan Lit**: `@morphis/core` mendeklarasikan `lit` sebagai `dependency`.
+> Saat merilis perubahan fondasi (mis. migrasi ke Lit), buat changeset untuk
+> `@morphis/core` **dan** paket komponen yang bergantung padanya — Changesets
+> akan ikut menaikkan paket dependen secara otomatis.
+
 ## 2. (Opsional) Preview
 
 ```bash

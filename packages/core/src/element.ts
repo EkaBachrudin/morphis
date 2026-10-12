@@ -1,45 +1,16 @@
-import { applyStyles } from './sheet';
+import { LitElement } from 'lit';
 import { emit } from './emit';
 
-export abstract class MorphisElement extends HTMLElement {
-  static styles: string[] = [];
-  static template = '';
-
-  protected root: ShadowRoot;
-  #listenersAttached = false;
-
-  constructor() {
-    super();
-    this.root = this.attachShadow({ mode: 'open' });
-  }
-
-  connectedCallback(): void {
-    if (!this.#listenersAttached) {
-      this.#listenersAttached = true;
-      this.attachEventListeners?.();
-    }
-    this.render();
-    this.onConnected?.();
-  }
-
-  disconnectedCallback(): void {
-    this.onDisconnected?.();
-  }
-
-  protected render(): void {
-    this.renderTemplate();
-    applyStyles(this.root, (this.constructor as typeof MorphisElement).styles);
-  }
-
-  protected renderTemplate(): void {
-    this.root.innerHTML = (this.constructor as typeof MorphisElement).template;
-  }
-
+/**
+ * Base class untuk semua komponen Morphis.
+ *
+ * Menurunkan {@link LitElement} sehingga komponen mendapatkan reactive
+ * properties, binding template `html`, dan siklus update deklaratif; lalu
+ * menambahkan helper `emit()` untuk memancarkan `CustomEvent` yang menembus
+ * shadow boundary (`bubbles: true, composed: true`).
+ */
+export abstract class MorphisElement extends LitElement {
   protected emit<T>(type: string, detail: T): void {
     emit(this, type, detail);
   }
-
-  protected attachEventListeners?(): void;
-  protected onConnected?(): void;
-  protected onDisconnected?(): void;
 }

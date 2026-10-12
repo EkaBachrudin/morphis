@@ -24,6 +24,10 @@ themes/custom/mytheme/libraries/morphis/
 Gunakan varian **`*.iife.js`** (script klasik) agar tidak butuh
 `<script type="module">`. Bila memakai bundler modern, gunakan `*.js` (ESM).
 
+> Varian `*.iife.js` dan meta-bundle `morphis.js` sudah **self-contained**:
+> runtime Lit ikut dibundel (sekitar 5–6 KB gzip) sehingga tetap tidak butuh
+> `type="module"` maupun dependensi eksternal.
+
 ## 2. Definisikan Drupal library
 
 `themes/custom/mytheme/mytheme.libraries.yml`:

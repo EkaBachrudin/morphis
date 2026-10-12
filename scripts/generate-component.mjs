@@ -52,16 +52,11 @@ const files = {
   }
 }
 `,
-  [`${name}.template.html`]: `<div class="ui-${name}" part="root">
-  <slot></slot>
-</div>
-`,
   [`${name}.markup.html`]: `<!-- Consumer markup — paste into Twig or plain HTML. Load @morphis/${name} (dist/${name}.js atau ${name}.iife.js) + @morphis/tokens tokens.css once. -->
 <${tag}>Konten</${tag}>
 `,
-  [`${name}.ts`]: `import { MorphisElement, define, interpolate } from '@morphis/core';
+  [`${name}.ts`]: `import { MorphisElement, define, html, litStyles, property } from '@morphis/core';
 import style from './${name}.css?inline';
-import template from './${name}.template.html?raw';
 
 /**
  * Komponen ${tag}.
@@ -77,27 +72,17 @@ import template from './${name}.template.html?raw';
  * @cssprop [--ui-color-border=#e5e7eb] - Warna border.
  */
 export class ${className} extends MorphisElement {
-  static override styles = [style];
-  static override template = template;
+  static override styles = litStyles(style);
 
-  static get observedAttributes(): string[] {
-    return ['label'];
-  }
+  /** Label komponen. */
+  @property({ reflect: true }) label = '';
 
-  get label(): string {
-    return this.getAttribute('label') ?? '';
-  }
-
-  set label(value: string) {
-    this.setAttribute('label', value);
-  }
-
-  attributeChangedCallback(): void {
-    if (this.isConnected) this.render();
-  }
-
-  protected override renderTemplate(): void {
-    this.root.innerHTML = interpolate(${className}.template, { label: this.label });
+  override render() {
+    return html\`
+      <div class="ui-${name}" part="root">
+        <slot></slot>
+      </div>
+    \`;
   }
 }
 

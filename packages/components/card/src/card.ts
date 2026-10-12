@@ -1,15 +1,20 @@
-import { MorphisElement, define, interpolate } from '@morphis/core';
+import { MorphisElement, define, html, property, state, litStyles } from '@morphis/core';
 import style from './card.css?inline';
-import template from './card.template.html?raw';
 
 export type CardVariant = 'elevated' | 'outlined';
+
+function slotHasContent(slot: HTMLSlotElement): boolean {
+  return slot.assignedNodes({ flatten: true }).some(
+    (node) =>
+      node.nodeType === Node.ELEMENT_NODE ||
+      (node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim() !== ''),
+  );
+}
 
 /**
  * Kartu framework-agnostic dengan header/body/footer.
  *
  * @element ui-card
- *
- * @attr {'elevated'|'outlined'} [variant=elevated] - Gaya visual kartu.
  *
  * @slot - Konten utama (body).
  * @slot header - Konten header. Disembunyikan bila kosong.
@@ -24,50 +29,46 @@ export type CardVariant = 'elevated' | 'outlined';
  * @cssprop [--ui-color-border=#e5e7eb] - Warna border/pemisah.
  */
 export class UiCard extends MorphisElement {
-  static override styles = [style];
-  static override template = template;
+  static override styles = litStyles(style);
 
-  static get observedAttributes(): string[] {
-    return ['variant'];
+  /** Gaya visual kartu. */
+  @property({ reflect: true }) variant: CardVariant = 'elevated';
+
+  @state() private _headerEmpty = true;
+  @state() private _footerEmpty = true;
+
+  override render() {
+    return html`
+      <div class="ui-card ui-card--${this.variant}" part="card">
+        <div class="ui-card__header" part="header" ?hidden=${this._headerEmpty}>
+          <slot name="header" @slotchange=${this.#onHeaderSlot}></slot>
+        </div>
+        <div class="ui-card__body" part="body"><slot></slot></div>
+        <div class="ui-card__footer" part="footer" ?hidden=${this._footerEmpty}>
+          <slot name="footer" @slotchange=${this.#onFooterSlot}></slot>
+        </div>
+      </div>
+    `;
   }
 
-  get variant(): CardVariant {
-    return (this.getAttribute('variant') as CardVariant) ?? 'elevated';
+  override firstUpdated(): void {
+    this.#sync(this.renderRoot.querySelector('slot[name="header"]'), true);
+    this.#sync(this.renderRoot.querySelector('slot[name="footer"]'), false);
   }
 
-  set variant(value: CardVariant) {
-    this.setAttribute('variant', value);
-  }
+  #onHeaderSlot = (event: Event): void => {
+    this.#sync(event.target as HTMLSlotElement, true);
+  };
 
-  attributeChangedCallback(): void {
-    if (this.isConnected) this.render();
-  }
+  #onFooterSlot = (event: Event): void => {
+    this.#sync(event.target as HTMLSlotElement, false);
+  };
 
-  protected override renderTemplate(): void {
-    this.root.innerHTML = interpolate(UiCard.template, { variant: this.variant });
-  }
-
-  protected onConnected(): void {
-    this.watchSlots();
-  }
-
-  private watchSlots(): void {
-    this.root.querySelectorAll('slot').forEach((slot) => {
-      const sync = (): void => {
-        const wrapper = slot.parentElement;
-        if (!wrapper) return;
-        if (typeof slot.assignedNodes !== 'function') return;
-        const assigned = slot.assignedNodes({ flatten: true });
-        const visible = assigned.some(
-          (node) =>
-            node.nodeType === Node.ELEMENT_NODE ||
-            (node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim() !== ''),
-        );
-        wrapper.hidden = !visible;
-      };
-      slot.addEventListener('slotchange', sync);
-      sync();
-    });
+  #sync(slot: HTMLSlotElement | null, header: boolean): void {
+    if (!slot) return;
+    const empty = !slotHasContent(slot);
+    if (header) this._headerEmpty = empty;
+    else this._footerEmpty = empty;
   }
 }
 

@@ -1,6 +1,5 @@
-import { MorphisElement, define, interpolate } from '@morphis/core';
+import { MorphisElement, define, html, property, litStyles } from '@morphis/core';
 import style from './button.css?inline';
-import template from './button.template.html?raw';
 
 export type ButtonVariant = 'primary' | 'secondary';
 
@@ -8,9 +7,6 @@ export type ButtonVariant = 'primary' | 'secondary';
  * Tombol framework-agnostic.
  *
  * @element ui-button
- *
- * @attr {'primary'|'secondary'} [variant=primary] - Gaya visual tombol.
- * @attr {boolean} [disabled=false] - Menonaktifkan tombol.
  *
  * @slot - Label teks tombol.
  * @slot icon - Ikon opsional di sisi kiri label.
@@ -29,46 +25,33 @@ export type ButtonVariant = 'primary' | 'secondary';
  * @fires ui-click - Dipancarkan saat tombol diklik. `detail: { variant }`.
  */
 export class UiButton extends MorphisElement {
-  static override styles = [style];
-  static override template = template;
+  static override styles = litStyles(style);
 
-  static get observedAttributes(): string[] {
-    return ['variant', 'disabled'];
+  /** Gaya visual tombol. */
+  @property({ reflect: true }) variant: ButtonVariant = 'primary';
+
+  /** Menonaktifkan tombol. */
+  @property({ type: Boolean, reflect: true }) disabled = false;
+
+  override render() {
+    return html`
+      <button
+        class="ui-button ui-button--${this.variant}"
+        part="button"
+        type="button"
+        ?disabled=${this.disabled}
+        @click=${this.#onClick}
+      >
+        <slot name="icon" part="icon"></slot>
+        <span class="ui-button__label" part="label"><slot></slot></span>
+      </button>
+    `;
   }
 
-  get variant(): ButtonVariant {
-    return (this.getAttribute('variant') as ButtonVariant) ?? 'primary';
-  }
-
-  set variant(value: ButtonVariant) {
-    this.setAttribute('variant', value);
-  }
-
-  get disabled(): boolean {
-    return this.hasAttribute('disabled');
-  }
-
-  set disabled(value: boolean) {
-    this.toggleAttribute('disabled', value);
-  }
-
-  attributeChangedCallback(): void {
-    if (this.isConnected) this.render();
-  }
-
-  protected attachEventListeners(): void {
-    this.root.addEventListener('click', (event) => {
-      const button = (event.target as HTMLElement).closest('.ui-button');
-      if (!button || this.disabled) return;
-      this.emit('ui-click', { variant: this.variant });
-    });
-  }
-
-  protected override renderTemplate(): void {
-    this.root.innerHTML = interpolate(UiButton.template, { variant: this.variant });
-    const button = this.root.querySelector<HTMLButtonElement>('.ui-button');
-    button?.toggleAttribute('disabled', this.disabled);
-  }
+  #onClick = (): void => {
+    if (this.disabled) return;
+    this.emit('ui-click', { variant: this.variant });
+  };
 }
 
 define('ui-button', UiButton);

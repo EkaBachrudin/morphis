@@ -30,9 +30,8 @@ packages/components/badge/
 ├── package.json                 # @morphis/badge, versi 0.1.0
 ├── tsconfig.json
 └── src/
-    ├── badge.ts                 # kelas <ui-badge>
+    ├── badge.ts                 # kelas <ui-badge> (Lit)
     ├── badge.css                # gaya (Tailwind lewat @apply)
-    ├── badge.template.html      # template Shadow DOM
     ├── badge.markup.html        # markup siap tempel (Twig/HTML)
     ├── badge.stories.ts         # contoh Storybook
     ├── badge.mdx                # halaman Docs komponen
@@ -56,19 +55,40 @@ dari paket lain dan dari Storybook.
 
 ## 3. Lengkapi komponen
 
-Sunting `src/badge.ts` (dan `.css`/`.template.html`), lalu tambahkan anotasi
-JSDoc. CEM membacanya dan mengisi **tabel API Storybook** secara otomatis:
+Sunting `src/badge.ts` (dan `.css`). Komponen dibuat dengan **Lit**: tulis
+template di dalam `render()` dengan tagged template `html`, dan deklarasikan
+state lewat `@property` (menjadi Atribut) / `@state` (internal). CEM
+(`litelement: true`) membaca `@property` untuk mengisi **tabel Attributes**;
+anotasi JSDoc mengisi slot/part/event/custom property.
 
 ```ts
+import { MorphisElement, define, html, property, litStyles } from '@morphis/core';
+import style from './badge.css?inline';
+
 /**
  * @element ui-badge
  *
- * @attr {string} label - Teks badge.
  * @slot - Konten utama.
  * @csspart root - Elemen pembungkus.
  * @fires ui-click - Saat badge diklik.
  * @cssprop [--ui-color-primary=#2563eb] - Warna utama.
  */
+export class UiBadge extends MorphisElement {
+  static override styles = litStyles(style);
+
+  /** Teks badge. */
+  @property({ reflect: true }) label = '';
+
+  override render() {
+    return html`
+      <div class="ui-badge" part="root">
+        <slot></slot>
+      </div>
+    `;
+  }
+}
+
+define('ui-badge', UiBadge);
 ```
 
 Aturan CSS: file komponen wajib diawali

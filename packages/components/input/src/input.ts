@@ -1,20 +1,26 @@
-import { MorphisElement, define, interpolate } from '@morphis/core';
+import {
+  MorphisElement,
+  define,
+  html,
+  nothing,
+  property,
+  state,
+  litStyles,
+} from '@morphis/core';
 import style from './input.css?inline';
-import template from './input.template.html?raw';
+
+function slotHasContent(slot: HTMLSlotElement): boolean {
+  return slot.assignedNodes({ flatten: true }).some(
+    (node) =>
+      node.nodeType === Node.ELEMENT_NODE ||
+      (node.nodeType === Node.TEXT_NODE && (node.textContent ?? '').trim() !== ''),
+  );
+}
 
 /**
  * Input teks framework-agnostic.
  *
  * @element ui-input
- *
- * @attr {'text'|'email'|'password'|'number'|'search'|'tel'|'url'} [type=text] - Tipe input HTML.
- * @attr {string} [value] - Nilai awal input.
- * @attr {string} [placeholder] - Teks placeholder.
- * @attr {string} [label] - Label yang ditampilkan di atas input.
- * @attr {boolean} [disabled=false] - Menonaktifkan input.
- * @attr {boolean} [readonly=false] - Membuat input hanya-baca.
- * @attr {string} [name] - Nama field untuk form submission.
- * @attr {boolean} [invalid=false] - Menandai input dalam keadaan tidak valid.
  *
  * @slot label - Label kustom, menggantikan atribut `label`.
  *
@@ -30,104 +36,89 @@ import template from './input.template.html?raw';
  * @fires ui-change - Nilai dikomit. `detail: { value }`.
  */
 export class UiInput extends MorphisElement {
-  static override styles = [style];
-  static override template = template;
+  static override styles = litStyles(style);
 
-  #input?: HTMLInputElement;
-  #labelEl?: HTMLElement;
-  #labelSlot?: HTMLSlotElement;
+  /** Nilai input. */
+  @property({ reflect: true }) value = '';
 
-  static get observedAttributes(): string[] {
-    return ['value', 'type', 'placeholder', 'disabled', 'readonly', 'name', 'label', 'invalid'];
+  /** Tipe input HTML. */
+  @property({ reflect: true }) type = 'text';
+
+  /** Teks placeholder. */
+  @property({ reflect: true }) placeholder = '';
+
+  /** Nama field untuk form submission. */
+  @property({ reflect: true }) name = '';
+
+  /** Label yang ditampilkan di atas input. */
+  @property({ reflect: true }) label = '';
+
+  /** Menonaktifkan input. */
+  @property({ type: Boolean, reflect: true }) disabled = false;
+
+  /** Membuat input hanya-baca. */
+  @property({ type: Boolean, reflect: true }) readonly = false;
+
+  /** Menandai input dalam keadaan tidak valid. */
+  @property({ type: Boolean, reflect: true }) invalid = false;
+
+  @state() private _slotLabel = false;
+
+  override render() {
+    return html`
+      <label class="ui-field" part="field">
+        <span class="ui-field__label" part="label" ?hidden=${!this.#hasLabel()}>
+          <slot name="label" @slotchange=${this.#onLabelSlot}>${this.label}</slot>
+        </span>
+        <input
+          class="ui-input"
+          part="input"
+          type=${this.type}
+          name=${this.name || nothing}
+          placeholder=${this.placeholder}
+          ?disabled=${this.disabled}
+          ?readonly=${this.readonly}
+          aria-invalid=${this.invalid ? '' : nothing}
+          @input=${this.#onInput}
+          @change=${this.#onChange}
+        />
+      </label>
+    `;
   }
 
-  get value(): string {
-    return this.#input?.value ?? this.getAttribute('value') ?? '';
+  override firstUpdated(): void {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="label"]');
+    if (slot) this._slotLabel = slotHasContent(slot);
+    this.#syncValue();
   }
 
-  set value(next: string) {
-    this.setAttribute('value', next);
-    if (this.#input && this.#input.value !== next) this.#input.value = next;
+  override updated(): void {
+    this.#syncValue();
   }
 
-  get type(): string {
-    return this.getAttribute('type') ?? 'text';
+  #hasLabel(): boolean {
+    return this._slotLabel || this.label !== '';
   }
 
-  set type(next: string) {
-    this.setAttribute('type', next);
-  }
-
-  get disabled(): boolean {
-    return this.hasAttribute('disabled');
-  }
-
-  set disabled(next: boolean) {
-    this.toggleAttribute('disabled', next);
-  }
-
-  attributeChangedCallback(): void {
-    if (this.isConnected) this.render();
-  }
-
-  protected override render(): void {
-    super.render();
-    this.sync();
-  }
-
-  protected override renderTemplate(): void {
-    if (this.#input) return;
-    this.root.innerHTML = interpolate(UiInput.template, {
-      label: this.getAttribute('label') ?? '',
-    });
-    this.#input = this.root.querySelector<HTMLInputElement>('.ui-input') ?? undefined;
-    this.#labelEl = this.root.querySelector<HTMLElement>('.ui-field__label') ?? undefined;
-    this.#labelSlot = this.root.querySelector<HTMLSlotElement>('slot[name="label"]') ?? undefined;
-  }
-
-  private sync(): void {
-    const input = this.#input;
+  #syncValue(): void {
+    const input = this.renderRoot.querySelector<HTMLInputElement>('.ui-input');
     if (!input) return;
-
-    input.type = this.type;
-    input.placeholder = this.getAttribute('placeholder') ?? '';
-    input.disabled = this.disabled;
-    input.readOnly = this.hasAttribute('readonly');
-    input.toggleAttribute('aria-invalid', this.hasAttribute('invalid'));
-
-    const name = this.getAttribute('name');
-    if (name) input.name = name;
-    else input.removeAttribute('name');
-
-    const value = this.getAttribute('value') ?? '';
-    if (document.activeElement !== input && input.value !== value) {
-      input.value = value;
-    }
-
-    if (this.#labelEl) {
-      const hasSlotted = Boolean(this.querySelector('[slot="label"]'));
-      const hasLabel = hasSlotted || (this.getAttribute('label') ?? '') !== '';
-      this.#labelEl.hidden = !hasLabel;
-    }
-
-    if (this.#labelSlot && !this.querySelector('[slot="label"]')) {
-      this.#labelSlot.textContent = this.getAttribute('label') ?? '';
+    if (this.shadowRoot?.activeElement !== input && input.value !== this.value) {
+      input.value = this.value;
     }
   }
 
-  protected attachEventListeners(): void {
-    this.root.addEventListener('input', (event) => {
-      const input = event.target as HTMLInputElement;
-      if (!input.classList.contains('ui-input')) return;
-      this.emit('ui-input', { value: input.value });
-    });
+  #onLabelSlot = (event: Event): void => {
+    this._slotLabel = slotHasContent(event.target as HTMLSlotElement);
+  };
 
-    this.root.addEventListener('change', (event) => {
-      const input = event.target as HTMLInputElement;
-      if (!input.classList.contains('ui-input')) return;
-      this.emit('ui-change', { value: input.value });
-    });
-  }
+  #onInput = (event: Event): void => {
+    this.emit('ui-input', { value: (event.target as HTMLInputElement).value });
+  };
+
+  #onChange = (event: Event): void => {
+    this.emit('ui-change', { value: (event.target as HTMLInputElement).value });
+  };
 }
 
 define('ui-input', UiInput);
