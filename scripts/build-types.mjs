@@ -7,7 +7,6 @@ const root = resolve(import.meta.dirname, '..');
 const componentConfigs = globSync('packages/components/*/tsconfig.json', { cwd: root }).sort();
 const configs = [
   ...componentConfigs,
-  'packages/components/tsconfig.json',
   'packages/react/tsconfig.json',
 ];
 

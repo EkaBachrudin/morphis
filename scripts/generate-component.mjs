@@ -237,12 +237,6 @@ function wireComponent(name) {
       `      "@eka-morphis/${name}": ["./packages/components/${name}/dist/types/${name}.d.ts", "./packages/components/${name}/src/${name}.ts"],`,
       `"@eka-morphis/${name}"`,
     ),
-    insertBefore(
-      'packages/components/package.json',
-      '"@eka-morphis/select": "^0.1.0"',
-      `    "@eka-morphis/${name}": "^0.1.0",`,
-      `"@eka-morphis/${name}"`,
-    ),
   ];
   return wired.filter(Boolean).length;
 }
@@ -252,23 +246,6 @@ for (const [file, content] of Object.entries(files)) {
   writeFileSync(target, content);
 }
 
-const metaIndexPath = join(root, 'packages', 'components', 'src', 'index.ts');
-const importLine = `import '@eka-morphis/${name}';`;
-const exportLine = `export * from '@eka-morphis/${name}';`;
-
-let index = readFileSync(metaIndexPath, 'utf8');
-if (!index.includes(importLine)) {
-  const lines = index.split('\n').filter((line) => line.trim() !== '');
-  const imports = lines.filter((line) => line.startsWith('import '));
-  const exports = lines.filter((line) => line.startsWith('export '));
-  imports.push(importLine);
-  exports.push(exportLine);
-  imports.sort();
-  exports.sort();
-  index = `${[...imports, '', ...exports].join('\n')}\n`;
-  writeFileSync(metaIndexPath, index);
-}
-
 const wired = wireComponent(name);
 
 console.log(`Komponen dibuat: packages/components/${name}/`);
@@ -276,6 +253,5 @@ for (const file of Object.keys(files)) {
   const target = file === 'package.json' || file === 'tsconfig.json' ? '' : 'src/';
   console.log(`  - ${target}${file}`);
 }
-console.log(`Terdaftar di packages/components/src/index.ts sebagai <${tag}>.`);
-console.log(`Wiring alias ke ${wired}/5 file (.storybook/main.ts, vite.config.ts, tsconfig.json, tsconfig.package.json, packages/components/package.json).`);
+console.log(`Wiring alias ke ${wired}/4 file (.storybook/main.ts, vite.config.ts, tsconfig.json, tsconfig.package.json).`);
 console.log('Langkah berikut: npm install (link workspace) lalu npm run build.');

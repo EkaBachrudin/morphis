@@ -1,6 +1,10 @@
 import { setCustomElementsManifest } from '@storybook/web-components';
 import manifest from '../custom-elements.json';
-import '../packages/components/src/index';
+import '../packages/components/button/src/button';
+import '../packages/components/card/src/card';
+import '../packages/components/input/src/input';
+import '../packages/components/other-offer/src/other-offer';
+import '../packages/components/select/src/select';
 import '../packages/tokens/dist/tokens.css';
 
 setCustomElementsManifest(manifest);

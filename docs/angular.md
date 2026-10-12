@@ -49,7 +49,7 @@ keduanya.
 Pemicu: sejak TypeScript 5.6 ada flag `noUncheckedSideEffectImports`, dan
 TypeScript 6.0 mengecek side-effect import secara default.
 
-> Sejak `@eka-morphis/tokens`/`@eka-morphis/components` versi terbaru, import
+> Sejak `@eka-morphis/tokens` versi terbaru, import
 > `.../tokens.css` sudah membawa deklarasi tipe sehingga error ini umumnya
 > hilang. Bila masih muncul (mis. versi lama), gunakan salah satu opsi di bawah.
 

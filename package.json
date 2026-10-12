@@ -13,15 +13,14 @@
     "node": ">=22"
   },
   "scripts": {
-    "clean": "rm -rf custom-elements.json downloads packages/*/dist packages/components/dist packages/components/*/dist",
-    "build": "npm run clean && npm run build:tokens && npm run build:core && npm run build:components && npm run build:types && npm run build:cem && npm run build:export",
+    "clean": "rm -rf custom-elements.json downloads packages/*/dist packages/components/*/dist",
+    "build": "npm run clean && npm run build:tokens && npm run build:core && npm run build:components && npm run build:types && npm run build:cem",
     "build:core": "npm run build -w @eka-morphis/core",
     "build:tokens": "npm run build -w @eka-morphis/tokens",
     "build:components": "node scripts/build-components.mjs",
     "build:downloads": "node scripts/build-downloads.mjs",
     "build:types": "node scripts/build-types.mjs",
     "build:cem": "node scripts/build-cem.mjs",
-    "build:export": "node scripts/build-export.mjs",
     "gen": "node scripts/generate-component.mjs",
     "typecheck": "tsc --noEmit",
     "pretypecheck": "npm run build:cem",

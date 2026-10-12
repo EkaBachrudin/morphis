@@ -40,8 +40,7 @@ packages/components/badge/
     └── badge.test.ts            # tes Vitest
 ```
 
-Ia juga mendaftarkan paket ke meta-bundle `packages/components/src/index.ts`
-(sehingga ikut masuk `@eka-morphis/components`), dan memakai tag `ui-badge`.
+Paket memakai tag `ui-badge`.
 
 > Nama harus kebab-case, mis. `badge` atau `data-table`. Paket yang sudah ada
 > ditolak kecuali memakai `--force`.
@@ -113,7 +112,7 @@ Aturan CSS: file komponen wajib diawali
 ## 4. Verifikasi lokal
 
 ```bash
-npm run build     # hasilkan dist/ paket + meta-bundle
+npm run build     # hasilkan dist/ tiap paket
 npm test          # Vitest + @open-wc/testing-helpers
 npm run storybook # HMR di :6006
 ```
@@ -147,7 +146,6 @@ npm run release
 ## Checklist paket baru
 
 - [ ] `npm run gen -- component <nama>` dijalankan.
-- [ ] Paket terdaftar di `packages/components/src/index.ts`.
 - [ ] `npm install` (link workspace).
 - [ ] Anotasi JSDoc lengkap → tabel API terisi.
 - [ ] Alias ditambahkan di `.storybook/main.ts`.

@@ -55,7 +55,6 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 | `@eka-morphis/tokens` | `tokens.css` (design token `--ui-*`) |
 | `@eka-morphis/button`, `@eka-morphis/card`, `@eka-morphis/input`, `@eka-morphis/select`, … | Satu Web Component per paket (versi independen) |
 | `@eka-morphis/react` | Wrapper tipis untuk React (16.8+): `Button`, `Input`, `Card`, `Select`, `OtherOffer` |
-| `@eka-morphis/components` | Meta-bundle: `morphis.js` (semua komponen) + `tokens.css` |
 
 ## Perintah
 
@@ -106,28 +105,21 @@ npm run release            # build + publish paket yang berubah
 >
 > Lalu `npm install @eka-morphis/other-offer @eka-morphis/tokens`.
 
-### Meta-bundle (semua komponen sekaligus)
-
-```js
-import '@eka-morphis/components';          // semua <ui-*> terdaftar
-import '@eka-morphis/components/tokens.css';
-```
-
-Untuk HTML polos tanpa bundler, pakai file IIFE dari `node_modules` (atau
-`downloads/`):
-
-```html
-<link rel="stylesheet" href="node_modules/@eka-morphis/components/dist/tokens.css">
-<script src="node_modules/@eka-morphis/button/dist/button.iife.js"></script>
-
-<ui-button variant="primary">Simpan</ui-button>
-```
-
 ### Per komponen (versi independen)
 
 ```js
 import '@eka-morphis/other-offer';        // mendaftarkan <ui-other-offer>
 import '@eka-morphis/tokens/tokens.css';
+```
+
+Untuk HTML polos tanpa bundler, pakai file IIFE per komponen dari
+`node_modules` (atau `downloads/`):
+
+```html
+<link rel="stylesheet" href="node_modules/@eka-morphis/tokens/dist/tokens.css">
+<script src="node_modules/@eka-morphis/button/dist/button.iife.js"></script>
+
+<ui-button variant="primary">Simpan</ui-button>
 ```
 
 ### React
@@ -240,7 +232,7 @@ Satu permukaan dokumentasi (**Storybook**), satu sumber data
 ## Menambah komponen
 
 ```bash
-npm run gen -- component <nama>   # buat paket @eka-morphis/<nama> + daftarkan di meta
+npm run gen -- component <nama>   # buat paket @eka-morphis/<nama>
 npm install                       # link workspace
 ```
 
@@ -275,7 +267,7 @@ yang bisa merender HTML. Yang ada hanyalah **catatan integrasi** kecil per frame
 
 | Target | Dukungan | Catatan integrasi |
 | --- | --- | --- |
-| HTML / Twig / Drupal | Langsung | Import `morphis.js` + `tokens.css`; theming via `--ui-*` / `::part()` |
+| HTML / Twig / Drupal | Langsung | Salin `tokens.css` + `*.iife.js` per komponen; theming via `--ui-*` / `::part()` |
 | React ≥19 | Langsung | Property & event custom element deklaratif |
 | React 16.8+ | Langsung + wrapper | Wrapper bertipe `@eka-morphis/react` (`Button`, `Input`, `Card`, `Select`, `OtherOffer`) |
 | Angular | Langsung | `CUSTOM_ELEMENTS_SCHEMA`; import sekali di `main.ts` |

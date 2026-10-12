@@ -87,22 +87,6 @@ for (const file of componentFiles) {
 }
 
 await buildEntry({
-  entry: resolve(root, 'packages/components/src/index.ts'),
-  outDir: resolve(root, 'packages/components/dist'),
-  fileName: 'morphis.js',
-  format: 'es',
-});
-copyFileSync(
-  resolve(root, 'packages/tokens/dist/tokens.css'),
-  resolve(root, 'packages/components/dist/tokens.css'),
-);
-copyFileSync(
-  resolve(root, 'packages/tokens/dist/tokens.css.d.ts'),
-  resolve(root, 'packages/components/dist/tokens.css.d.ts'),
-);
-console.log('components -> packages/components/dist (morphis.js, tokens.css)');
-
-await buildEntry({
   entry: resolve(root, 'packages/react/src/index.tsx'),
   outDir: resolve(root, 'packages/react/dist'),
   fileName: 'react.js',

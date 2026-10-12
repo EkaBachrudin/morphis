@@ -12,7 +12,7 @@ biasa, maupun Twig/Drupal.
 - Styling: Tailwind v4 (build-time, `@apply`) + design token `--ui-*`
 - Theming: CSS custom property + `::part()` + `::slotted()`
 - Runtime: **Lit 3** (±5–6 KB gzip, di-*share* lintas komponen; tetap custom element standar)
-- Distribusi: paket npm per komponen (versioning independen) + meta-bundle + markup HTML untuk Drupal
+- Distribusi: paket npm per komponen (versioning independen) + markup HTML untuk Drupal
 
 ## Konsumsi
 
@@ -31,11 +31,11 @@ import '@eka-morphis/button';   // mendaftarkan <ui-button>
 import '@eka-morphis/tokens/tokens.css';
 ```
 
-Atau meta-bundle semua komponen (dari `node_modules`, karena tidak ada CDN publik):
+Untuk HTML polos tanpa bundler (dari `node_modules`, karena tidak ada CDN publik):
 
 ```html
-<link rel="stylesheet" href="node_modules/@eka-morphis/components/dist/tokens.css">
-<script type="module" src="node_modules/@eka-morphis/components/dist/morphis.js"></script>
+<link rel="stylesheet" href="node_modules/@eka-morphis/tokens/dist/tokens.css">
+<script src="node_modules/@eka-morphis/button/dist/button.iife.js"></script>
 
 <ui-button variant="primary">Simpan</ui-button>
 ```

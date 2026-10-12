@@ -24,9 +24,9 @@ themes/custom/mytheme/libraries/morphis/
 Gunakan varian **`*.iife.js`** (script klasik) agar tidak butuh
 `<script type="module">`. Bila memakai bundler modern, gunakan `*.js` (ESM).
 
-> Varian `*.iife.js` dan meta-bundle `morphis.js` sudah **self-contained**:
-> runtime Lit ikut dibundel (sekitar 5–6 KB gzip) sehingga tetap tidak butuh
-> `type="module"` maupun dependensi eksternal.
+> Varian `*.iife.js` sudah **self-contained**: runtime Lit ikut dibundel
+> (sekitar 5–6 KB gzip) sehingga tetap tidak butuh `type="module"` maupun
+> dependensi eksternal.
 
 ## 2. Definisikan Drupal library
 
@@ -98,11 +98,10 @@ Markup tiap komponen tersedia di `dist/<nama>.html` (atau
 }
 ```
 
-## Alternatif: meta-bundle
+## Beberapa komponen sekaligus
 
-Bila ingin semua komponen sekaligus, salin `tokens.css` + `morphis.js` dari
-`@eka-morphis/components` (atau varian IIFE per komponen) ke tema. Tidak ada CDN
-publik karena paket di-host di GitHub Packages.
+Salin `tokens.css` + `*.iife.js` untuk tiap komponen yang dipakai ke tema. Tidak
+ada CDN publik karena paket di-host di GitHub Packages.
 
 ## Checklist
 
