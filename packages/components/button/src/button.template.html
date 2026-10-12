@@ -1,0 +1,10 @@
+<button
+  class="ui-button ui-button--${ctx.variant}"
+  part="button"
+  type="button"
+  ?disabled=${ctx.disabled}
+  @click=${ctx.onClick}
+>
+  <slot name="icon" part="icon"></slot>
+  <span class="ui-button__label" part="label"><slot></slot></span>
+</button>

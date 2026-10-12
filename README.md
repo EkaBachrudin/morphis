@@ -33,7 +33,8 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 
 - **Generator komponen** — `npm run gen -- component badge` langsung membuat paket
   `@morphis/<nama>` (package.json, tsconfig, `src/{nama}.ts`, `.css`,
-  `.markup.html`, `.stories.ts`, `.test.ts`) dan mendaftarkannya di meta.
+  `.template.html`, `env.d.ts`, `.markup.html`, `.stories.ts`, `.test.ts`) dan
+  mendaftarkannya di meta.
 - **Satu permukaan dokumentasi (Storybook)** — contoh live, controls, **tabel API
   otomatis** (Attributes/Events/Slots/CSS Parts/CSS Custom Properties dari CEM),
   snippet per-framework lewat toolbar **Framework** (Native/Twig/React/Vue/Angular),
@@ -190,9 +191,11 @@ npm install                       # link workspace
 ```
 
 Generator membuat `packages/components/<nama>/` berisi `package.json`,
-`tsconfig.json`, dan `src/{<nama>.ts,.css,.markup.html,.stories.ts,.test.ts}`.
-Komponen dibuat dengan Lit: `render()` mengembalikan template `html`, dan state
-dideklarasikan lewat `@property`/`@state`.
+`tsconfig.json`, dan
+`src/{<nama>.ts,.css,.template.html,.markup.html,.stories.ts,.test.ts}`.
+Komponen dibuat dengan Lit: template ditulis di file `<nama>.template.html` dan
+diimpor lewat suffix Vite `?html` (`vite-plugin-lit-template`), sedangkan state
+dideklarasikan lewat `@property`/`@state`. Semua komponen bawaan memakai pola ini.
 
 Anotasi JSDoc `@slot`/`@csspart`/`@fires`/`@cssprop` pada komponen mengisi
 **tabel API Storybook** secara otomatis. Atribut **tidak** perlu `@attr` manual:

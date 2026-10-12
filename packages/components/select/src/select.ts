@@ -1,15 +1,15 @@
 import {
   MorphisElement,
   define,
-  html,
   nothing,
   property,
   state,
-  repeat,
   litStyles,
   type PropertyValues,
+  type TemplateResult,
 } from '@morphis/core';
 import style from './select.css?inline';
+import selectTemplate from './select.template.html?html';
 
 export interface SelectOption {
   value: string;
@@ -25,6 +25,27 @@ function parseOptions(value: string | null): SelectOption[] {
     return [];
   }
 }
+
+/** Data yang dioper ke template `select.template.html`. */
+interface SelectTemplateContext {
+  uid: string;
+  options: SelectOption[];
+  selected: SelectOption | undefined;
+  open: boolean;
+  activeIndex: number;
+  hasLabel: boolean;
+  ariaLabel: string | null;
+  activeDescendant: string | typeof nothing;
+  placeholder: string;
+  label: string;
+  value: string;
+  disabled: boolean;
+  onRootClick: (event: Event) => void;
+  onRootMouseover: (event: Event) => void;
+  onRootKeydown: (event: Event) => void;
+}
+
+const renderSelect = selectTemplate as (ctx: SelectTemplateContext) => TemplateResult;
 
 /**
  * Dropdown pilihan framework-agnostic (select-only combobox, panel dikustom).
@@ -96,75 +117,33 @@ export class UiSelect extends MorphisElement {
     }
   }
 
-  override render() {
+  override render(): TemplateResult {
     const options = this.#options();
     const selected = options.find((option) => option.value === this.value);
     const hasLabel = this.label !== '';
     const ariaLabel = this.getAttribute('aria-label');
     const activeDescendant =
-      this._open && this._activeIndex >= 0 ? `${this.#uid}-opt-${this._activeIndex}` : nothing;
+      this._open && this._activeIndex >= 0
+        ? `${this.#uid}-opt-${this._activeIndex}`
+        : nothing;
 
-    return html`
-      <div
-        class="ui-select"
-        part="field"
-        @click=${this.#onRootClick}
-        @mouseover=${this.#onRootMouseover}
-        @keydown=${this.#onRootKeydown}
-      >
-        <span
-          class="ui-select__label"
-          part="label"
-          id=${`${this.#uid}-label`}
-          ?hidden=${!hasLabel}
-          >${this.label}</span
-        >
-        <button
-          class="ui-select__trigger ${this._open ? 'is-open' : ''}"
-          part="trigger"
-          type="button"
-          role="combobox"
-          aria-haspopup="listbox"
-          aria-expanded=${String(this._open)}
-          aria-controls=${`${this.#uid}-listbox`}
-          aria-labelledby=${hasLabel ? `${this.#uid}-label` : nothing}
-          aria-label=${!hasLabel && ariaLabel ? ariaLabel : nothing}
-          aria-activedescendant=${activeDescendant}
-          ?disabled=${this.disabled}
-        >
-          <span
-            class="ui-select__value ${selected ? '' : 'is-placeholder'}"
-            part="value"
-            >${selected?.label ?? this.placeholder}</span
-          >
-          <span class="ui-select__chevron" part="chevron" aria-hidden="true"></span>
-        </button>
-        <ul
-          class="ui-select__listbox"
-          part="listbox"
-          id=${`${this.#uid}-listbox`}
-          role="listbox"
-          ?hidden=${!this._open}
-        >
-          ${repeat(
-            options,
-            (option) => option.value,
-            (option, index) => html`
-              <li
-                class="ui-select__option ${index === this._activeIndex
-                  ? 'is-active'
-                  : ''} ${option.value === this.value ? 'is-selected' : ''}"
-                part="option"
-                role="option"
-                id=${`${this.#uid}-opt-${index}`}
-                data-index=${String(index)}
-                aria-selected=${String(option.value === this.value)}
-              >${option.label}</li>
-            `,
-          )}
-        </ul>
-      </div>
-    `;
+    return renderSelect({
+      uid: this.#uid,
+      options,
+      selected,
+      open: this._open,
+      activeIndex: this._activeIndex,
+      hasLabel,
+      ariaLabel,
+      activeDescendant,
+      placeholder: this.placeholder,
+      label: this.label,
+      value: this.value,
+      disabled: this.disabled,
+      onRootClick: this.#onRootClick,
+      onRootMouseover: this.#onRootMouseover,
+      onRootKeydown: this.#onRootKeydown,
+    });
   }
 
   #options(): SelectOption[] {

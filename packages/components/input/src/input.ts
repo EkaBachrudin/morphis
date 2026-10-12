@@ -1,13 +1,30 @@
 import {
   MorphisElement,
   define,
-  html,
-  nothing,
   property,
   state,
   litStyles,
+  type TemplateResult,
 } from '@morphis/core';
 import style from './input.css?inline';
+import inputTemplate from './input.template.html?html';
+
+/** Data yang dioper ke template `input.template.html`. */
+interface InputTemplateContext {
+  label: string;
+  hasLabel: boolean;
+  type: string;
+  name: string;
+  placeholder: string;
+  disabled: boolean;
+  readonly: boolean;
+  invalid: boolean;
+  onInput: (event: Event) => void;
+  onChange: (event: Event) => void;
+  onLabelSlot: (event: Event) => void;
+}
+
+const renderInput = inputTemplate as (ctx: InputTemplateContext) => TemplateResult;
 
 function slotHasContent(slot: HTMLSlotElement): boolean {
   return slot.assignedNodes({ flatten: true }).some(
@@ -64,26 +81,20 @@ export class UiInput extends MorphisElement {
 
   @state() private _slotLabel = false;
 
-  override render() {
-    return html`
-      <label class="ui-field" part="field">
-        <span class="ui-field__label" part="label" ?hidden=${!this.#hasLabel()}>
-          <slot name="label" @slotchange=${this.#onLabelSlot}>${this.label}</slot>
-        </span>
-        <input
-          class="ui-input"
-          part="input"
-          type=${this.type}
-          name=${this.name || nothing}
-          placeholder=${this.placeholder}
-          ?disabled=${this.disabled}
-          ?readonly=${this.readonly}
-          aria-invalid=${this.invalid ? '' : nothing}
-          @input=${this.#onInput}
-          @change=${this.#onChange}
-        />
-      </label>
-    `;
+  override render(): TemplateResult {
+    return renderInput({
+      label: this.label,
+      hasLabel: this.#hasLabel(),
+      type: this.type,
+      name: this.name,
+      placeholder: this.placeholder,
+      disabled: this.disabled,
+      readonly: this.readonly,
+      invalid: this.invalid,
+      onInput: this.#onInput,
+      onChange: this.#onChange,
+      onLabelSlot: this.#onLabelSlot,
+    });
   }
 
   override firstUpdated(): void {

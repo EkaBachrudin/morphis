@@ -3,6 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { globSync } from 'glob';
 import { copyFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname, basename, join } from 'node:path';
+import { litTemplate } from './vite-plugin-lit-template.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 
@@ -19,7 +20,7 @@ async function buildEntry({ entry, outDir, fileName, format, external, name }) {
     root,
     configFile: false,
     logLevel: 'warn',
-    plugins: [tailwindcss()],
+    plugins: [litTemplate(), tailwindcss()],
     resolve: { alias: aliases },
     build: {
       target: 'es2021',
@@ -48,7 +49,7 @@ function pascal(value) {
 
 const componentFiles = globSync('packages/components/*/src/*.ts', {
   cwd: root,
-  ignore: ['**/*.stories.ts', '**/*.test.ts'],
+  ignore: ['**/*.stories.ts', '**/*.test.ts', '**/*.d.ts'],
 });
 
 for (const file of componentFiles) {

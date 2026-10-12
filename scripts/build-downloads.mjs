@@ -4,6 +4,7 @@ import { globSync } from 'glob';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname, basename, join } from 'node:path';
 import { crc32, deflateRawSync } from 'node:zlib';
+import { litTemplate } from './vite-plugin-lit-template.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 
@@ -79,7 +80,7 @@ async function buildIife({ entry, outFile, name, minify }) {
     root,
     configFile: false,
     logLevel: 'warn',
-    plugins: [tailwindcss()],
+    plugins: [litTemplate(), tailwindcss()],
     resolve: { alias: aliases },
     build: {
       target: 'es2021',
@@ -162,7 +163,7 @@ const tokensMin = minifyCss(tokensSource);
 
 const componentFiles = globSync('packages/components/*/src/*.ts', {
   cwd: root,
-  ignore: ['**/*.stories.ts', '**/*.test.ts'],
+  ignore: ['**/*.stories.ts', '**/*.test.ts', '**/*.d.ts'],
 });
 
 for (const file of componentFiles) {

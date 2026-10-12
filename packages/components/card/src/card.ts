@@ -1,7 +1,17 @@
-import { MorphisElement, define, html, property, state, litStyles } from '@morphis/core';
+import { MorphisElement, define, property, state, litStyles, type TemplateResult } from '@morphis/core';
 import style from './card.css?inline';
+import cardTemplate from './card.template.html?html';
 
 export type CardVariant = 'elevated' | 'outlined';
+
+/** Data yang dioper ke template `card.template.html`. */
+interface CardTemplateContext {
+  variant: CardVariant;
+  headerEmpty: boolean;
+  footerEmpty: boolean;
+}
+
+const renderCard = cardTemplate as (ctx: CardTemplateContext) => TemplateResult;
 
 function slotHasContent(slot: HTMLSlotElement): boolean {
   return slot.assignedNodes({ flatten: true }).some(
@@ -37,23 +47,21 @@ export class UiCard extends MorphisElement {
   @state() private _headerEmpty = true;
   @state() private _footerEmpty = true;
 
-  override render() {
-    return html`
-      <div class="ui-card ui-card--${this.variant}" part="card">
-        <div class="ui-card__header" part="header" ?hidden=${this._headerEmpty}>
-          <slot name="header" @slotchange=${this.#onHeaderSlot}></slot>
-        </div>
-        <div class="ui-card__body" part="body"><slot></slot></div>
-        <div class="ui-card__footer" part="footer" ?hidden=${this._footerEmpty}>
-          <slot name="footer" @slotchange=${this.#onFooterSlot}></slot>
-        </div>
-      </div>
-    `;
+  override render(): TemplateResult {
+    return renderCard({
+      variant: this.variant,
+      headerEmpty: this._headerEmpty,
+      footerEmpty: this._footerEmpty,
+    });
   }
 
   override firstUpdated(): void {
-    this.#sync(this.renderRoot.querySelector('slot[name="header"]'), true);
-    this.#sync(this.renderRoot.querySelector('slot[name="footer"]'), false);
+    const header = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="header"]');
+    const footer = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="footer"]');
+    header?.addEventListener('slotchange', this.#onHeaderSlot);
+    footer?.addEventListener('slotchange', this.#onFooterSlot);
+    this.#sync(header, true);
+    this.#sync(footer, false);
   }
 
   #onHeaderSlot = (event: Event): void => {

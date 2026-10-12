@@ -1,11 +1,12 @@
 import { defineConfig } from 'vitest/config';
 import tailwindcss from '@tailwindcss/vite';
 import { resolve } from 'node:path';
+import { litTemplate } from './scripts/vite-plugin-lit-template.mjs';
 
 const root = import.meta.dirname;
 
 export default defineConfig({
-  plugins: [tailwindcss()],
+  plugins: [litTemplate(), tailwindcss()],
   resolve: {
     alias: [
       { find: /^@morphis\/core$/, replacement: resolve(root, 'packages/core/src/index.ts') },

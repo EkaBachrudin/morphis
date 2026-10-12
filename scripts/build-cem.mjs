@@ -22,7 +22,8 @@ const toPosix = (p) => p.split(sep).join('/');
 // mengecualikan stories & test (sama seperti config CEM sebelumnya).
 const isComponentSource = (file) =>
   /[/\\]packages[/\\]components[/\\][^/\\]+[/\\]src[/\\][^/\\]+\.ts$/.test(file) &&
-  !/\.(stories|test)\.ts$/.test(file);
+  !/\.(stories|test)\.ts$/.test(file) &&
+  !/\.d\.ts$/.test(file);
 
 // Tag nama elemen diambil dari JSDoc `@element <tag>` (konvensi yang sudah
 // dipakai di sumber komponen). Analyzer Lit mengenali `@customElement`/
@@ -105,9 +106,12 @@ for (const diagnostic of analyzer.getDiagnostics()) {
     typeof diagnostic.messageText === 'string'
       ? diagnostic.messageText
       : diagnostic.messageText.messageText;
-  // Import bertanda `?inline` adalah sufiks Vite, bukan modul filesystem —
-  // abaikan peringatan resolusi untuknya.
-  if (text.includes('Could not resolve specifier') && text.includes('?inline')) {
+  // Import bertanda `?inline`/`?html` adalah sufiks Vite, bukan modul
+  // filesystem — abaikan peringatan resolusi untuknya.
+  if (
+    text.includes('Could not resolve specifier') &&
+    (text.includes('?inline') || text.includes('?html'))
+  ) {
     continue;
   }
   console.warn(`build-cem: ${text}`);

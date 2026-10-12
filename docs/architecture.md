@@ -452,12 +452,35 @@ export { litStyles } from './sheet';
 
 ## 7. Kontrak Komponen
 
+```html
+<!-- packages/components/button/src/button.template.html -->
+<button
+  class="ui-button ui-button--${ctx.variant}"
+  part="button"
+  type="button"
+  ?disabled=${ctx.disabled}
+  @click=${ctx.onClick}
+>
+  <slot name="icon" part="icon"></slot>
+  <span class="ui-button__label" part="label"><slot></slot></span>
+</button>
+```
+
 ```ts
 // packages/components/button/src/button.ts
-import { MorphisElement, define, html, property, litStyles } from '@morphis/core';
+import { MorphisElement, define, property, litStyles, type TemplateResult } from '@morphis/core';
 import style from './button.css?inline';
+import template from './button.template.html?html';
 
 export type ButtonVariant = 'primary' | 'secondary';
+
+interface ButtonTemplateContext {
+  variant: ButtonVariant;
+  disabled: boolean;
+  onClick: () => void;
+}
+
+const renderButton = template as (ctx: ButtonTemplateContext) => TemplateResult;
 
 export class UiButton extends MorphisElement {
   static override styles = litStyles(style);
@@ -465,19 +488,8 @@ export class UiButton extends MorphisElement {
   @property({ reflect: true }) variant: ButtonVariant = 'primary';
   @property({ type: Boolean, reflect: true }) disabled = false;
 
-  override render() {
-    return html`
-      <button
-        class="ui-button ui-button--${this.variant}"
-        part="button"
-        type="button"
-        ?disabled=${this.disabled}
-        @click=${this.#onClick}
-      >
-        <slot name="icon" part="icon"></slot>
-        <span class="ui-button__label" part="label"><slot></slot></span>
-      </button>
-    `;
+  override render(): TemplateResult {
+    return renderButton({ variant: this.variant, disabled: this.disabled, onClick: this.#onClick });
   }
 
   #onClick = (): void => {
@@ -489,12 +501,12 @@ export class UiButton extends MorphisElement {
 define('ui-button', UiButton);
 ```
 
-> **Binding template**: template hidup di dalam `render()` sebagai tagged
-> template `html`, sehingga binding atribut (`variant`), boolean (`?disabled`),
-> dan event (`@click`) semuanya deklaratif. lit-html melakukan update
-> *differential* — hanya node yang berubah yang disentuh, sehingga fokus,
-> posisi kursor, dan scroll internal terjaga. Style **tidak** ikut di markup; ia
-> diserahkan lewat `static styles` (`litStyles()` → `adoptedStyleSheets`, §6.3).
+> **Binding template**: markup ditulis di `button.template.html` dan diimpor
+> lewat `?html`, sehingga binding atribut (`variant`), boolean (`?disabled`), dan
+> event (`@click`) semuanya deklaratif. lit-html melakukan update *differential* —
+> hanya node yang berubah yang disentuh, sehingga fokus, posisi kursor, dan
+> scroll internal terjaga. Style **tidak** ikut di markup; ia diserahkan lewat
+> `static styles` (`litStyles()` → `adoptedStyleSheets`, §6.3).
 
 - **Props/atribut** → `@property`/`@state` (reactive properties Lit).
 - **Slots** → `<slot>` / `<slot name="...">` untuk komposisi konten.
@@ -502,6 +514,16 @@ define('ui-button', UiButton);
 - **Events** → `emit('ui-*', detail)`; `bubbles` + `composed` agar menembus
   shadow dan bisa ditangkap framework induk.
 - **Namespace**: tag `ui-*`, class `.ui-x__y`, `part` bernama.
+
+> **Template di file terpisah** (`*.template.html`): markup ditulis di
+> `<nama>.template.html` dan diimpor lewat suffix Vite `?html`
+> (`scripts/vite-plugin-lit-template.mjs`), yang mengompilasinya menjadi
+> `(ctx) => html\`...\``. File diperlakukan sebagai **badan literal `html\`...\``**:
+> binding (`${...}`, `?attr`, `@event`) dan nested template didukung, serta helper
+> `html`/`nothing`/`repeat` tersedia tanpa import. Karena file terpisah, isinya
+> tidak di-type-check TypeScript; deklarasikan bentuk `ctx` di komponen. Handler
+> privat bisa dioper lewat `ctx` (mis. `@click`) atau dipasang imperatif
+> (`slotchange`). Keempat komponen (card/button/input/select) memakai pola ini.
 
 ---
 
@@ -754,8 +776,12 @@ mencegah duplikasi logika data/snippet.
   dari `docs/`.
 
 **Fase 5 — Migrasi fondasi ke Lit (selesai)**
-- `MorphisElement` menurunkan `LitElement`; `interpolate()`/`*.template.html`
-  dihapus; reactive properties + `render()` deklaratif + `litStyles()`.
+- `MorphisElement` menurunkan `LitElement`; helper `interpolate()` lama dihapus
+  (beserta pola `*.template.html` berbasis string); reactive properties +
+  `render()` deklaratif + `litStyles()`.
+- `*.template.html` kemudian dihadirkan kembali secara Lit-native lewat plugin
+  Vite `?html` (`scripts/vite-plugin-lit-template.mjs`); seluruh komponen
+  (card/button/input/select) memakainya.
 - CEM beralih ke `litelement: true`; build ESM menge-*external* `lit` &
   `@morphis/core`, IIFE/meta membundel.
 - Seluruh dokumentasi (`README.md`, `docs/architecture.md`, panduan Storybook,

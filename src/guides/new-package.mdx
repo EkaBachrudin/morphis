@@ -32,7 +32,9 @@ packages/components/badge/
 └── src/
     ├── badge.ts                 # kelas <ui-badge> (Lit)
     ├── badge.css                # gaya (Tailwind lewat @apply)
+    ├── badge.template.html      # template render (dikompilasi plugin `?html`)
     ├── badge.markup.html        # markup siap tempel (Twig/HTML)
+    ├── env.d.ts                 # deklarasi tipe import `*.html?html`
     ├── badge.stories.ts         # contoh Storybook
     ├── badge.mdx                # halaman Docs komponen
     └── badge.test.ts            # tes Vitest
@@ -55,15 +57,24 @@ dari paket lain dan dari Storybook.
 
 ## 3. Lengkapi komponen
 
-Sunting `src/badge.ts` (dan `.css`). Komponen dibuat dengan **Lit**: tulis
-template di dalam `render()` dengan tagged template `html`, dan deklarasikan
-state lewat `@property` (menjadi Atribut) / `@state` (internal). CEM
-(`litelement: true`) membaca `@property` untuk mengisi **tabel Attributes**;
-anotasi JSDoc mengisi slot/part/event/custom property.
+Sunting `src/badge.template.html` (markup) dan `src/badge.ts` (logika). Komponen
+dibuat dengan **Lit**: template ditulis di `badge.template.html` lalu diimpor
+lewat suffix Vite `?html`, sementara state dideklarasikan lewat `@property`
+(menjadi Atribut) / `@state` (internal). CEM (`litelement: true`) membaca
+`@property` untuk mengisi **tabel Attributes**; anotasi JSDoc mengisi
+slot/part/event/custom property.
+
+```html
+<!-- src/badge.template.html -->
+<div class="ui-badge" part="root">
+  <slot></slot>
+</div>
+```
 
 ```ts
-import { MorphisElement, define, html, property, litStyles } from '@morphis/core';
+import { MorphisElement, define, property, litStyles } from '@morphis/core';
 import style from './badge.css?inline';
+import template from './badge.template.html?html';
 
 /**
  * @element ui-badge
@@ -80,16 +91,20 @@ export class UiBadge extends MorphisElement {
   @property({ reflect: true }) label = '';
 
   override render() {
-    return html`
-      <div class="ui-badge" part="root">
-        <slot></slot>
-      </div>
-    `;
+    return template(this);
   }
 }
 
 define('ui-badge', UiBadge);
 ```
+
+> Isi template memakai sintaks Lit biasa (mis. `${ctx.label}`, `?hidden=${ctx.x}`,
+> `@click=${...}`) dengan `ctx` = objek yang dioper dari `render()`. File
+> diperlakukan sebagai **badan literal `html\`...\``**: helper `html`, `nothing`,
+> dan `repeat` dari `@morphis/core` tersedia tanpa import, dan nested template
+> `html\`...\`` didukung (mis. untuk `repeat`). Backtick/backslash literal ditulis
+> seperti di TypeScript (`` \` ``, `\\`). Karena berada di file terpisah, binding
+> di dalamnya **tidak** di-type-check.
 
 Aturan CSS: file komponen wajib diawali
 `@reference "../../../../src/styles/base.css"`, dan utility Tailwind hanya lewat

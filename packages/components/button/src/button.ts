@@ -1,7 +1,17 @@
-import { MorphisElement, define, html, property, litStyles } from '@morphis/core';
+import { MorphisElement, define, property, litStyles, type TemplateResult } from '@morphis/core';
 import style from './button.css?inline';
+import buttonTemplate from './button.template.html?html';
 
 export type ButtonVariant = 'primary' | 'secondary';
+
+/** Data yang dioper ke template `button.template.html`. */
+interface ButtonTemplateContext {
+  variant: ButtonVariant;
+  disabled: boolean;
+  onClick: () => void;
+}
+
+const renderButton = buttonTemplate as (ctx: ButtonTemplateContext) => TemplateResult;
 
 /**
  * Tombol framework-agnostic.
@@ -33,19 +43,12 @@ export class UiButton extends MorphisElement {
   /** Menonaktifkan tombol. */
   @property({ type: Boolean, reflect: true }) disabled = false;
 
-  override render() {
-    return html`
-      <button
-        class="ui-button ui-button--${this.variant}"
-        part="button"
-        type="button"
-        ?disabled=${this.disabled}
-        @click=${this.#onClick}
-      >
-        <slot name="icon" part="icon"></slot>
-        <span class="ui-button__label" part="label"><slot></slot></span>
-      </button>
-    `;
+  override render(): TemplateResult {
+    return renderButton({
+      variant: this.variant,
+      disabled: this.disabled,
+      onClick: this.#onClick,
+    });
   }
 
   #onClick = (): void => {

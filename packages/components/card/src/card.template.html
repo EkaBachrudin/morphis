@@ -1,0 +1,9 @@
+<div class="ui-card ui-card--${ctx.variant}" part="card">
+  <div class="ui-card__header" part="header" ?hidden=${ctx.headerEmpty}>
+    <slot name="header"></slot>
+  </div>
+  <div class="ui-card__body" part="body"><slot></slot></div>
+  <div class="ui-card__footer" part="footer" ?hidden=${ctx.footerEmpty}>
+    <slot name="footer"></slot>
+  </div>
+</div>

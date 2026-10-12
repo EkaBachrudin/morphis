@@ -1,0 +1,59 @@
+<div
+  class="ui-select"
+  part="field"
+  @click=${ctx.onRootClick}
+  @mouseover=${ctx.onRootMouseover}
+  @keydown=${ctx.onRootKeydown}
+>
+  <span
+    class="ui-select__label"
+    part="label"
+    id=${`${ctx.uid}-label`}
+    ?hidden=${!ctx.hasLabel}
+    >${ctx.label}</span
+  >
+  <button
+    class="ui-select__trigger ${ctx.open ? 'is-open' : ''}"
+    part="trigger"
+    type="button"
+    role="combobox"
+    aria-haspopup="listbox"
+    aria-expanded=${String(ctx.open)}
+    aria-controls=${`${ctx.uid}-listbox`}
+    aria-labelledby=${ctx.hasLabel ? `${ctx.uid}-label` : nothing}
+    aria-label=${!ctx.hasLabel && ctx.ariaLabel ? ctx.ariaLabel : nothing}
+    aria-activedescendant=${ctx.activeDescendant}
+    ?disabled=${ctx.disabled}
+  >
+    <span
+      class="ui-select__value ${ctx.selected ? '' : 'is-placeholder'}"
+      part="value"
+      >${ctx.selected?.label ?? ctx.placeholder}</span
+    >
+    <span class="ui-select__chevron" part="chevron" aria-hidden="true"></span>
+  </button>
+  <ul
+    class="ui-select__listbox"
+    part="listbox"
+    id=${`${ctx.uid}-listbox`}
+    role="listbox"
+    ?hidden=${!ctx.open}
+  >
+    ${repeat(
+      ctx.options,
+      (option) => option.value,
+      (option, index) => html`
+        <li
+          class="ui-select__option ${index === ctx.activeIndex
+            ? 'is-active'
+            : ''} ${option.value === ctx.value ? 'is-selected' : ''}"
+          part="option"
+          role="option"
+          id=${`${ctx.uid}-opt-${index}`}
+          data-index=${String(index)}
+          aria-selected=${String(option.value === ctx.value)}
+        >${option.label}</li>
+      `,
+    )}
+  </ul>
+</div>

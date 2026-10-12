@@ -2,6 +2,7 @@ import type { StorybookConfig } from '@storybook/web-components-vite';
 import tailwindcss from '@tailwindcss/vite';
 import remarkGfm from 'remark-gfm';
 import { fileURLToPath } from 'node:url';
+import { litTemplate } from '../scripts/vite-plugin-lit-template.mjs';
 
 const root = (path: string) => fileURLToPath(new URL(`../${path}`, import.meta.url));
 
@@ -31,7 +32,7 @@ const config: StorybookConfig = {
     options: {},
   },
   async viteFinal(viteConfig) {
-    viteConfig.plugins = [...(viteConfig.plugins ?? []), tailwindcss()];
+    viteConfig.plugins = [...(viteConfig.plugins ?? []), litTemplate(), tailwindcss()];
     const existing = viteConfig.resolve?.alias;
     const existingAlias = Array.isArray(existing)
       ? existing

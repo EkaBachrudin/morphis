@@ -1,0 +1,17 @@
+<label class="ui-field" part="field">
+  <span class="ui-field__label" part="label" ?hidden=${!ctx.hasLabel}>
+    <slot name="label" @slotchange=${ctx.onLabelSlot}>${ctx.label}</slot>
+  </span>
+  <input
+    class="ui-input"
+    part="input"
+    type=${ctx.type}
+    name=${ctx.name || nothing}
+    placeholder=${ctx.placeholder}
+    ?disabled=${ctx.disabled}
+    ?readonly=${ctx.readonly}
+    aria-invalid=${ctx.invalid ? '' : nothing}
+    @input=${ctx.onInput}
+    @change=${ctx.onChange}
+  />
+</label>

@@ -55,8 +55,21 @@ const files = {
   [`${name}.markup.html`]: `<!-- Consumer markup — paste into Twig or plain HTML. Load @morphis/${name} (dist/${name}.js atau ${name}.iife.js) + @morphis/tokens tokens.css once. -->
 <${tag}>Konten</${tag}>
 `,
+  [`${name}.template.html`]: `<div class="ui-${name}" part="root">
+  <slot></slot>
+</div>
+`,
+  [`env.d.ts`]: `declare module '*.html?html' {
+  import type { TemplateResult } from 'lit';
+
+  /** Template Lit hasil kompilasi file \`.html?html\` oleh \`vite-plugin-lit-template\`. */
+  const template: (ctx: any) => TemplateResult;
+  export default template;
+}
+`,
   [`${name}.ts`]: `import { MorphisElement, define, html, litStyles, property } from '@morphis/core';
 import style from './${name}.css?inline';
+import template from './${name}.template.html?html';
 
 /**
  * Komponen ${tag}.
@@ -78,11 +91,7 @@ export class ${className} extends MorphisElement {
   @property({ reflect: true }) label = '';
 
   override render() {
-    return html\`
-      <div class="ui-${name}" part="root">
-        <slot></slot>
-      </div>
-    \`;
+    return template(this);
   }
 }
 
