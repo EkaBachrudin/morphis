@@ -303,8 +303,9 @@ npm pack --dry-run -w @eka-morphis/button   # cek isi satu paket
 ```
 
 Auth lokal memakai PAT classic lewat `npm login --auth-type=legacy` atau
-`~/.npmrc`. Paket yang tidak berubah tidak di-publish dan versinya tetap. CI
-menjalankan alur ini otomatis lewat `.github/workflows/release.yml`.
+`~/.npmrc`. Paket yang tidak berubah tidak di-publish dan versinya tetap.
+Publish dilakukan **manual dari lokal**; CI (`.github/workflows/ci.yml`) hanya
+menjalankan validasi dan **tidak** menerbitkan paket.
 
 Panduan lengkap: [`docs/publishing.md`](docs/publishing.md) (juga tersedia di
 Storybook → **Panduan/Publikasi**).

@@ -8,6 +8,9 @@ Repositori ini memakai **npm workspaces** + **Changesets** untuk mem-publish
 **per paket dengan versi independen**. Memperbaiki `@eka-morphis/card` tidak memaksa
 menaikkan versi `@eka-morphis/button`.
 
+> Publish dilakukan **manual dari lokal** oleh maintainer. CI hanya menjalankan
+> validasi (`ci.yml`: typecheck/lint/test/build) — **tidak** menerbitkan paket.
+
 > Panduan ini untuk **maintainer**. Versi lengkap: [`docs/publishing.md`](../../docs/publishing.md).
 
 ## Prasyarat
@@ -121,15 +124,6 @@ npm run release
 Membuat dan merilis **paket baru** dari nol (scaffold → build → rilis pertama)
 dibahas di **Panduan/Paket Baru**.
 
-## Publikasi via CI (opsional)
-
-`.github/workflows/release.yml` menjalankan alur ini otomatis saat push ke
-`main`:
-
-- bot membuka PR **"Version Packages"** (hasil `version-packages`);
-- saat PR di-merge, `npm run release` dijalankan (`changesets/action`) dengan
-  `NODE_AUTH_TOKEN = secrets.GITHUB_TOKEN`.
-
 ## Konsumsi (di project framework)
 
 GitHub Packages butuh autentikasi untuk install. Tambahkan `.npmrc` di project
@@ -169,7 +163,7 @@ npx changeset pre exit
 - [ ] `npm pack --dry-run -w @eka-morphis/<pkg>` berisi `dist/` saja.
 - [ ] Changeset dibuat & di-commit.
 - [ ] `npm run version-packages` dijalankan.
-- [ ] `npm run release` (atau PR "Version Packages" di-merge).
+- [ ] `npm run release`.
 - [ ] `npx changeset git-tag && git push origin --tags`.
 - [ ] Verifikasi di GitHub Packages + git tag dibuat.
 

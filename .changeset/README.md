@@ -15,6 +15,9 @@ versioning dan publikasi **independen per paket**.
 
 Paket yang tidak berubah tidak akan di-publish dan versinya tetap.
 
+> Publish **manual dari lokal** (maintainer). CI hanya menjalankan validasi dan
+> tidak menerbitkan paket.
+
 Panduan lengkap alur rilis: [`docs/publishing.md`](../docs/publishing.md).
 
 Lihat [dokumentasi Changesets](https://github.com/changesets/changesets/blob/main/docs/intro-to-using-changesets.md).
