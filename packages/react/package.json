@@ -1,7 +1,7 @@
 {
   "name": "@eka-morphis/react",
-  "version": "0.1.0",
-  "description": "Thin React wrappers for Morphis Web Components (React 16.8–18)",
+  "version": "0.2.0",
+  "description": "Thin React wrappers for Morphis Web Components (React 16.8+)",
   "license": "MIT",
   "author": "Morphis",
   "type": "module",
@@ -32,7 +32,9 @@
   "dependencies": {
     "@eka-morphis/button": "^0.1.0",
     "@eka-morphis/card": "^0.1.0",
-    "@eka-morphis/input": "^0.1.0"
+    "@eka-morphis/input": "^0.1.0",
+    "@eka-morphis/other-offer": "^0.1.1",
+    "@eka-morphis/select": "^0.1.0"
   },
   "peerDependencies": {
     "react": ">=16.8"

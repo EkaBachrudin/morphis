@@ -30,6 +30,8 @@ export function snippetFor(doc: ComponentDoc, framework: Framework): string {
         `import '${pkg}';`,
         `import '@eka-morphis/tokens/tokens.css';`,
         '',
+        '// TypeScript: tambahkan augmentasi JSX untuk tag <ui-*> (lihat docs/react-typescript.md)',
+        '// atau pakai wrapper bertipe dari "@eka-morphis/react".',
         'export function Example() {',
         '  return (',
         indent(markup, 4),

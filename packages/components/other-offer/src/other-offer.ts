@@ -108,7 +108,7 @@ export class UiOtherOffer extends MorphisElement {
   cards: OtherOfferCard[] = [];
 
   /** Teks tombol footer. */
-  @property() footerLabel = 'Lihat Selengkapnya';
+  @property({ attribute: 'footer-label' }) footerLabel = 'Lihat Selengkapnya';
 
   override render(): TemplateResult {
     const cards = this.#cards();

@@ -37,6 +37,14 @@ describe('ui-other-offer', () => {
     expect(el.shadowRoot?.querySelectorAll('[part="card"]')).toHaveLength(4);
   });
 
+  it('reads footer label from the kebab-case attribute', async () => {
+    const el = await fixture<UiOtherOffer>(
+      html`<ui-other-offer footer-label="Lainnya"></ui-other-offer>`,
+    );
+    expect(el.footerLabel).toBe('Lainnya');
+    expect(el.shadowRoot?.querySelector('[part="button"]')?.textContent?.trim()).toBe('Lainnya');
+  });
+
   it('hides the footer when fewer than four cards', async () => {
     const el = await renderWith(CARDS.slice(0, 3));
     const footer = el.shadowRoot?.querySelector<HTMLElement>('[part="footer"]');
