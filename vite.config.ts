@@ -14,6 +14,7 @@ export default defineConfig({
       { find: /^@morphis\/card$/, replacement: resolve(root, 'packages/components/card/src/card.ts') },
       { find: /^@morphis\/input$/, replacement: resolve(root, 'packages/components/input/src/input.ts') },
       { find: /^@morphis\/select$/, replacement: resolve(root, 'packages/components/select/src/select.ts') },
+      { find: /^@morphis\/other-offer$/, replacement: resolve(root, 'packages/components/other-offer/src/other-offer.ts') },
       { find: /^@morphis\/react$/, replacement: resolve(root, 'packages/react/src/index.tsx') },
       { find: /^@morphis\/component-meta$/, replacement: resolve(root, 'src/component-meta/index.ts') },
       {

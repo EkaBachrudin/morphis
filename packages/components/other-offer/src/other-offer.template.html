@@ -1,0 +1,120 @@
+<section
+  class="ui-other-offer"
+  part="root"
+  data-widget="other-offer-section"
+  @click=${ctx.onRootClick}
+>
+  <div class="ui-other-offer__container">
+    <div class="ui-other-offer__header">
+      <h2 class="ui-other-offer__title" part="title" data-field="title">${ctx.title}</h2>
+      <p class="ui-other-offer__subtitle" part="subtitle" data-field="subtitle">${ctx.subtitle}</p>
+    </div>
+
+    <div
+      id="grid"
+      class="ui-other-offer__${ctx.isLess ? 'grid-less' : 'grid'}"
+      part="grid"
+    >
+      ${repeat(
+        ctx.cards,
+        (card) => card.id,
+        (card, index) => html`
+          <article
+            class="ui-other-offer__card ui-other-offer__card--${index === 0 && ctx.isLess
+              ? 'wide'
+              : 'normal'}"
+            part="card"
+            data-offer-id=${card.id}
+          >
+            <a
+              class="ui-other-offer__mobile-cta-hitbox ui-other-offer__mobile-cta-hitbox--${index ===
+                0 && ctx.isLess
+                ? 'wide'
+                : 'normal'}"
+              href="#"
+              data-action="view-offer"
+              data-offer=${card.offer}
+              data-label=${card.label}
+              aria-label="Lihat semua penawaran ${card.label}"
+            ></a>
+
+            ${card.art
+              ? html`
+                  <picture class="ui-other-offer__art">
+                    ${card.artDesktop
+                      ? html`<source
+                          media="(min-width: 768px)"
+                          srcset=${card.artDesktop}
+                        />`
+                      : nothing}
+                    <img
+                      class="ui-other-offer__mobile-art ui-other-offer__desktop-art"
+                      src=${card.art}
+                      alt=""
+                      loading="lazy"
+                    >
+                  </picture>
+                `
+              : nothing}
+
+            <div class="ui-other-offer__content">
+              <div class="ui-other-offer__badge" part="badge">
+                <svg
+                  class="ui-other-offer__badge-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    fill="currentColor"
+                    d=${ctx.iconPath(card.badgeIcon ?? 'plane')}
+                  ></path>
+                </svg>
+                <span>${card.badge}</span>
+              </div>
+
+              <h3 class="ui-other-offer__card-title" part="card-title">${card.title}</h3>
+
+              <a
+                class="ui-other-offer__cta"
+                part="cta"
+                href="#"
+                data-action="view-offer"
+                data-offer=${card.offer}
+                data-label=${card.label}
+              >
+                <span>${card.cta}</span>
+                <svg
+                  class="ui-other-offer__cta-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path fill="currentColor" d=${ctx.chevronPath}></path>
+                </svg>
+              </a>
+            </div>
+          </article>
+        `,
+      )}
+    </div>
+
+    <div class="ui-other-offer__footer" part="footer" ?hidden=${!ctx.showFooter}>
+      <a
+        href="#"
+        class="ui-other-offer__button"
+        part="button"
+        data-action="view-all-offers"
+        data-label=${ctx.footerLabel}
+        aria-label="Lihat selengkapnya penawaran lainnya"
+      >
+        <span>${ctx.footerLabel}</span>
+        <span class="ui-other-offer__button-icon" part="button-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path fill="currentColor" d=${ctx.chevronPath}></path>
+          </svg>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>

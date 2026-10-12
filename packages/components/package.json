@@ -31,6 +31,7 @@
     "@morphis/button": "^0.1.0",
     "@morphis/card": "^0.1.0",
     "@morphis/input": "^0.1.0",
+    "@morphis/other-offer": "^0.1.0",
     "@morphis/select": "^0.1.0"
   }
 }

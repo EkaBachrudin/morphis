@@ -1,0 +1,30 @@
+{
+  "name": "@morphis/other-offer",
+  "version": "0.1.0",
+  "description": "Framework-agnostic other-offer Web Component by Morphis",
+  "license": "MIT",
+  "author": "Morphis",
+  "type": "module",
+  "main": "./dist/other-offer.js",
+  "module": "./dist/other-offer.js",
+  "types": "./dist/types/other-offer.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/other-offer.d.ts",
+      "default": "./dist/other-offer.js"
+    },
+    "./markup": "./dist/other-offer.html"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "**/*.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@morphis/core": "^0.1.0"
+  }
+}

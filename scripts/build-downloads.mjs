@@ -14,6 +14,7 @@ const aliases = {
   '@morphis/card': resolve(root, 'packages/components/card/src/card.ts'),
   '@morphis/input': resolve(root, 'packages/components/input/src/input.ts'),
   '@morphis/select': resolve(root, 'packages/components/select/src/select.ts'),
+  '@morphis/other-offer': resolve(root, 'packages/components/other-offer/src/other-offer.ts'),
 };
 
 const tokensCss = resolve(root, 'packages/tokens/dist/tokens.css');

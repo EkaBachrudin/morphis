@@ -35,6 +35,15 @@ function hoistCustomProperties(css: string): void {
 }
 
 /**
+ * Reset `box-sizing` untuk shadow root.
+ *
+ * Preflight Tailwind tidak ikut ke Shadow DOM (stylesheet komponen hanya
+ * me-`@reference` base), sehingga elemen ber-`w-full` + padding meluber ke
+ * kanan. Ditulis di luar `@layer` agar menang atas rule ber-`@layer`.
+ */
+const BOX_SIZING_RESET = ':host, *, *::before, *::after { box-sizing: border-box; }\n';
+
+/**
  * Menyiapkan string CSS komponen untuk `static styles` Lit.
  *
  * Mengangkat rule `@property` (Tailwind v4) ke document level sekali, lalu
@@ -42,5 +51,5 @@ function hoistCustomProperties(css: string): void {
  */
 export function litStyles(css: string): CSSResult {
   hoistCustomProperties(css);
-  return unsafeCSS(css);
+  return unsafeCSS(BOX_SIZING_RESET + css);
 }

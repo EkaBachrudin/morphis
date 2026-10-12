@@ -48,6 +48,7 @@ const config: StorybookConfig = {
         { find: /^@morphis\/card$/, replacement: root('packages/components/card/src/card.ts') },
         { find: /^@morphis\/input$/, replacement: root('packages/components/input/src/input.ts') },
         { find: /^@morphis\/select$/, replacement: root('packages/components/select/src/select.ts') },
+        { find: /^@morphis\/other-offer$/, replacement: root('packages/components/other-offer/src/other-offer.ts') },
         { find: /^@morphis\/react$/, replacement: root('packages/react/src/index.tsx') },
         {
           find: /^@morphis\/component-meta$/,

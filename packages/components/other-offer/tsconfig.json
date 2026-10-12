@@ -1,0 +1,14 @@
+{
+  "extends": "../../../tsconfig.package.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist/types"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.stories.ts",
+    "src/**/*.test.ts"
+  ]
+}

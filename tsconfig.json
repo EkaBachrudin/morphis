@@ -22,6 +22,7 @@
       "@morphis/card": ["./packages/components/card/src/card.ts"],
       "@morphis/input": ["./packages/components/input/src/input.ts"],
       "@morphis/select": ["./packages/components/select/src/select.ts"],
+      "@morphis/other-offer": ["./packages/components/other-offer/src/other-offer.ts"],
       "@morphis/react": ["./packages/react/src/index.tsx"],
       "@morphis/component-meta": ["./src/component-meta/index.ts"],
       "@morphis/component-meta/*": ["./src/component-meta/*"]

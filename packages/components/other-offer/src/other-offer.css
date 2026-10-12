@@ -1,0 +1,356 @@
+@reference "../../../../src/styles/base.css";
+
+@theme {
+  --font-batik: "Batik", ui-sans-serif, system-ui, sans-serif;
+  --font-poppins: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-poppins-medium: "Poppins Medium", "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --color-gray-80: #4b5563;
+  --color-dark-red: #ec2028;
+}
+
+:host {
+  display: block;
+
+  --font-batik: var(--ui-font-batik, "Batik", ui-sans-serif, system-ui, sans-serif);
+  --font-poppins: var(--ui-font-poppins, "Poppins", ui-sans-serif, system-ui, sans-serif);
+  --font-poppins-medium: var(
+    --ui-font-poppins-medium,
+    "Poppins Medium",
+    "Poppins",
+    ui-sans-serif,
+    system-ui,
+    sans-serif
+  );
+  --color-gray-80: var(--ui-color-gray-80, #4b5563);
+  --color-dark-red: var(--ui-color-dark-red, #ec2028);
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+@layer components {
+  .ui-other-offer {
+    @apply w-full bg-white px-3 py-6 flex flex-col items-center justify-center;
+    margin: 0 auto;
+  }
+
+  .ui-other-offer__container {
+    @apply mx-auto max-w-[1440px] w-full;
+  }
+
+  .ui-other-offer__header {
+    @apply mb-6 text-center;
+  }
+
+  .ui-other-offer__title {
+    @apply font-batik text-[20px] font-bold leading-7 tracking-[-0.2px] text-[#202531];
+  }
+
+  .ui-other-offer__subtitle {
+    @apply mt-2 font-poppins text-[14px] leading-5 tracking-[-0.14px] text-gray-80;
+  }
+
+  .ui-other-offer__grid {
+    @apply grid grid-cols-2 gap-3;
+  }
+
+  .ui-other-offer__grid-less {
+    @apply grid grid-cols-2 gap-3;
+  }
+
+  .ui-other-offer__card {
+    @apply relative overflow-hidden text-white;
+    border-radius: 24px;
+    min-height: 338px;
+    padding: 0;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  }
+
+  .ui-other-offer__card::before {
+    content: "";
+    position: absolute;
+    inset: auto -32px -88px auto;
+    width: 180px;
+    height: 180px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 72%);
+    pointer-events: none;
+  }
+
+  .ui-other-offer__card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 36%);
+    pointer-events: none;
+  }
+
+  .ui-other-offer__card--wide {
+    @apply col-span-2;
+    min-height: 186px;
+    max-height: 200px;
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 36%);
+  }
+
+  .ui-other-offer__card--normal {
+    background: radial-gradient(circle at top center, rgba(153, 208, 255, 0.16), rgba(255, 255, 255, 0) 36%);
+  }
+
+  .ui-other-offer__art,
+  .ui-other-offer__mobile-art,
+  .ui-other-offer__desktop-art {
+    @apply hidden h-full w-full;
+  }
+
+  .ui-other-offer__mobile-art {
+    @apply object-cover;
+    position: relative;
+    z-index: 0;
+  }
+
+  .ui-other-offer__desktop-art {
+    @apply object-cover;
+    z-index: 0;
+  }
+
+  .ui-other-offer__mobile-cta-hitbox {
+    @apply absolute bg-transparent;
+    z-index: 3;
+    border: 0;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .ui-other-offer__content {
+    @apply relative z-[1] flex flex-col;
+  }
+
+  .ui-other-offer__card--wide .ui-other-offer__content {
+    @apply items-start;
+  }
+
+  .ui-other-offer__card--normal .ui-other-offer__content {
+    @apply items-center text-center;
+  }
+
+  .ui-other-offer__badge {
+    @apply inline-flex min-h-7 items-center gap-2 rounded-full px-3 py-1.5;
+    background: rgba(255, 255, 255, 0.24);
+    color: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+  }
+
+  .ui-other-offer__badge svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  .ui-other-offer__badge span {
+    @apply font-poppins-medium text-[12px] leading-4 tracking-[0px] font-semibold;
+  }
+
+  .ui-other-offer__card-title {
+    @apply mt-2 font-poppins-medium text-[14px] leading-5 tracking-[-0.14px] text-white font-semibold;
+  }
+
+  .ui-other-offer__card--wide .ui-other-offer__card-title {
+    @apply leading-[18px];
+  }
+
+  .ui-other-offer__cta {
+    @apply mt-2 inline-flex items-center gap-1 font-poppins text-[12px] md:text-[16px] leading-[18px] tracking-[-0.13px] text-white;
+    opacity: 0.98;
+  }
+
+  .ui-other-offer__cta svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .ui-other-offer__footer {
+    @apply flex justify-center py-6 md:py-8;
+  }
+
+  .ui-other-offer__footer[hidden] {
+    @apply hidden;
+  }
+
+  .ui-other-offer__button {
+    @apply inline-flex items-center gap-2 md:w-auto w-full justify-center rounded-full border-2 border-[#EC2028] px-6 py-3.5 font-poppins text-sm font-bold text-dark-red transition hover:scale-105;
+  }
+
+  .ui-other-offer__button-icon {
+    @apply block h-4 w-4 md:h-5 md:w-5;
+  }
+
+  .ui-other-offer__button-icon svg {
+    @apply h-full w-full;
+  }
+
+  @media (min-width: 768px) {
+    .ui-other-offer {
+      @apply px-14 py-12;
+    }
+
+    .ui-other-offer__header {
+      @apply mb-10;
+    }
+
+    .ui-other-offer__title {
+      @apply text-[32px] leading-7 tracking-[-0.2px];
+    }
+
+    .ui-other-offer__subtitle {
+      @apply text-[24px] leading-8 tracking-[-0.16px];
+    }
+
+    .ui-other-offer__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .ui-other-offer__grid-less {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .ui-other-offer__card {
+      @apply flex min-h-[448px] flex-col items-center justify-end px-7 pb-5 pt-7 text-center;
+      border-radius: 28px;
+      background: transparent;
+    }
+
+    .ui-other-offer__card::before,
+    .ui-other-offer__card::after {
+      content: none;
+    }
+
+    .ui-other-offer__card--wide {
+      @apply col-span-1 gap-0;
+      grid-template-columns: 1fr;
+      min-height: 448px;
+      padding: 28px 24px 20px;
+    }
+
+    .ui-other-offer__card--normal {
+      @apply flex flex-col items-center justify-between;
+      padding: 28px 24px 20px;
+    }
+
+    .ui-other-offer__art,
+    .ui-other-offer__mobile-art {
+      @apply hidden;
+    }
+
+    .ui-other-offer__desktop-art,
+    .ui-other-offer__art {
+      @apply block;
+    }
+
+    .ui-other-offer__art {
+      @apply absolute inset-0;
+      z-index: 0;
+    }
+
+    .ui-other-offer__content {
+      @apply relative z-[1] h-full w-full items-center justify-end;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .ui-other-offer__card--wide .ui-other-offer__content {
+      @apply max-w-none items-center text-center;
+    }
+
+    .ui-other-offer__card--normal .ui-other-offer__content {
+      @apply items-center text-center;
+    }
+
+    .ui-other-offer__badge {
+      @apply min-h-8 px-4 py-[7px];
+    }
+
+    .ui-other-offer__badge span {
+      @apply font-poppins text-[16px] leading-6 tracking-[0px];
+    }
+
+    .ui-other-offer__card-title {
+      @apply mt-[18px] text-[20px] leading-7 tracking-[-0.2px];
+    }
+
+    .ui-other-offer__card--wide .ui-other-offer__card-title {
+      @apply leading-7;
+    }
+
+    .ui-other-offer__cta {
+      @apply mt-[18px] text-[16px] leading-6 tracking-[-0.16px];
+    }
+
+    .ui-other-offer__cta svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .ui-other-offer__art {
+      @apply block;
+    }
+
+    .ui-other-offer__mobile-art {
+      @apply block object-top;
+    }
+
+    .ui-other-offer__card {
+      @apply max-h-[480px];
+      box-shadow: none;
+      background: transparent;
+    }
+
+    .ui-other-offer__card::before,
+    .ui-other-offer__card::after {
+      content: none;
+    }
+
+    .ui-other-offer__card:first-child
+      .ui-other-offer__card-title.ui-other-offer__card-title--wide {
+      text-align: left !important;
+    }
+
+    .ui-other-offer__content {
+      @apply absolute inset-x-0 bottom-0 flex;
+      opacity: 1;
+      pointer-events: none;
+      padding: 12px 12px 20px;
+    }
+
+    .ui-other-offer__card--wide .ui-other-offer__content {
+      @apply inset-y-0 bottom-auto top-0 left-0 h-full justify-between;
+      padding: 20px;
+      max-width: 55%;
+    }
+
+    .ui-other-offer__card--normal .ui-other-offer__content {
+      @apply items-center justify-end text-center;
+    }
+
+    .ui-other-offer__badge,
+    .ui-other-offer__card-title {
+      @apply pointer-events-none;
+    }
+
+    .ui-other-offer__card-title {
+      @apply text-center;
+    }
+
+    .ui-other-offer__cta {
+      @apply opacity-100;
+      pointer-events: auto;
+    }
+  }
+}
