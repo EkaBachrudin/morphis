@@ -14,7 +14,10 @@
       "types": "./dist/types/index.d.ts",
       "default": "./dist/morphis.js"
     },
-    "./tokens.css": "./dist/tokens.css",
+    "./tokens.css": {
+      "types": "./dist/tokens.css.d.ts",
+      "default": "./dist/tokens.css"
+    },
     "./custom-elements.json": "./custom-elements.json"
   },
   "files": [

@@ -1,5 +1,6 @@
 import StyleDictionary from 'style-dictionary';
 import { resolve } from 'node:path';
+import { mkdirSync, writeFileSync } from 'node:fs';
 
 const root = resolve(import.meta.dirname, '..');
 
@@ -23,4 +24,11 @@ const sd = new StyleDictionary({
 });
 
 await sd.buildAllPlatforms();
-console.log('tokens -> packages/tokens/dist/tokens.css');
+
+// Deklarasi tipe untuk side-effect import `@eka-morphis/tokens/tokens.css`,
+// agar TypeScript tidak melaporkan TS2882 (css bukan modul yang bisa dibaca TS).
+const dist = resolve(root, 'dist');
+mkdirSync(dist, { recursive: true });
+writeFileSync(resolve(dist, 'tokens.css.d.ts'), 'export {};\n');
+
+console.log('tokens -> packages/tokens/dist/tokens.css (+ tokens.css.d.ts)');

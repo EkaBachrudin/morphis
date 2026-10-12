@@ -150,9 +150,10 @@ konsumen, tambahkan `.npmrc`:
 ```
 
 Lalu `npm install @eka-morphis/other-offer @eka-morphis/tokens`. Panduan per
-framework (React wrapper, Vue `isCustomElement`, Angular `CUSTOM_ELEMENTS_SCHEMA`,
-tag mentah + augmentasi TS) ada di [`docs/react-typescript.md`](react-typescript.md)
-dan README.
+framework (React wrapper, Vue `isCustomElement`, Angular `CUSTOM_ELEMENTS_SCHEMA`
++ penanganan `TS2882` untuk import `tokens.css`, tag mentah + augmentasi TS) ada
+di [`docs/react-typescript.md`](react-typescript.md),
+[`docs/angular.md`](angular.md), dan README.
 
 ## Pre-release (opsional)
 

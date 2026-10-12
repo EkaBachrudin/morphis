@@ -151,6 +151,19 @@ export function Example() {
 Untuk memakai tag mentah `<ui-*>` di TSX (atau framework lain), lihat
 [`docs/react-typescript.md`](docs/react-typescript.md).
 
+### Angular
+
+```ts
+// main.ts
+import '@eka-morphis/other-offer';         // mendaftarkan <ui-other-offer>
+import '@eka-morphis/tokens/tokens.css';
+```
+
+Daftarkan `CUSTOM_ELEMENTS_SCHEMA` di komponen/standalone component yang
+memakai tag `<ui-*>`. Bila `tsc`/IDE melaporkan `TS2882: Cannot find module or
+type declarations for side-effect import of '@eka-morphis/tokens/tokens.css'`,
+lihat panduan lengkap di [`docs/angular.md`](docs/angular.md).
+
 ### Drupal (comot native, tanpa CDN)
 
 Salin **tiga file** dari paket yang dipakai ke tema Drupal:
@@ -273,6 +286,8 @@ yang bisa merender HTML. Yang ada hanyalah **catatan integrasi** kecil per frame
 | Meta-framework (Next/Nuxt/SvelteKit) | Client hydration | Import di boundary client; anti-FOUC via tokens global |
 
 > TypeScript + tag mentah `<ui-*>`: lihat [`docs/react-typescript.md`](docs/react-typescript.md).
+> TypeScript di Angular (termasuk error `TS2882` pada import `tokens.css`):
+> lihat [`docs/angular.md`](docs/angular.md).
 
 ## Publikasi (versioning independen)
 
