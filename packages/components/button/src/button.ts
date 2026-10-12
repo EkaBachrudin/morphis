@@ -1,4 +1,4 @@
-import { MorphisElement, define, property, litStyles, type TemplateResult } from '@morphis/core';
+import { MorphisElement, define, property, litStyles, type TemplateResult } from '@eka-morphis/core';
 import style from './button.css?inline';
 import buttonTemplate from './button.template.html?html';
 

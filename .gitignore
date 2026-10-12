@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.npmrc
 downloads/
 storybook-static/
 custom-elements.json

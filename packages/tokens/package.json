@@ -1,5 +1,5 @@
 {
-  "name": "@morphis/tokens",
+  "name": "@eka-morphis/tokens",
   "version": "0.1.0",
   "description": "Design tokens (CSS custom properties) for Morphis components",
   "license": "MIT",
@@ -13,7 +13,13 @@
     "dist"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eka-morphis/morphis.git",
+    "directory": "packages/tokens"
   },
   "scripts": {
     "build": "node scripts/build-tokens.mjs"

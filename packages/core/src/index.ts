@@ -1,5 +1,5 @@
 /**
- * Permukaan publik `@morphis/core`.
+ * Permukaan publik `@eka-morphis/core`.
  *
  * Menyediakan base class {@link MorphisElement}, helper (`define`, `emit`,
  * `litStyles`), dan re-export API Lit yang dipakai komponen (`html`, `css`,

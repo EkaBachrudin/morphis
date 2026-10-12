@@ -5,7 +5,7 @@ import {
   state,
   litStyles,
   type TemplateResult,
-} from '@morphis/core';
+} from '@eka-morphis/core';
 import style from './input.css?inline';
 import inputTemplate from './input.template.html?html';
 

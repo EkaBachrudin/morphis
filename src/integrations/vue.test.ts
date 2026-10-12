@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createApp, h } from 'vue';
-import '@morphis/button';
-import '@morphis/input';
+import '@eka-morphis/button';
+import '@eka-morphis/input';
 
 /** Menunggu siklus update Lit (render async) sebelum assertion DOM. */
 async function settle(el: Element): Promise<void> {

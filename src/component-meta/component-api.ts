@@ -1,4 +1,4 @@
-import { define } from '@morphis/core';
+import { define } from '@eka-morphis/core';
 import { findComponent, type ComponentDoc } from './model';
 import './component-version';
 

@@ -5,7 +5,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 # Paket baru
 
 Panduan membuat **paket komponen baru** dari nol sampai rilis pertama. Setiap
-komponen dipublikasikan sebagai paket npm tersendiri (mis. `@morphis/badge`)
+komponen dipublikasikan sebagai paket npm tersendiri (mis. `@eka-morphis/badge`)
 dengan versi independen. Untuk mekanik rilis umum (changeset, versi, CI), lihat
 **Panduan/Publikasi**.
 
@@ -27,7 +27,7 @@ Generator membuat `packages/components/badge/`:
 
 ```
 packages/components/badge/
-├── package.json                 # @morphis/badge, versi 0.1.0
+├── package.json                 # @eka-morphis/badge, versi 0.1.0
 ├── tsconfig.json
 └── src/
     ├── badge.ts                 # kelas <ui-badge> (Lit)
@@ -41,7 +41,7 @@ packages/components/badge/
 ```
 
 Ia juga mendaftarkan paket ke meta-bundle `packages/components/src/index.ts`
-(sehingga ikut masuk `@morphis/components`), dan memakai tag `ui-badge`.
+(sehingga ikut masuk `@eka-morphis/components`), dan memakai tag `ui-badge`.
 
 > Nama harus kebab-case, mis. `badge` atau `data-table`. Paket yang sudah ada
 > ditolak kecuali memakai `--force`.
@@ -52,7 +52,7 @@ Ia juga mendaftarkan paket ke meta-bundle `packages/components/src/index.ts`
 npm install
 ```
 
-npm workspaces menautkan `@morphis/badge` ke `node_modules` agar bisa diimpor
+npm workspaces menautkan `@eka-morphis/badge` ke `node_modules` agar bisa diimpor
 dari paket lain dan dari Storybook.
 
 ## 3. Lengkapi komponen
@@ -72,7 +72,7 @@ slot/part/event/custom property.
 ```
 
 ```ts
-import { MorphisElement, define, property, litStyles } from '@morphis/core';
+import { MorphisElement, define, property, litStyles } from '@eka-morphis/core';
 import style from './badge.css?inline';
 import template from './badge.template.html?html';
 
@@ -101,7 +101,7 @@ define('ui-badge', UiBadge);
 > Isi template memakai sintaks Lit biasa (mis. `${ctx.label}`, `?hidden=${ctx.x}`,
 > `@click=${...}`) dengan `ctx` = objek yang dioper dari `render()`. File
 > diperlakukan sebagai **badan literal `html\`...\``**: helper `html`, `nothing`,
-> dan `repeat` dari `@morphis/core` tersedia tanpa import, dan nested template
+> dan `repeat` dari `@eka-morphis/core` tersedia tanpa import, dan nested template
 > `html\`...\`` didukung (mis. untuk `repeat`). Backtick/backslash literal ditulis
 > seperti di TypeScript (`` \` ``, `\\`). Karena berada di file terpisah, binding
 > di dalamnya **tidak** di-type-check.
@@ -126,7 +126,7 @@ jadi tambahkan alias di `.storybook/main.ts` agar dev me-resolve sumber
 komponen (bukan `dist/` yang belum ada):
 
 ```ts
-{ find: /^@morphis\/badge$/, replacement: root('packages/components/badge/src/badge.ts') },
+{ find: /^@eka-morphis\/badge$/, replacement: root('packages/components/badge/src/badge.ts') },
 ```
 
 ## 5. Rilis pertama
@@ -136,7 +136,7 @@ Generator memakai versi `0.1.0`, dan `changeset publish` menerbitkan versi yang
 
 ```bash
 npm run typecheck && npm test && npm run build
-npx changeset --minor @morphis/badge -m "feat: komponen badge"   # atau: npm run changeset
+npx changeset --minor @eka-morphis/badge -m "feat: komponen badge"   # atau: npm run changeset
 npm run version-packages
 npm run release
 ```

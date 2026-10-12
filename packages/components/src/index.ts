@@ -1,11 +1,11 @@
-import '@morphis/button';
-import '@morphis/card';
-import '@morphis/input';
-import '@morphis/other-offer';
-import '@morphis/select';
+import '@eka-morphis/button';
+import '@eka-morphis/card';
+import '@eka-morphis/input';
+import '@eka-morphis/other-offer';
+import '@eka-morphis/select';
 
-export * from '@morphis/button';
-export * from '@morphis/card';
-export * from '@morphis/input';
-export * from '@morphis/other-offer';
-export * from '@morphis/select';
+export * from '@eka-morphis/button';
+export * from '@eka-morphis/card';
+export * from '@eka-morphis/input';
+export * from '@eka-morphis/other-offer';
+export * from '@eka-morphis/select';

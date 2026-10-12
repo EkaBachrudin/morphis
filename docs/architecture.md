@@ -8,7 +8,7 @@
 
 - **Status**: Monorepo aktif (migrasi dari single-package selesai)
 - **Namespace**: `ui-` (tag custom element, class internal, `part`)
-- **Nama paket**: `@morphis/*` (paket per komponen + `@morphis/components` meta + `@morphis/core` + `@morphis/tokens` + `@morphis/react`)
+- **Nama paket**: `@eka-morphis/*` (paket per komponen + `@eka-morphis/components` meta + `@eka-morphis/core` + `@eka-morphis/tokens` + `@eka-morphis/react`)
 - **Struktur**: npm workspaces + Changesets (versioning independen per paket)
 - **Prinsip**: build once, run anywhere — tanpa version floor, tanpa lock-in.
 
@@ -39,7 +39,7 @@ Morphis adalah monorepo npm untuk membangun pustaka komponen UI yang:
 | Theming | **CSS custom property `--ui-*`** (diwariskan menembus shadow) + `::part()` + `::slotted()` |
 | Komunikasi | **Atribut/property** + **`CustomEvent`** (`bubbles: true, composed: true`) |
 | Build | **Vite (library mode)** → ESM; bundle penuh + entry per komponen |
-| Distribusi | Paket npm **per komponen** (versioning independen) + meta-bundle `@morphis/components` + markup HTML + varian IIFE |
+| Distribusi | Paket npm **per komponen** (versioning independen) + meta-bundle `@eka-morphis/components` + markup HTML + varian IIFE |
 | Integrasi Drupal | **Tidak ada paket khusus**; developer Drupal menyalin `dist/*.iife.js` + `tokens.css` + markup |
 | SSR | Client-side / progressive enhancement |
 | Dokumentasi | Storybook + Custom Elements Manifest |
@@ -224,21 +224,21 @@ reusable-components/
 │   ├── main.ts
 │   └── preview.ts
 ├── packages/
-│   ├── core/                    # @morphis/core — MorphisElement (extends LitElement) + helper
+│   ├── core/                    # @eka-morphis/core — MorphisElement (extends LitElement) + helper
 │   │   └── src/{element,sheet,emit,define,index}.ts
-│   ├── tokens/                  # @morphis/tokens
+│   ├── tokens/                  # @eka-morphis/tokens
 │   │   ├── src/tokens.json      # Style Dictionary → dist/tokens.css
 │   │   └── scripts/build-tokens.mjs
-│   ├── components/              # @morphis/components (meta-bundle)
+│   ├── components/              # @eka-morphis/components (meta-bundle)
 │   │   ├── package.json
 │   │   ├── src/index.ts         # re-export semua komponen
 │   │   └── dist/morphis.js, tokens.css, custom-elements.json
-│   │   └── button/              # @morphis/button (versi independen)
+│   │   └── button/              # @eka-morphis/button (versi independen)
 │   │       ├── package.json, tsconfig.json
 │   │       └── src/{button.ts, button.css,
 │   │                button.markup.html, button.stories.ts, button.test.ts, button.mdx}
 │   │   └── card/  input/  select/ ...
-│   └── react/                   # @morphis/react — wrapper React <19
+│   └── react/                   # @eka-morphis/react — wrapper React <19
 ├── src/                         # dev app Storybook (bukan paket terbit)
 │   ├── styles/base.css          # konteks @apply + blok @theme
 │   ├── component-meta/          # model docs (dari CEM) + snippet + tabel API
@@ -256,7 +256,7 @@ semuanya siap disalin ("dicomot") untuk Drupal/HTML.
 > **Mengapa per komponen?** Agar setiap komponen punya **semver independen**:
 > memperbaiki `card` tidak memaksa menaikkan versi `button`. npm hanya
 > mem-version satu paket per nama, jadi ini mengharuskan paket terpisah dengan
-> npm workspaces + Changesets. Meta-bundle `@morphis/components` tetap
+> npm workspaces + Changesets. Meta-bundle `@eka-morphis/components` tetap
 > disediakan untuk konsumen yang ingin semua komponen sekaligus (versinya naik
 > bila salah satu komponen naik).
 
@@ -283,7 +283,7 @@ const componentEntries = Object.fromEntries(
 export default defineConfig({
   plugins: [tailwindcss()],
   resolve: {
-    alias: { '@morphis/core': resolve(import.meta.dirname, 'src/core/index.ts') },
+    alias: { '@eka-morphis/core': resolve(import.meta.dirname, 'src/core/index.ts') },
   },
   build: {
     target: 'es2021',
@@ -301,7 +301,7 @@ export default defineConfig({
 });
 ```
 
-> Alias `@morphis/core` diselesaikan saat build (Vite) dan saat typecheck (tsconfig
+> Alias `@eka-morphis/core` diselesaikan saat build (Vite) dan saat typecheck (tsconfig
 > `paths`), sehingga kode komponen tetap memakai specifier yang stabil.
 
 Output:
@@ -313,7 +313,7 @@ Output:
 
 ```json
 {
-  "name": "@morphis/components",
+  "name": "@eka-morphis/components",
   "version": "1.0.0",
   "description": "Framework-agnostic Web Components by Morphis",
   "type": "module",
@@ -354,9 +354,9 @@ Output:
 }
 ```
 
-> `@morphis/core` mendeklarasikan **`lit`** sebagai `dependency`; paket komponen
-> cukup bergantung pada `@morphis/core`. Build ESM menge-*external* `lit` &
-> `@morphis/core`, sedangkan varian IIFE dan meta-bundle membundel keduanya.
+> `@eka-morphis/core` mendeklarasikan **`lit`** sebagai `dependency`; paket komponen
+> cukup bergantung pada `@eka-morphis/core`. Build ESM menge-*external* `lit` &
+> `@eka-morphis/core`, sedangkan varian IIFE dan meta-bundle membundel keduanya.
 
 > `build:cem` memakai **`@lit-labs/analyzer`** (Lit-native) lewat
 > `scripts/build-cem.mjs`, dengan konfigurasi TypeScript di `tsconfig.cem.json`.
@@ -468,7 +468,7 @@ export { litStyles } from './sheet';
 
 ```ts
 // packages/components/button/src/button.ts
-import { MorphisElement, define, property, litStyles, type TemplateResult } from '@morphis/core';
+import { MorphisElement, define, property, litStyles, type TemplateResult } from '@eka-morphis/core';
 import style from './button.css?inline';
 import template from './button.template.html?html';
 
@@ -544,7 +544,7 @@ src/tokens/tokens.json ──► dist/tokens.css ──────────�
 ```
 
 Pipeline: tiap komponen dikompilasi sebagai entry Vite terpisah. Varian **ESM**
-menge-*external* `lit` & `@morphis/core` (konsumen/bundler men-dedupe runtime),
+menge-*external* `lit` & `@eka-morphis/core` (konsumen/bundler men-dedupe runtime),
 sedangkan varian **IIFE** (`*.iife.js`, untuk Drupal) dan **meta-bundle**
 (`morphis.js`, untuk CDN) membundel Lit + core agar self-contained. `tokens.css`
 di-ship terpisah dan dimuat konsumen. CEM dan markup dihasilkan dari sumber yang
@@ -580,8 +580,8 @@ Contoh `markup/button.html` (siap tempel ke Twig):
 ### 9.1 Konsumsi HTML / CDN (tanpa framework)
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@morphis/components/dist/tokens.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@morphis/components/dist/morphis.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/tokens.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/morphis.js"></script>
 
 <ui-button variant="primary">Simpan</ui-button>
 ```
@@ -595,7 +595,7 @@ bekerja tanpa build khusus.
 **React** — import sekali + pakai tag; interaksi lewat `ref`:
 
 ```tsx
-import '@morphis/button';
+import '@eka-morphis/button';
 import { useRef } from 'react';
 
 export function App() {
@@ -607,13 +607,13 @@ export function App() {
 - React ≥19 mendukung property & event custom element secara deklaratif.
 - **React <19**: atribut dikirim sebagai string dan custom event tidak bisa
   di-bind deklaratif. Solusi: pasang `addEventListener` lewat `ref`, atau pakai
-  wrapper tipis `@morphis/react` (opsional, Fase 3).
+  wrapper tipis `@eka-morphis/react` (opsional, Fase 3).
 
 **Angular** — izinkan elemen tak dikenal + import sekali:
 
 ```ts
 // main.ts
-import '@morphis/button';
+import '@eka-morphis/button';
 ```
 
 ```ts
@@ -643,7 +643,7 @@ export default defineConfig({
 
 ```vue
 <script setup>
-import '@morphis/button';
+import '@eka-morphis/button';
 </script>
 
 <template>
@@ -713,7 +713,7 @@ mencegah duplikasi logika data/snippet.
 | Ganti warna/spacing global | `packages/tokens/src/tokens.json` | semua komponen ikut |
 | Themer ganti tema | `--ui-*` di `:root` | tanpa build ulang |
 | Tata elemen internal | `ui-x::part(...)` | tanpa build ulang |
-| Tambah komponen | `npm run gen -- component <nama>` | scaffold paket baru (@morphis/<nama>) + register di meta |
+| Tambah komponen | `npm run gen -- component <nama>` | scaffold paket baru (@eka-morphis/<nama>) + register di meta |
 
 ---
 
@@ -723,7 +723,7 @@ mencegah duplikasi logika data/snippet.
 |---|---|
 | Theming terasa lebih sulit karena Shadow DOM | Token `--ui-*` (diwariskan) + `::part()` + `::slotted()`; dokumentasikan daftar part |
 | FOUC / SSR (WC baru muncul setelah JS) | `tokens.css` global selalu dirender; siapkan style host minimal; define-on-client; `:not(:defined)` styling |
-| React <19 tak bisa bind custom event deklaratif | Gunakan `ref` + `addEventListener`; sediakan wrapper `@morphis/react` opsional |
+| React <19 tak bisa bind custom event deklaratif | Gunakan `ref` + `addEventListener`; sediakan wrapper `@eka-morphis/react` opsional |
 | Vue menganggap `<ui-*>` sebagai komponen | Set `compilerOptions.isCustomElement` |
 | Angular menolak tag tak dikenal | `CUSTOM_ELEMENTS_SCHEMA` |
 | Preflight Tailwind terduplikasi per komponen | Jangan inject preflight ke shadow; hanya style komponen |
@@ -733,7 +733,7 @@ mencegah duplikasi logika data/snippet.
 | CEM tidak membaca getter/setter kompleks | `@lit-labs/analyzer` membaca `@property` otomatis untuk **Attributes**; anotasi `@slot`/`@csspart`/`@cssprop`/`@fires` melengkapi slot/part/event. |
 | `useDefineForClassFields` meng-override accessor Lit | Set `false` di tsconfig (proyek memakai decorator legacy Lit). |
 | `@property` Tailwind diabaikan di Shadow DOM | `litStyles()` mengangkat rule ke `document.adoptedStyleSheets` sekali (lihat §6.3). |
-| Duplikasi runtime Lit di banyak entry | ESM menge-*external* `lit` + `@morphis/core`; IIFE/meta-bundle membundel (lihat §8). |
+| Duplikasi runtime Lit di banyak entry | ESM menge-*external* `lit` + `@eka-morphis/core`; IIFE/meta-bundle membundel (lihat §8). |
 | Update Lit asinkron → assertion test terlalu awal | Tunggu `await el.updateComplete` (atau `elementUpdated` dari `@open-wc/testing-helpers`). |
 | Slot tanpa konten merusak a11y | Slot default + fallback; uji dengan addon a11y |
 | Bundel membesar (Lit ±5–6 KB gzip) | Runtime di-*share* lintas komponen; entry per komponen tetap tree-shakable; audit ukuran di CI |
@@ -763,7 +763,7 @@ mencegah duplikasi logika data/snippet.
 
 **Fase 3 — DX & Skala**
 - Generator komponen (`npm run gen component`), versioning npm, auto-docs dari CEM.
-- Wrapper opsional `@morphis/react` (ergonomi event React <19).
+- Wrapper opsional `@eka-morphis/react` (ergonomi event React <19).
 - Uji integrasi nyata React/Angular/Vue/Svelte/Solid.
 - Visual regression + audit aksesibilitas.
 
@@ -783,7 +783,7 @@ mencegah duplikasi logika data/snippet.
   Vite `?html` (`scripts/vite-plugin-lit-template.mjs`); seluruh komponen
   (card/button/input/select) memakainya.
 - CEM beralih ke `litelement: true`; build ESM menge-*external* `lit` &
-  `@morphis/core`, IIFE/meta membundel.
+  `@eka-morphis/core`, IIFE/meta membundel.
 - Seluruh dokumentasi (`README.md`, `docs/architecture.md`, panduan Storybook,
   generator) disesuaikan.
 
@@ -799,7 +799,7 @@ kecil) per framework.
 |---|---|---|
 | HTML / Twig / Drupal | Langsung | Import `morphis.js` + `tokens.css`; theming via `--ui-*` / `::part()` |
 | React ≥19 | Langsung | Property & event custom element deklaratif |
-| React 16.8–18 | Langsung + wrapper | Atribut string; custom event via `ref` atau `@morphis/react` |
+| React 16.8–18 | Langsung + wrapper | Atribut string; custom event via `ref` atau `@eka-morphis/react` |
 | Angular | Langsung | `CUSTOM_ELEMENTS_SCHEMA`; import sekali di `main.ts` |
 | Vue 3 | Langsung | `compilerOptions.isCustomElement` untuk prefix `ui-` |
 | Vue 2 | Langsung (opsional) | Gunakan via tag HTML; hindari binding Vue-specific |

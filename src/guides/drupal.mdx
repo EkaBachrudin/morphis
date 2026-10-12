@@ -10,15 +10,15 @@ perlu CDN** — cukup salin file yang dipakai dari paket npm ke tema.
 
 ## 1. Salin file ke tema
 
-Setiap komponen punya paket sendiri (`@morphis/button`, `@morphis/card`, …).
+Setiap komponen punya paket sendiri (`@eka-morphis/button`, `@eka-morphis/card`, …).
 Ambil dari `node_modules` (atau dari tarball) hanya yang dibutuhkan:
 
 ```
 themes/custom/mytheme/libraries/morphis/
-├── tokens.css        # dari @morphis/tokens/dist/tokens.css
-├── button.iife.js    # dari @morphis/button/dist/button.iife.js
-├── card.iife.js      # dari @morphis/card/dist/card.iife.js
-└── input.iife.js     # dari @morphis/input/dist/input.iife.js
+├── tokens.css        # dari @eka-morphis/tokens/dist/tokens.css
+├── button.iife.js    # dari @eka-morphis/button/dist/button.iife.js
+├── card.iife.js      # dari @eka-morphis/card/dist/card.iife.js
+└── input.iife.js     # dari @eka-morphis/input/dist/input.iife.js
 ```
 
 Gunakan varian **`*.iife.js`** (script klasik) agar tidak butuh
@@ -103,8 +103,8 @@ Markup tiap komponen tersedia di `dist/<nama>.html` (atau
 Bila ingin semua komponen sekaligus:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@morphis/components/dist/tokens.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@morphis/components/dist/morphis.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/tokens.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/morphis.js"></script>
 ```
 
 ## Checklist

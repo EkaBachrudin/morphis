@@ -1,10 +1,10 @@
 # Contoh library Drupal untuk Morphis (mode "comot native", tanpa CDN).
 #
 # 1. Salin file yang dibutuhkan dari paket ke libraries/morphis/:
-#      @morphis/tokens/dist/tokens.css        -> libraries/morphis/tokens.css
-#      @morphis/button/dist/button.iife.js    -> libraries/morphis/button.iife.js
-#      @morphis/card/dist/card.iife.js        -> libraries/morphis/card.iife.js
-#      @morphis/input/dist/input.iife.js      -> libraries/morphis/input.iife.js
+#      @eka-morphis/tokens/dist/tokens.css        -> libraries/morphis/tokens.css
+#      @eka-morphis/button/dist/button.iife.js    -> libraries/morphis/button.iife.js
+#      @eka-morphis/card/dist/card.iife.js        -> libraries/morphis/card.iife.js
+#      @eka-morphis/input/dist/input.iife.js      -> libraries/morphis/input.iife.js
 #    (varian *.iife.js adalah script klasik, tidak butuh <script type="module">;
 #     untuk bundler modern gunakan *.js ESM)
 # 2. Tempel markup komponen (lihat *.markup.html) ke template Twig.

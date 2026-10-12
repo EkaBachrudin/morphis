@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import { Button, Input, Card } from '@morphis/react';
+import { Button, Input, Card } from '@eka-morphis/react';
 
 /** Menunggu siklus update Lit (render async) sebelum assertion DOM. */
 async function settle(el: Element): Promise<void> {

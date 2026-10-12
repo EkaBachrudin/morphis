@@ -14,7 +14,7 @@ bekerja tanpa build khusus.
 > bocor ke konsumen.
 
 ```ts
-import '@morphis/button'; // daftarkan <ui-button>
+import '@eka-morphis/button'; // daftarkan <ui-button>
 ```
 
 ## Kontrak umum
@@ -38,8 +38,8 @@ Event yang dipancarkan: `ui-click`, `ui-input`, `ui-change`. Listener menerima
 jadi cukup render tag-nya langsung:
 
 ```tsx
-import '@morphis/button';
-import '@morphis/tokens/tokens.css';
+import '@eka-morphis/button';
+import '@eka-morphis/tokens/tokens.css';
 import { useRef } from 'react';
 
 export function App() {
@@ -49,11 +49,11 @@ export function App() {
 ```
 
 **React 16.8–18** belum meneruskan property/custom event ke custom element,
-jadi pakai wrapper `@morphis/react`:
+jadi pakai wrapper `@eka-morphis/react`:
 
 ```tsx
-import { Button, Input, Card } from '@morphis/react';
-import '@morphis/tokens/tokens.css';
+import { Button, Input, Card } from '@eka-morphis/react';
+import '@eka-morphis/tokens/tokens.css';
 
 <Button variant="primary" onUiClick={(e) => console.log(e.detail)}>Simpan</Button>
 ```
@@ -65,8 +65,8 @@ Daftarkan elemen sekali di entry point, lalu izinkan custom element lewat
 
 ```ts
 // main.ts
-import '@morphis/button';
-import '@morphis/tokens/tokens.css';
+import '@eka-morphis/button';
+import '@eka-morphis/tokens/tokens.css';
 ```
 
 ```ts
@@ -96,8 +96,8 @@ vue({
 
 ```vue
 <script setup lang="ts">
-import '@morphis/button';
-import '@morphis/input';
+import '@eka-morphis/button';
+import '@eka-morphis/input';
 function onClick(event: CustomEvent) {
   console.log(event.detail);
 }
@@ -113,7 +113,7 @@ function onClick(event: CustomEvent) {
 
 ```svelte
 <script lang="ts">
-  import '@morphis/button';
+  import '@eka-morphis/button';
   function onClick(event: CustomEvent) {
     console.log(event.detail);
   }
@@ -125,7 +125,7 @@ function onClick(event: CustomEvent) {
 ## Solid / Qwik
 
 ```tsx
-import '@morphis/button';
+import '@eka-morphis/button';
 ```
 
 ```tsx

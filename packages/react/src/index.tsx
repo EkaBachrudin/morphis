@@ -1,10 +1,10 @@
-import '@morphis/button';
-import '@morphis/input';
-import '@morphis/card';
+import '@eka-morphis/button';
+import '@eka-morphis/input';
+import '@eka-morphis/card';
 
-import type { UiButton } from '@morphis/button';
-import type { UiInput } from '@morphis/input';
-import type { UiCard } from '@morphis/card';
+import type { UiButton } from '@eka-morphis/button';
+import type { UiInput } from '@eka-morphis/input';
+import type { UiCard } from '@eka-morphis/card';
 import { createComponent } from './create-component';
 
 export { createComponent } from './create-component';

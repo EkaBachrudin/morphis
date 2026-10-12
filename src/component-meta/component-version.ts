@@ -1,4 +1,4 @@
-import { define } from '@morphis/core';
+import { define } from '@eka-morphis/core';
 import { findComponent } from './model';
 
 const STYLE_ID = 'morphis-component-version-styles';

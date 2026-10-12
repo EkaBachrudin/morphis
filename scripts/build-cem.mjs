@@ -5,7 +5,7 @@
  * menyeret `globby`/`chokidar` (dan transitifnya `micromatch`/`braces`).
  *
  * Analyzer ini memakai TypeScript compiler API + parse5 (tanpa braces).
- * Program TS dibangun dari tsconfig.json root (punya `paths` ke `@morphis/core`
+ * Program TS dibangun dari tsconfig.json root (punya `paths` ke `@eka-morphis/core`
  * dan tiap paket komponen), lalu modul komponen disaring dan path-nya
  * dinormalisasi relatif ke root repo agar kompatibel dengan manifest lama.
  */

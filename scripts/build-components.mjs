@@ -8,12 +8,12 @@ import { litTemplate } from './vite-plugin-lit-template.mjs';
 const root = resolve(import.meta.dirname, '..');
 
 const aliases = {
-  '@morphis/core': resolve(root, 'packages/core/src/index.ts'),
-  '@morphis/button': resolve(root, 'packages/components/button/src/button.ts'),
-  '@morphis/card': resolve(root, 'packages/components/card/src/card.ts'),
-  '@morphis/input': resolve(root, 'packages/components/input/src/input.ts'),
-  '@morphis/select': resolve(root, 'packages/components/select/src/select.ts'),
-  '@morphis/other-offer': resolve(root, 'packages/components/other-offer/src/other-offer.ts'),
+  '@eka-morphis/core': resolve(root, 'packages/core/src/index.ts'),
+  '@eka-morphis/button': resolve(root, 'packages/components/button/src/button.ts'),
+  '@eka-morphis/card': resolve(root, 'packages/components/card/src/card.ts'),
+  '@eka-morphis/input': resolve(root, 'packages/components/input/src/input.ts'),
+  '@eka-morphis/select': resolve(root, 'packages/components/select/src/select.ts'),
+  '@eka-morphis/other-offer': resolve(root, 'packages/components/other-offer/src/other-offer.ts'),
 };
 
 async function buildEntry({ entry, outDir, fileName, format, external, name }) {
@@ -59,14 +59,14 @@ for (const file of componentFiles) {
   const name = basename(pkgDir);
   const outDir = join(pkgDir, 'dist');
 
-  // ESM per komponen: `lit` + `@morphis/core` di-external agar konsumen
+  // ESM per komponen: `lit` + `@eka-morphis/core` di-external agar konsumen
   // (bundler) men-dedupe runtime dan komponen tetap tree-shakable.
   await buildEntry({
     entry,
     outDir,
     fileName: `${name}.js`,
     format: 'es',
-    external: [/^lit($|\/)/, '@morphis/core'],
+    external: [/^lit($|\/)/, '@eka-morphis/core'],
   });
   // IIFE untuk Drupal: self-contained (Lit + core ikut dibundel).
   await buildEntry({
@@ -103,6 +103,6 @@ await buildEntry({
   outDir: resolve(root, 'packages/react/dist'),
   fileName: 'react.js',
   format: 'es',
-  external: ['react', 'react/jsx-runtime', /^@morphis\//],
+  external: ['react', 'react/jsx-runtime', /^@eka-morphis\//],
 });
 console.log('components -> packages/react/dist (react.js)');

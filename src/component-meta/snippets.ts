@@ -20,7 +20,7 @@ function indent(text: string, spaces: number): string {
 
 export function snippetFor(doc: ComponentDoc, framework: Framework): string {
   const markup = doc.markup;
-  const pkg = `@morphis/${doc.tag.replace(/^ui-/, '')}`;
+  const pkg = `@eka-morphis/${doc.tag.replace(/^ui-/, '')}`;
 
   switch (framework) {
     case 'twig':
@@ -28,7 +28,7 @@ export function snippetFor(doc: ComponentDoc, framework: Framework): string {
     case 'react':
       return [
         `import '${pkg}';`,
-        `import '@morphis/tokens/tokens.css';`,
+        `import '@eka-morphis/tokens/tokens.css';`,
         '',
         'export function Example() {',
         '  return (',
@@ -40,7 +40,7 @@ export function snippetFor(doc: ComponentDoc, framework: Framework): string {
       return [
         '<script setup lang="ts">',
         `import '${pkg}';`,
-        `import '@morphis/tokens/tokens.css';`,
+        `import '@eka-morphis/tokens/tokens.css';`,
         '</script>',
         '',
         '<template>',
@@ -50,7 +50,7 @@ export function snippetFor(doc: ComponentDoc, framework: Framework): string {
     case 'angular': {
       const lines = [
         `import '${pkg}';`,
-        `import '@morphis/tokens/tokens.css';`,
+        `import '@eka-morphis/tokens/tokens.css';`,
         '',
         '// app.module.ts (atau standalone component)',
         '// schemas: [CUSTOM_ELEMENTS_SCHEMA]',

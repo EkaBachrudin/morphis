@@ -1,4 +1,4 @@
-import { MorphisElement, define, property, state, litStyles, type TemplateResult } from '@morphis/core';
+import { MorphisElement, define, property, state, litStyles, type TemplateResult } from '@eka-morphis/core';
 import style from './card.css?inline';
 import cardTemplate from './card.template.html?html';
 

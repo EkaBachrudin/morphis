@@ -52,7 +52,7 @@ const files = {
   }
 }
 `,
-  [`${name}.markup.html`]: `<!-- Consumer markup — paste into Twig or plain HTML. Load @morphis/${name} (dist/${name}.js atau ${name}.iife.js) + @morphis/tokens tokens.css once. -->
+  [`${name}.markup.html`]: `<!-- Consumer markup — paste into Twig or plain HTML. Load @eka-morphis/${name} (dist/${name}.js atau ${name}.iife.js) + @eka-morphis/tokens tokens.css once. -->
 <${tag}>Konten</${tag}>
 `,
   [`${name}.template.html`]: `<div class="ui-${name}" part="root">
@@ -67,7 +67,7 @@ const files = {
   export default template;
 }
 `,
-  [`${name}.ts`]: `import { MorphisElement, define, litStyles, property } from '@morphis/core';
+  [`${name}.ts`]: `import { MorphisElement, define, litStyles, property } from '@eka-morphis/core';
 import style from './${name}.css?inline';
 import template from './${name}.template.html?html';
 
@@ -99,7 +99,7 @@ define('${tag}', ${className});
 `,
   [`${name}.mdx`]: `import { Meta, Canvas, Controls } from '@storybook/addon-docs/blocks';
 import * as Stories from './${name}.stories';
-import '@morphis/component-meta/component-api';
+import '@eka-morphis/component-meta/component-api';
 
 <Meta of={Stories} />
 
@@ -123,7 +123,7 @@ import '@morphis/component-meta/component-api';
 `,
   [`${name}.stories.ts`]: `import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { ${className} } from './${name}';
-import { renderSnippet } from '@morphis/component-meta/snippet-story';
+import { renderSnippet } from '@eka-morphis/component-meta/snippet-story';
 
 const meta: Meta = {
   title: 'Components/${componentName}',
@@ -157,7 +157,7 @@ describe('${tag}', () => {
 `,
   [`package.json`]: `${JSON.stringify(
     {
-      name: `@morphis/${name}`,
+      name: `@eka-morphis/${name}`,
       version: '0.1.0',
       description: `Framework-agnostic ${name} Web Component by Morphis`,
       license: 'MIT',
@@ -176,7 +176,7 @@ describe('${tag}', () => {
       files: ['dist'],
       sideEffects: ['**/*.js'],
       publishConfig: { access: 'public' },
-      dependencies: { '@morphis/core': '^0.1.0' },
+      dependencies: { '@eka-morphis/core': '^0.1.0' },
     },
     null,
     2,
@@ -215,33 +215,33 @@ function wireComponent(name) {
   const wired = [
     insertBefore(
       '.storybook/main.ts',
-      "{ find: /^@morphis\\/react$/, replacement: root('packages/react/src/index.tsx') },",
-      `        { find: /^@morphis\\/${name}$/, replacement: root('packages/components/${name}/src/${name}.ts') },`,
-      `@morphis\\/${name}$`,
+      "{ find: /^@eka-morphis\\/react$/, replacement: root('packages/react/src/index.tsx') },",
+      `        { find: /^@eka-morphis\\/${name}$/, replacement: root('packages/components/${name}/src/${name}.ts') },`,
+      `@eka-morphis\\/${name}$`,
     ),
     insertBefore(
       'vite.config.ts',
-      "{ find: /^@morphis\\/react$/, replacement: resolve(root, 'packages/react/src/index.tsx') },",
-      `      { find: /^@morphis\\/${name}$/, replacement: resolve(root, 'packages/components/${name}/src/${name}.ts') },`,
-      `@morphis\\/${name}$`,
+      "{ find: /^@eka-morphis\\/react$/, replacement: resolve(root, 'packages/react/src/index.tsx') },",
+      `      { find: /^@eka-morphis\\/${name}$/, replacement: resolve(root, 'packages/components/${name}/src/${name}.ts') },`,
+      `@eka-morphis\\/${name}$`,
     ),
     insertBefore(
       'tsconfig.json',
-      '"@morphis/react": ["./packages/react/src/index.tsx"],',
-      `      "@morphis/${name}": ["./packages/components/${name}/src/${name}.ts"],`,
-      `"@morphis/${name}"`,
+      '"@eka-morphis/react": ["./packages/react/src/index.tsx"],',
+      `      "@eka-morphis/${name}": ["./packages/components/${name}/src/${name}.ts"],`,
+      `"@eka-morphis/${name}"`,
     ),
     insertBefore(
       'tsconfig.package.json',
-      '"@morphis/core": ["./packages/core/dist/index.d.ts"',
-      `      "@morphis/${name}": ["./packages/components/${name}/dist/types/${name}.d.ts", "./packages/components/${name}/src/${name}.ts"],`,
-      `"@morphis/${name}"`,
+      '"@eka-morphis/core": ["./packages/core/dist/index.d.ts"',
+      `      "@eka-morphis/${name}": ["./packages/components/${name}/dist/types/${name}.d.ts", "./packages/components/${name}/src/${name}.ts"],`,
+      `"@eka-morphis/${name}"`,
     ),
     insertBefore(
       'packages/components/package.json',
-      '"@morphis/select": "^0.1.0"',
-      `    "@morphis/${name}": "^0.1.0",`,
-      `"@morphis/${name}"`,
+      '"@eka-morphis/select": "^0.1.0"',
+      `    "@eka-morphis/${name}": "^0.1.0",`,
+      `"@eka-morphis/${name}"`,
     ),
   ];
   return wired.filter(Boolean).length;
@@ -253,8 +253,8 @@ for (const [file, content] of Object.entries(files)) {
 }
 
 const metaIndexPath = join(root, 'packages', 'components', 'src', 'index.ts');
-const importLine = `import '@morphis/${name}';`;
-const exportLine = `export * from '@morphis/${name}';`;
+const importLine = `import '@eka-morphis/${name}';`;
+const exportLine = `export * from '@eka-morphis/${name}';`;
 
 let index = readFileSync(metaIndexPath, 'utf8');
 if (!index.includes(importLine)) {

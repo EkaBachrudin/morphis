@@ -32,7 +32,7 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 ## Kemudahan (Developer Experience)
 
 - **Generator komponen** — `npm run gen -- component badge` langsung membuat paket
-  `@morphis/<nama>` (package.json, tsconfig, `src/{nama}.ts`, `.css`,
+  `@eka-morphis/<nama>` (package.json, tsconfig, `src/{nama}.ts`, `.css`,
   `.template.html`, `env.d.ts`, `.markup.html`, `.stories.ts`, `.test.ts`) dan
   mendaftarkannya di meta.
 - **Satu permukaan dokumentasi (Storybook)** — contoh live, controls, **tabel API
@@ -41,7 +41,7 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
   panduan, dan addon a11y.
 - **Snippet siap tempel** — tiap paket menghasilkan `<nama>.js` (ESM), `<nama>.iife.js`
   (script klasik untuk Drupal), dan `<nama>.markup.html` (markup untuk Twig).
-- **Wrapper React opsional** (`@morphis/react`) untuk React 16.8–18; React ≥19 tidak butuh wrapper.
+- **Wrapper React opsional** (`@eka-morphis/react`) untuk React 16.8–18; React ≥19 tidak butuh wrapper.
 - **Rantai kualitas** — Vitest + `@open-wc/testing-helpers` (unit + integrasi React/Vue),
   Playwright (visual regression + audit a11y axe), ESLint (TypeScript via `typescript-eslint`,
   CSS via `@eslint/css`), `tsc --noEmit`.
@@ -51,11 +51,11 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 
 | Paket | Isi |
 | --- | --- |
-| `@morphis/core` | Base class `MorphisElement` (extends `LitElement`) + helper (`define`, `emit`, `litStyles`) + re-export Lit (`html`, `css`, `nothing`, `property`, `state`, `repeat`) |
-| `@morphis/tokens` | `tokens.css` (design token `--ui-*`) |
-| `@morphis/button`, `@morphis/card`, `@morphis/input`, `@morphis/select`, … | Satu Web Component per paket (versi independen) |
-| `@morphis/react` | Wrapper tipis untuk React 16.8–18 |
-| `@morphis/components` | Meta-bundle: `morphis.js` (semua komponen) + `tokens.css` |
+| `@eka-morphis/core` | Base class `MorphisElement` (extends `LitElement`) + helper (`define`, `emit`, `litStyles`) + re-export Lit (`html`, `css`, `nothing`, `property`, `state`, `repeat`) |
+| `@eka-morphis/tokens` | `tokens.css` (design token `--ui-*`) |
+| `@eka-morphis/button`, `@eka-morphis/card`, `@eka-morphis/input`, `@eka-morphis/select`, … | Satu Web Component per paket (versi independen) |
+| `@eka-morphis/react` | Wrapper tipis untuk React 16.8–18 |
+| `@eka-morphis/components` | Meta-bundle: `morphis.js` (semua komponen) + `tokens.css` |
 
 ## Perintah
 
@@ -84,7 +84,7 @@ npm run release            # build + publish paket yang berubah
 
 ## Arsitektur singkat
 
-- **Base class** `MorphisElement` (`@morphis/core`): turunan `LitElement`
+- **Base class** `MorphisElement` (`@eka-morphis/core`): turunan `LitElement`
   (reactive properties + `render()` deklaratif dengan `html`), ditambah helper
   `emit` event.
 - **Enkapsulasi**: Shadow DOM (`mode: 'open'`) agar DevTools, testing, dan
@@ -99,8 +99,8 @@ npm run release            # build + publish paket yang berubah
 ### Meta-bundle (semua komponen sekaligus)
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@morphis/components/dist/tokens.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@morphis/components/dist/morphis.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/tokens.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@eka-morphis/components/dist/morphis.js"></script>
 
 <ui-button variant="primary">Simpan</ui-button>
 ```
@@ -108,8 +108,8 @@ npm run release            # build + publish paket yang berubah
 ### Per komponen (versi independen)
 
 ```js
-import '@morphis/button';   // mendaftarkan <ui-button>
-import '@morphis/tokens/tokens.css';
+import '@eka-morphis/button';   // mendaftarkan <ui-button>
+import '@eka-morphis/tokens/tokens.css';
 ```
 
 ### Drupal (comot native, tanpa CDN)
@@ -117,9 +117,9 @@ import '@morphis/tokens/tokens.css';
 Salin **tiga file** dari paket yang dipakai ke tema Drupal:
 
 ```
-@morphis/tokens/dist/tokens.css        -> libraries/morphis/tokens.css
-@morphis/button/dist/button.iife.js    -> libraries/morphis/button.iife.js
-@morphis/button/dist/button.html       -> markup siap tempel ke Twig
+@eka-morphis/tokens/dist/tokens.css        -> libraries/morphis/tokens.css
+@eka-morphis/button/dist/button.iife.js    -> libraries/morphis/button.iife.js
+@eka-morphis/button/dist/button.html       -> markup siap tempel ke Twig
 ```
 
 `*.iife.js` adalah script klasik (tidak butuh `type="module"`); `*.js` ESM
@@ -159,8 +159,8 @@ shadow — **tanpa rebuild**.
 ## React wrapper (opsional, untuk React <19)
 
 ```tsx
-import { Button, Input, Card } from '@morphis/react';
-import '@morphis/tokens/tokens.css';
+import { Button, Input, Card } from '@eka-morphis/react';
+import '@eka-morphis/tokens/tokens.css';
 
 <Button variant="primary" onUiClick={(e) => console.log(e.detail)}>Simpan</Button>
 ```
@@ -186,7 +186,7 @@ Satu permukaan dokumentasi (**Storybook**), satu sumber data
 ## Menambah komponen
 
 ```bash
-npm run gen -- component <nama>   # buat paket @morphis/<nama> + daftarkan di meta
+npm run gen -- component <nama>   # buat paket @eka-morphis/<nama> + daftarkan di meta
 npm install                       # link workspace
 ```
 
@@ -223,7 +223,7 @@ yang bisa merender HTML. Yang ada hanyalah **catatan integrasi** kecil per frame
 | --- | --- | --- |
 | HTML / Twig / Drupal | Langsung | Import `morphis.js` + `tokens.css`; theming via `--ui-*` / `::part()` |
 | React ≥19 | Langsung | Property & event custom element deklaratif |
-| React 16.8–18 | Langsung + wrapper | Atribut string; custom event via `ref` atau `@morphis/react` |
+| React 16.8–18 | Langsung + wrapper | Atribut string; custom event via `ref` atau `@eka-morphis/react` |
 | Angular | Langsung | `CUSTOM_ELEMENTS_SCHEMA`; import sekali di `main.ts` |
 | Vue 3 | Langsung | `compilerOptions.isCustomElement` untuk prefix `ui-` |
 | Vue 2 | Langsung (opsional) | Gunakan via tag HTML; hindari binding Vue-specific |
@@ -239,7 +239,7 @@ Rilis diatur dengan [Changesets](https://github.com/changesets/changesets):
 npm run changeset          # pilih paket + jenis bump, tulis ringkasan
 npm run version-packages   # naikkan versi HANYA paket yang berubah
 npm run release            # build + publish paket yang berubah
-npm pack --dry-run -w @morphis/button   # cek isi satu paket
+npm pack --dry-run -w @eka-morphis/button   # cek isi satu paket
 ```
 
 Paket yang tidak berubah tidak di-publish dan versinya tetap. CI menjalankan
@@ -251,7 +251,7 @@ Storybook → **Panduan/Publikasi**).
 ## Catatan teknis penting
 
 - **Tailwind v4 `@property` tidak berlaku di dalam Shadow DOM**
-  (tailwindlabs/tailwindcss#15005). Helper `litStyles()` (`@morphis/core`)
+  (tailwindlabs/tailwindcss#15005). Helper `litStyles()` (`@eka-morphis/core`)
   mengekstrak rule `@property` dari tiap stylesheet komponen dan mengangkatnya
   ke `document.adoptedStyleSheets` sekali, sehingga utility `ring`, `shadow`,
   `gradient`, `translate`, dll. tetap bekerja.
@@ -276,4 +276,4 @@ Storybook → **Panduan/Publikasi**).
   `:not(:defined)`, dan define-on-client.
 - **SSR + Shadow DOM** tergolong rumit, sehingga SSR tidak menjadi target utama.
 - **React <19** tidak dapat bind custom event secara deklaratif → gunakan `ref`
-  atau wrapper `@morphis/react`.
+  atau wrapper `@eka-morphis/react`.

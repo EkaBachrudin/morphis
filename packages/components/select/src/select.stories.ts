@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UiSelect, type SelectOption } from './select';
-import { renderSnippet } from '@morphis/component-meta/snippet-story';
+import { renderSnippet } from '@eka-morphis/component-meta/snippet-story';
 
 const OPTIONS: SelectOption[] = [
   { value: 'native', label: 'Native HTML' },

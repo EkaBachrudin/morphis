@@ -6,7 +6,7 @@ versioning dan publikasi **independen per paket**.
 ## Alur
 
 1. Setiap perubahan yang perlu dirilis: jalankan `npm run changeset`, pilih paket
-   yang berubah (mis. `@morphis/card`) dan jenis bump (patch/minor/major), lalu
+   yang berubah (mis. `@eka-morphis/card`) dan jenis bump (patch/minor/major), lalu
    tulis ringkasan.
 2. Commit file `.changeset/*.md` bersama perubahan kode.
 3. Saat siap rilis: `npm run version-packages` menaikkan versi **hanya paket yang

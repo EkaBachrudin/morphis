@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UiInput } from './input';
-import { renderSnippet } from '@morphis/component-meta/snippet-story';
+import { renderSnippet } from '@eka-morphis/component-meta/snippet-story';
 
 const meta: Meta = {
   title: 'Components/Input',

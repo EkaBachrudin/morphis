@@ -1,5 +1,5 @@
 {
-  "name": "@morphis/components",
+  "name": "@eka-morphis/components",
   "version": "0.1.0",
   "description": "All Morphis Web Components in one bundle",
   "license": "MIT",
@@ -25,13 +25,19 @@
     "**/*.js"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eka-morphis/morphis.git",
+    "directory": "packages/components"
   },
   "dependencies": {
-    "@morphis/button": "^0.1.0",
-    "@morphis/card": "^0.1.0",
-    "@morphis/input": "^0.1.0",
-    "@morphis/other-offer": "^0.1.0",
-    "@morphis/select": "^0.1.0"
+    "@eka-morphis/button": "^0.1.0",
+    "@eka-morphis/card": "^0.1.0",
+    "@eka-morphis/input": "^0.1.0",
+    "@eka-morphis/other-offer": "^0.1.0",
+    "@eka-morphis/select": "^0.1.0"
   }
 }

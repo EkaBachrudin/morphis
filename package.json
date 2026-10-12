@@ -15,8 +15,8 @@
   "scripts": {
     "clean": "rm -rf custom-elements.json downloads packages/*/dist packages/components/dist packages/components/*/dist",
     "build": "npm run clean && npm run build:tokens && npm run build:core && npm run build:components && npm run build:types && npm run build:cem && npm run build:export",
-    "build:core": "npm run build -w @morphis/core",
-    "build:tokens": "npm run build -w @morphis/tokens",
+    "build:core": "npm run build -w @eka-morphis/core",
+    "build:tokens": "npm run build -w @eka-morphis/tokens",
     "build:components": "node scripts/build-components.mjs",
     "build:downloads": "node scripts/build-downloads.mjs",
     "build:types": "node scripts/build-types.mjs",

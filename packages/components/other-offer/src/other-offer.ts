@@ -4,7 +4,7 @@ import {
   property,
   litStyles,
   type TemplateResult,
-} from '@morphis/core';
+} from '@eka-morphis/core';
 import style from './other-offer.css?inline';
 import otherOfferTemplate from './other-offer.template.html?html';
 

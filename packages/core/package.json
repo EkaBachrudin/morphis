@@ -1,5 +1,5 @@
 {
-  "name": "@morphis/core",
+  "name": "@eka-morphis/core",
   "version": "0.1.0",
   "description": "Base class and helpers for Morphis Web Components",
   "license": "MIT",
@@ -18,7 +18,13 @@
     "dist"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eka-morphis/morphis.git",
+    "directory": "packages/core"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

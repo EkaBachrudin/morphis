@@ -7,7 +7,7 @@ import {
   litStyles,
   type PropertyValues,
   type TemplateResult,
-} from '@morphis/core';
+} from '@eka-morphis/core';
 import style from './select.css?inline';
 import selectTemplate from './select.template.html?html';
 

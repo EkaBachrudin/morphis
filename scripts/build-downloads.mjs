@@ -9,12 +9,12 @@ import { litTemplate } from './vite-plugin-lit-template.mjs';
 const root = resolve(import.meta.dirname, '..');
 
 const aliases = {
-  '@morphis/core': resolve(root, 'packages/core/src/index.ts'),
-  '@morphis/button': resolve(root, 'packages/components/button/src/button.ts'),
-  '@morphis/card': resolve(root, 'packages/components/card/src/card.ts'),
-  '@morphis/input': resolve(root, 'packages/components/input/src/input.ts'),
-  '@morphis/select': resolve(root, 'packages/components/select/src/select.ts'),
-  '@morphis/other-offer': resolve(root, 'packages/components/other-offer/src/other-offer.ts'),
+  '@eka-morphis/core': resolve(root, 'packages/core/src/index.ts'),
+  '@eka-morphis/button': resolve(root, 'packages/components/button/src/button.ts'),
+  '@eka-morphis/card': resolve(root, 'packages/components/card/src/card.ts'),
+  '@eka-morphis/input': resolve(root, 'packages/components/input/src/input.ts'),
+  '@eka-morphis/select': resolve(root, 'packages/components/select/src/select.ts'),
+  '@eka-morphis/other-offer': resolve(root, 'packages/components/other-offer/src/other-offer.ts'),
 };
 
 const tokensCss = resolve(root, 'packages/tokens/dist/tokens.css');

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { UiOtherOffer, type OtherOfferCard } from './other-offer';
-import { renderSnippet } from '@morphis/component-meta/snippet-story';
+import { renderSnippet } from '@eka-morphis/component-meta/snippet-story';
 
 const CARDS: OtherOfferCard[] = [
   {

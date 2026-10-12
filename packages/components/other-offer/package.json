@@ -1,5 +1,5 @@
 {
-  "name": "@morphis/other-offer",
+  "name": "@eka-morphis/other-offer",
   "version": "0.1.0",
   "description": "Framework-agnostic other-offer Web Component by Morphis",
   "license": "MIT",
@@ -22,9 +22,15 @@
     "**/*.js"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eka-morphis/morphis.git",
+    "directory": "packages/components/other-offer"
   },
   "dependencies": {
-    "@morphis/core": "^0.1.0"
+    "@eka-morphis/core": "^0.1.0"
   }
 }

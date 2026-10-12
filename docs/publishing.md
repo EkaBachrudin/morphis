@@ -1,13 +1,13 @@
 # Panduan Publikasi (Changesets)
 
 Repositori ini memakai **npm workspaces** + **Changesets** untuk mem-publish
-**per paket dengan versi independen**. Memperbaiki `@morphis/card` tidak memaksa
-menaikkan versi `@morphis/button`.
+**per paket dengan versi independen**. Memperbaiki `@eka-morphis/card` tidak memaksa
+menaikkan versi `@eka-morphis/button`.
 
 ## Prasyarat
 
 - Node ≥ 22.
-- Akses scope npm `@morphis`; semua paket sudah
+- Akses scope npm `@eka-morphis`; semua paket sudah
   `"publishConfig": { "access": "public" }`.
 - Auth: lokal `npm login`; CI butuh secret **`NPM_TOKEN`**.
 
@@ -40,7 +40,7 @@ Contoh file hasil (`.changeset/<acak>.md`):
 
 ```md
 ---
-"@morphis/card": patch
+"@eka-morphis/card": patch
 ---
 
 fix: perbaiki padding card saat header kosong
@@ -49,19 +49,19 @@ fix: perbaiki padding card saat header kosong
 Non-interaktif:
 
 ```bash
-npx changeset --patch @morphis/card -m "fix: padding card"
-npx changeset --minor @morphis/badge -m "feat: komponen badge"
+npx changeset --patch @eka-morphis/card -m "fix: padding card"
+npx changeset --minor @eka-morphis/badge -m "feat: komponen badge"
 ```
 
 Perubahan yang tidak perlu rilis: `npx changeset add --empty`.
 
 > Jika bump sebuah dependensi membuat rentang di paket lain tidak lagi memenuhi
-> (mis. meta `@morphis/components` `"@morphis/x": "^0.1.0"` lalu x → 0.2.0),
+> (mis. meta `@eka-morphis/components` `"@eka-morphis/x": "^0.1.0"` lalu x → 0.2.0),
 > Changesets otomatis ikut menaikkan paket dependen itu.
 
-> **Catatan Lit**: `@morphis/core` mendeklarasikan `lit` sebagai `dependency`.
+> **Catatan Lit**: `@eka-morphis/core` mendeklarasikan `lit` sebagai `dependency`.
 > Saat merilis perubahan fondasi (mis. migrasi ke Lit), buat changeset untuk
-> `@morphis/core` **dan** paket komponen yang bergantung padanya — Changesets
+> `@eka-morphis/core` **dan** paket komponen yang bergantung padanya — Changesets
 > akan ikut menaikkan paket dependen secara otomatis.
 
 ## 2. (Opsional) Preview
@@ -88,7 +88,7 @@ git add -A && git commit -m "chore: version packages"
 `= npm run build && changeset publish`.
 
 - `changeset publish` (tanpa argumen) hanya mem-publish paket yang **versinya
-  belum ada di npm**, lalu membuat git tag (mis. `@morphis/card@0.1.1`).
+  belum ada di npm**, lalu membuat git tag (mis. `@eka-morphis/card@0.1.1`).
 - **Catatan:** `npm run build` membangun **semua** paket (build global), bukan
   hanya yang berubah — hanya *publish* yang ter-scope.
 
@@ -98,12 +98,12 @@ npm run release
 
 ## Paket baru (publish pertama)
 
-- `npm run gen -- component badge` membuat `@morphis/badge` versi `0.1.0`.
+- `npm run gen -- component badge` membuat `@eka-morphis/badge` versi `0.1.0`.
 - `changeset publish` menerbitkan versi yang belum ada di registry, jadi
   `0.1.0` bisa langsung terbit.
 - Bila ingin rilis pertama lewat bump: set versi paket ke `0.0.0` lalu beri
   changeset `minor` → `0.1.0`.
-- Pastikan scope `@morphis` terdaftar dan Anda punya hak publish.
+- Pastikan scope `@eka-morphis` terdaftar dan Anda punya hak publish.
 
 ## Publikasi via CI (disarankan)
 
@@ -130,13 +130,13 @@ npx changeset pre exit
 - **Salah publish** — `npm deprecate <pkg>@<version> "pesan"`; `npm unpublish`
   hanya dalam 72 jam dan hindari untuk versi yang sudah dipakai.
 - **2FA** — siapkan OTP; CI pakai automation token.
-- **Scope/izin** — pastikan `@morphis` milik akun/org dan token punya hak
+- **Scope/izin** — pastikan `@eka-morphis` milik akun/org dan token punya hak
   `publish`.
 
 ## Checklist rilis
 
 - [ ] `npm run typecheck`, `npm test`, `npm run build` hijau.
-- [ ] `npm pack --dry-run -w @morphis/<pkg>` berisi `dist/` saja.
+- [ ] `npm pack --dry-run -w @eka-morphis/<pkg>` berisi `dist/` saja.
 - [ ] Changeset dibuat & di-commit.
 - [ ] `npm run version-packages` dijalankan.
 - [ ] `npm run release` (atau PR "Version Packages" di-merge).

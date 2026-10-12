@@ -17,15 +17,15 @@
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "paths": {
-      "@morphis/core": ["./packages/core/src/index.ts"],
-      "@morphis/button": ["./packages/components/button/src/button.ts"],
-      "@morphis/card": ["./packages/components/card/src/card.ts"],
-      "@morphis/input": ["./packages/components/input/src/input.ts"],
-      "@morphis/select": ["./packages/components/select/src/select.ts"],
-      "@morphis/other-offer": ["./packages/components/other-offer/src/other-offer.ts"],
-      "@morphis/react": ["./packages/react/src/index.tsx"],
-      "@morphis/component-meta": ["./src/component-meta/index.ts"],
-      "@morphis/component-meta/*": ["./src/component-meta/*"]
+      "@eka-morphis/core": ["./packages/core/src/index.ts"],
+      "@eka-morphis/button": ["./packages/components/button/src/button.ts"],
+      "@eka-morphis/card": ["./packages/components/card/src/card.ts"],
+      "@eka-morphis/input": ["./packages/components/input/src/input.ts"],
+      "@eka-morphis/select": ["./packages/components/select/src/select.ts"],
+      "@eka-morphis/other-offer": ["./packages/components/other-offer/src/other-offer.ts"],
+      "@eka-morphis/react": ["./packages/react/src/index.tsx"],
+      "@eka-morphis/component-meta": ["./src/component-meta/index.ts"],
+      "@eka-morphis/component-meta/*": ["./src/component-meta/*"]
     }
   },
   "include": ["src", "packages", "vite.config.ts"]

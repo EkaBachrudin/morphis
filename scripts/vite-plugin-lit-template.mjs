@@ -19,7 +19,7 @@ import { readFileSync } from 'node:fs';
  * dengan `ctx` sebagai objek yang dioper komponen. Backtick/backslash literal
  * ditulis seperti di TypeScript (`` \` ``, `\\`).
  *
- * Helper `html`, `nothing`, dan `repeat` dari `@morphis/core` tersedia di dalam
+ * Helper `html`, `nothing`, dan `repeat` dari `@eka-morphis/core` tersedia di dalam
  * template tanpa import tambahan.
  *
  * Catatan: karena template berada di file terpisah, isinya tidak
@@ -51,7 +51,7 @@ export function litTemplate() {
       this.addWatchFile(file);
 
       return {
-        code: `import { html, nothing, repeat } from '@morphis/core';\nexport default (ctx) => html\`${source}\`;\n`,
+        code: `import { html, nothing, repeat } from '@eka-morphis/core';\nexport default (ctx) => html\`${source}\`;\n`,
         map: null,
       };
     },
