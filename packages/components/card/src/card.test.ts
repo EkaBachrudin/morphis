@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fixture, html } from '@open-wc/testing';
+import { fixture, html } from '@open-wc/testing-helpers';
 import { UiCard } from './card';
 
 describe('ui-card', () => {

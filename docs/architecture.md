@@ -332,7 +332,7 @@ Output:
     "build:components": "vite build",
     "build:tokens": "node scripts/build-tokens.mjs",
     "build:types": "tsc -p tsconfig.build.json",
-    "build:cem": "cem analyze",
+    "build:cem": "node scripts/build-cem.mjs",
     "build:export": "node scripts/build-export.mjs",
     "dev": "vite",
     "typecheck": "tsc --noEmit",
@@ -346,7 +346,8 @@ Output:
     "tailwindcss": "^4.0.0",
     "lit": "^3.0.0",
     "style-dictionary": "^5.0.0",
-    "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@lit-labs/analyzer": "^0.14.0",
+    "@lit-labs/gen-manifest": "^0.3.6",
     "storybook": "^10.0.0",
     "@storybook/web-components-vite": "^10.0.0"
   }
@@ -357,10 +358,13 @@ Output:
 > cukup bergantung pada `@morphis/core`. Build ESM menge-*external* `lit` &
 > `@morphis/core`, sedangkan varian IIFE dan meta-bundle membundel keduanya.
 
-> `cem analyze` dikonfigurasi dengan **`litelement: true`** (`custom-elements-manifest.config.mjs`)
-> karena sumbernya Lit. Plugin Lit membaca `@property` untuk **Attributes**,
-> serta template `html` untuk **Slots**/**CSS Parts**; anotasi JSDoc `@slot`,
-> `@csspart`, `@cssprop`, dan `@fires` melengkapi sisanya.
+> `build:cem` memakai **`@lit-labs/analyzer`** (Lit-native) lewat
+> `scripts/build-cem.mjs`, dengan konfigurasi TypeScript di `tsconfig.cem.json`.
+> Analyzer membaca `@property` untuk **Attributes**, serta mengekstrak
+> **Slots**/**CSS Parts**/**CSS Properties**/**Events** dari anotasi JSDoc
+> (`@slot`, `@csspart`, `@cssprop`, `@fires`); nama tag diambil dari `@element`.
+> Pendekatan ini menghindari `globby`/`chokidar` (dan transitif `braces`) yang
+> dibawa `@custom-elements-manifest/analyzer`.
 
 ### 6.3 Base class `MorphisElement`
 
@@ -438,8 +442,8 @@ export { litStyles } from './sheet';
 
 - Storybook dengan `@storybook/web-components-vite`; story menampilkan props,
   event, slot, dan `part` yang tersedia.
-- `cem analyze` menghasilkan `custom-elements.json` untuk auto API docs, dengan
-  `litelement: true` sehingga **Attributes** diambil otomatis dari `@property`.
+- `scripts/build-cem.mjs` (`@lit-labs/analyzer`) menghasilkan `custom-elements.json`
+  untuk auto API docs, dengan **Attributes** diambil otomatis dari `@property`.
 - `.storybook/preview.ts` memuat manifest itu dengan
   `setCustomElementsManifest(manifest)` sehingga panel docs/controls terisi
   otomatis, dan meng-import `dist/tokens.css` + `src/index.ts`.
@@ -702,13 +706,13 @@ mencegah duplikasi logika data/snippet.
 | Angular menolak tag tak dikenal | `CUSTOM_ELEMENTS_SCHEMA` |
 | Preflight Tailwind terduplikasi per komponen | Jangan inject preflight ke shadow; hanya style komponen |
 | `@apply` gagal di entry terpisah | Wajib `@reference "../../styles/base.css"`; rule BEM di `@layer components` |
-| CSS nesting tak bisa `&--modifier` | Tulis rule BEM terpisah; enforce via stylelint |
+| CSS nesting tak bisa `&--modifier` | Tulis rule BEM terpisah; enforce via ESLint CSS (`@eslint/css`) |
 | `customElements.define` dobel | `define()` menjaga dengan `customElements.get` |
-| CEM tidak membaca getter/setter kompleks | `litelement: true` membaca `@property` otomatis untuk **Attributes**; anotasi `@slot`/`@csspart`/`@cssprop`/`@fires` melengkapi slot/part/event. |
+| CEM tidak membaca getter/setter kompleks | `@lit-labs/analyzer` membaca `@property` otomatis untuk **Attributes**; anotasi `@slot`/`@csspart`/`@cssprop`/`@fires` melengkapi slot/part/event. |
 | `useDefineForClassFields` meng-override accessor Lit | Set `false` di tsconfig (proyek memakai decorator legacy Lit). |
 | `@property` Tailwind diabaikan di Shadow DOM | `litStyles()` mengangkat rule ke `document.adoptedStyleSheets` sekali (lihat §6.3). |
 | Duplikasi runtime Lit di banyak entry | ESM menge-*external* `lit` + `@morphis/core`; IIFE/meta-bundle membundel (lihat §8). |
-| Update Lit asinkron → assertion test terlalu awal | Tunggu `await el.updateComplete` (atau `elementUpdated` dari `@open-wc/testing`). |
+| Update Lit asinkron → assertion test terlalu awal | Tunggu `await el.updateComplete` (atau `elementUpdated` dari `@open-wc/testing-helpers`). |
 | Slot tanpa konten merusak a11y | Slot default + fallback; uji dengan addon a11y |
 | Bundel membesar (Lit ±5–6 KB gzip) | Runtime di-*share* lintas komponen; entry per komponen tetap tree-shakable; audit ukuran di CI |
 
@@ -721,7 +725,7 @@ mencegah duplikasi logika data/snippet.
 - `src/tokens` (Style Dictionary) → `dist/tokens.css`.
 - `src/core` (`MorphisElement`, `sheet`, `emit`, `define`). *Catatan: `interpolate` awalnya dipakai di iterasi vanilla dan dihapus pada Fase 5 (Lit).*
 - `src/styles/base.css` (konteks `@apply` + blok `@theme`, tidak di-ship global).
-- Lint (stylelint + eslint), CI dasar.
+- Lint (eslint + `@eslint/css`), CI dasar.
 
 **Fase 1 — PoC 3 komponen**
 - `button`, `input`, `card` sebagai custom element + Shadow DOM (awalnya vanilla, kini berbasis Lit).

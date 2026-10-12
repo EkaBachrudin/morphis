@@ -41,8 +41,9 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 - **Snippet siap tempel** — tiap paket menghasilkan `<nama>.js` (ESM), `<nama>.iife.js`
   (script klasik untuk Drupal), dan `<nama>.markup.html` (markup untuk Twig).
 - **Wrapper React opsional** (`@morphis/react`) untuk React 16.8–18; React ≥19 tidak butuh wrapper.
-- **Rantai kualitas** — Vitest + `@open-wc/testing` (unit + integrasi React/Vue),
-  Playwright (visual regression + audit a11y axe), ESLint + Stylelint, `tsc --noEmit`.
+- **Rantai kualitas** — Vitest + `@open-wc/testing-helpers` (unit + integrasi React/Vue),
+  Playwright (visual regression + audit a11y axe), ESLint (TypeScript via `typescript-eslint`,
+  CSS via `@eslint/css`), `tsc --noEmit`.
 - **Rilis per paket** — Changesets dengan semver independen + CI otomatis.
 
 ## Paket
@@ -60,14 +61,16 @@ Lihat [`docs/architecture.md`](docs/architecture.md) untuk arsitektur lengkap.
 ```bash
 npm install
 npm run build              # tokens + core + semua paket komponen + types + CEM
-npm test                   # Vitest + @open-wc/testing (unit + integrasi React/Vue)
+npm test                   # Vitest + @open-wc/testing-helpers (unit + integrasi React/Vue)
 npm run test:e2e           # Playwright: visual regression + audit a11y (axe)
 npm run test:e2e:update    # regenerasi baseline screenshot
 npm run storybook          # Storybook (workbench + dokumentasi lengkap) di :6006
 npm run build-storybook    # build Storybook statis -> storybook-static/
 npm run typecheck          # tsc --noEmit
 npm run lint               # ESLint
-npm run lint:styles        # Stylelint
+npm run lint:styles        # ESLint untuk CSS (via @eslint/css)
+npm run audit:prod         # npm audit khusus produksi (devDependencies diabaikan)
+npm run audit:ci           # gate audit CI (gagal hanya pada severity critical)
 npm run gen -- component badge   # scaffold paket komponen baru
 npm run changeset          # catat perubahan untuk rilis
 npm run version-packages   # naikkan versi paket yang berubah
@@ -253,6 +256,15 @@ Storybook → **Panduan/Publikasi**).
   tidak pernah di markup. Markup hanya berisi struktur + BEM + `<slot>`.
 - Setiap file CSS komponen wajib diawali
   `@reference "../../../../src/styles/base.css"`.
+- **Audit dependency**: `npm run audit:prod` dan `npm run audit:ci` melaporkan
+  **0 vulnerability**. Rantai `braces` (GHSA-vfj7-8cjw-p6xm) yang sebelumnya
+  masuk lewat tooling telah dihilangkan dengan mengganti analyzer ke
+  `@lit-labs/analyzer` dan linter CSS ke `@eslint/css`.
+- **Install script dependency** (npm ≥ 11.19 memblokirnya secara default):
+  `esbuild` diizinkan lewat field `allowScripts` di `package.json`
+  (`"esbuild": true`, name-only agar tetap berlaku saat versinya naik). Untuk
+  merawat daftar ini: `npm install-scripts ls` (lihat yang belum di-approve) dan
+  `npm install-scripts prune` (hapus entri basi).
 
 ## Catatan & batasan
 

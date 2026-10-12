@@ -132,7 +132,7 @@ export const Snippet: Story = {
 };
 `,
   [`${name}.test.ts`]: `import { describe, it, expect } from 'vitest';
-import { fixture, html } from '@open-wc/testing';
+import { fixture, html } from '@open-wc/testing-helpers';
 import { ${className} } from './${name}';
 
 describe('${tag}', () => {

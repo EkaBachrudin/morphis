@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fixture, html, elementUpdated } from '@open-wc/testing';
+import { fixture, html, elementUpdated } from '@open-wc/testing-helpers';
 import { UiButton } from './button';
 
 describe('ui-button', () => {
