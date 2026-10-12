@@ -79,6 +79,25 @@ npx changeset --minor @eka-morphis/badge -m "feat: komponen badge"
 
 Perubahan yang tidak perlu rilis: `npx changeset add --empty`.
 
+### Jika changeset dibuat setelah commit + push
+
+`npm run changeset` boleh dijalankan **setelah** perubahan kode di-commit & push.
+Urutannya fleksibel; yang wajib hanya: changeset harus ada **sebelum**
+`npm run version-packages`.
+
+Perbedaannya bila dilakukan setelah push:
+
+- `changeset add` mendeteksi paket berubah dari `git diff` terhadap `baseBranch`
+  (`main`). Bila kode sudah ter-push ke `main`, diff-nya kosong sehingga paket
+  **tidak** otomatis ditandai — pilih paket + jenis bump **secara manual** di prompt.
+- File `.changeset/*.md` yang baru dibuat menjadi **commit terpisah**; commit lalu
+  push seperti biasa (tidak masalah terpisah dari commit kode).
+- File changeset tidak wajib di-push untuk bisa di-`version-packages` (perintah itu
+  membaca working tree), tetapi tetap dianjurkan di-commit agar riwayat/CHANGELOG rapi.
+
+Urutan yang disarankan tetap: perubahan kode → `changeset` → commit + push (kode +
+changeset bersama).
+
 > Jika bump sebuah dependensi membuat rentang di paket lain tidak lagi memenuhi
 > (mis. meta `@eka-morphis/components` `"@eka-morphis/x": "^0.1.0"` lalu x → 0.2.0),
 > Changesets otomatis ikut menaikkan paket dependen itu.

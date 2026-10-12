@@ -1,6 +1,6 @@
 {
   "name": "@eka-morphis/tokens",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Design tokens (CSS custom properties) for Morphis components",
   "license": "MIT",
   "author": "Morphis",
