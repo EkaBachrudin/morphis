@@ -16,6 +16,13 @@
     "useDefineForClassFields": false,
     "declaration": true,
     "declarationMap": true,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "paths": {
+      "@morphis/core": ["./packages/core/dist/index.d.ts", "./packages/core/src/index.ts"],
+      "@morphis/button": ["./packages/components/button/dist/types/button.d.ts", "./packages/components/button/src/button.ts"],
+      "@morphis/card": ["./packages/components/card/dist/types/card.d.ts", "./packages/components/card/src/card.ts"],
+      "@morphis/input": ["./packages/components/input/dist/types/input.d.ts", "./packages/components/input/src/input.ts"],
+      "@morphis/select": ["./packages/components/select/dist/types/select.d.ts", "./packages/components/select/src/select.ts"]
+    }
   }
 }

@@ -67,7 +67,7 @@ const files = {
   export default template;
 }
 `,
-  [`${name}.ts`]: `import { MorphisElement, define, html, litStyles, property } from '@morphis/core';
+  [`${name}.ts`]: `import { MorphisElement, define, litStyles, property } from '@morphis/core';
 import style from './${name}.css?inline';
 import template from './${name}.template.html?html';
 
@@ -232,6 +232,12 @@ function wireComponent(name) {
       `"@morphis/${name}"`,
     ),
     insertBefore(
+      'tsconfig.package.json',
+      '"@morphis/core": ["./packages/core/dist/index.d.ts"',
+      `      "@morphis/${name}": ["./packages/components/${name}/dist/types/${name}.d.ts", "./packages/components/${name}/src/${name}.ts"],`,
+      `"@morphis/${name}"`,
+    ),
+    insertBefore(
       'packages/components/package.json',
       '"@morphis/select": "^0.1.0"',
       `    "@morphis/${name}": "^0.1.0",`,
@@ -271,5 +277,5 @@ for (const file of Object.keys(files)) {
   console.log(`  - ${target}${file}`);
 }
 console.log(`Terdaftar di packages/components/src/index.ts sebagai <${tag}>.`);
-console.log(`Wiring alias ke ${wired}/4 file (.storybook/main.ts, vite.config.ts, tsconfig.json, packages/components/package.json).`);
+console.log(`Wiring alias ke ${wired}/5 file (.storybook/main.ts, vite.config.ts, tsconfig.json, tsconfig.package.json, packages/components/package.json).`);
 console.log('Langkah berikut: npm install (link workspace) lalu npm run build.');
